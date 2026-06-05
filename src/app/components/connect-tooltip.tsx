@@ -29,7 +29,7 @@ export function ConnectTooltip() {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1 text-[13px] text-[#3b82f6] hover:text-[#2563eb] transition-colors"
       >
-        <span>{open ? "Close" : "Connect with me"}</span>
+        <span>{open ? "Close" : "Find me on the internet"}</span>
         <ChevronDown
           className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
