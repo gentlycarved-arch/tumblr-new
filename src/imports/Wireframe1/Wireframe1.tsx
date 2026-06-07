@@ -212,9 +212,9 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
 function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
   const [hover, setHover] = useState(false);
 
-  const TRACK_W = 52;
-  const TRACK_H = 28;
-  const KNOB = 22;
+  const TRACK_W = 80;
+  const TRACK_H = 42;
+  const KNOB = 34;
   const PAD = (TRACK_H - KNOB) / 2;
   const knobX = darkMode ? TRACK_W - KNOB - PAD : PAD;
 
