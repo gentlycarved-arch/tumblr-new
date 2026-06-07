@@ -438,32 +438,30 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           opacity: mobileToast ? 1 : 0,
           transition: "opacity 400ms ease",
           zIndex: 100,
-          width: 240,
+          background: "transparent",
+          filter: "drop-shadow(0 3px 10px rgba(0,0,0,0.18))",
         }}
       >
-        <div style={{ filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.18))" }}>
-          <div style={{
-            width: 14, height: 14,
-            background: "#f0eeeb",
-            transform: "rotate(45deg)",
-            margin: "0 auto",
-            marginBottom: -7,
-            position: "relative",
-            zIndex: 0,
-            borderRadius: 2,
-          }} />
-          <div
-            className="px-4 py-3 rounded-[12px] text-[15px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
-            style={{
-              position: "relative",
-              zIndex: 1,
-              background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
-            }}
-          >
+        {/* Arrow */}
+        <div style={{
+          width: 14, height: 14,
+          background: "#f5f3f0",
+          transform: "rotate(45deg)",
+          margin: "0 auto",
+          marginBottom: -7,
+          borderRadius: 2,
+        }} />
+        {/* Card */}
+        <div
+          className="px-4 py-3 rounded-[12px] text-[15px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
+          style={{
+            width: 240,
+            background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+          }}
+        >
             {darkMode
               ? "Dark mode changes to darker coloured images."
               : "Light mode changes to lighter coloured images."}
-          </div>
         </div>
       </div>
     </div>
