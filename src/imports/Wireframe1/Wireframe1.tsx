@@ -1,8 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { useArenaSlideshow } from "../../hooks/useArenaSlideshow";
+
+const PHRASES = [
+  "& Daydreamer",
+  "& Drip Coffee Drinker",
+  "& Watching Mad Men",
+  "& Film Photographer",
+];
+
+const TYPE_SPEED = 75;
+const BACKSPACE_SPEED = 45;
+const PAUSE_MS = 2200;
+
+function commonPrefixLen(a: string, b: string) {
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) i++;
+  return i;
+}
+
+function useTypewriter() {
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [displayed, setDisplayed] = useState(PHRASES[0]);
+  const [phase, setPhase] = useState<"pausing" | "deleting" | "typing">("pausing");
+
+  useEffect(() => {
+    const current = PHRASES[phraseIdx];
+    const next = PHRASES[(phraseIdx + 1) % PHRASES.length];
+    const stopAt = commonPrefixLen(current, next);
+
+    if (phase === "pausing") {
+      const t = setTimeout(() => setPhase("deleting"), PAUSE_MS);
+      return () => clearTimeout(t);
+    }
+
+    if (phase === "deleting") {
+      if (displayed.length > stopAt) {
+        const t = setTimeout(() => setDisplayed((d) => d.slice(0, -1)), BACKSPACE_SPEED);
+        return () => clearTimeout(t);
+      } else {
+        setPhraseIdx((i) => (i + 1) % PHRASES.length);
+        setPhase("typing");
+      }
+    }
+
+    if (phase === "typing") {
+      if (displayed.length < next.length) {
+        const t = setTimeout(() => setDisplayed(next.slice(0, displayed.length + 1)), TYPE_SPEED);
+        return () => clearTimeout(t);
+      } else {
+        setPhase("pausing");
+      }
+    }
+  }, [phase, displayed, phraseIdx]);
+
+  const pausing = phase === "pausing";
+  return { displayed, pausing };
+}
 
 function Group() {
   return (
@@ -77,6 +133,19 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   );
 }
 
+function Typewriter() {
+  const { displayed, pausing } = useTypewriter();
+  return (
+    <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]">
+      {displayed}
+      <span
+        className="inline-block w-[2px] h-[22px] max-sm:h-[18px] bg-[#afacac] ml-[2px] align-[-4px]"
+        style={{ animation: pausing ? "blink 1s steps(1) infinite" : "none", opacity: pausing ? undefined : 1 }}
+      />
+    </p>
+  );
+}
+
 export default function Wireframe() {
   const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage);
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -128,9 +197,7 @@ export default function Wireframe() {
         </div>
         <div className="absolute h-px left-[37.68%] right-[37.62%] top-[52%] max-sm:left-[10%] max-sm:right-[10%] max-sm:top-[51%] bg-[#CAC5C5]" />
         <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[47.8%] max-sm:top-[46%] tracking-[-0.44px]">Product Designer</p>
-        <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]">
-          & Daydreamer<span className="inline-block w-[2px] h-[22px] max-sm:h-[18px] bg-[#afacac] ml-[2px] align-[-4px] animate-[blink_1s_steps(1)_infinite]" />
-        </p>
+        <Typewriter />
         <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} />
       </div>
 
