@@ -285,11 +285,6 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
             strokeWidth="1.5"
             style={{ opacity: darkMode ? 1 : 0, transition: "opacity 600ms ease" }}
           />
-          {/* Track inset shadow top */}
-          <rect x="1" y="1" width={TRACK_W - 2} height={TRACK_H / 2} rx={(TRACK_H / 2) - 1} ry={(TRACK_H / 2) - 1}
-            fill="rgba(0,0,0,0.06)"
-          />
-
           {/* Knob */}
           <circle
             cx={knobX + KNOB / 2}
