@@ -153,7 +153,7 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
       <button
         type="button"
         onClick={onToggle}
-        className="relative size-[28px] flex items-center justify-center z-[51]"
+        className="relative size-[23px] flex items-center justify-center z-[51]"
         aria-label="About this site"
       >
         <svg className="absolute inset-0 size-full" fill="none" viewBox="0 0 28 28">
@@ -191,7 +191,7 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
           )}
         </svg>
         <span className="relative z-10 font-['Inter:Medium',sans-serif] font-medium text-[14px] text-white leading-none select-none"
-          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}>?</span>
+          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)" , fontSize: "12px" }}>?</span>
       </button>
 
       {/* Desktop tooltip — appears to the right of the button */}
