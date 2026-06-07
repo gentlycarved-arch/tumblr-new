@@ -332,9 +332,9 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
                 <circle cx={KNOB / 2 - 1} cy={TRACK_H / 2 - 2} r="7" fill="none" stroke="rgba(255,248,200,0.5)" strokeWidth="1" clipPath="url(#moonClip)" />
               </g>
             ) : (
-              // Skeuomorphic Sun — warm golden core with glowing rays
-              <g filter="url(#sunGlow)">
-                {/* Rays */}
+              // Sun — clean circle with simple rays
+              <g>
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="white" opacity="0.95" />
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
                   const rad = deg * Math.PI / 180;
                   const cx = KNOB / 2;
@@ -342,22 +342,17 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
                   return (
                     <line
                       key={deg}
-                      x1={cx + Math.cos(rad) * 5.5}
-                      y1={cy + Math.sin(rad) * 5.5}
-                      x2={cx + Math.cos(rad) * 8}
-                      y2={cy + Math.sin(rad) * 8}
-                      stroke="url(#sunRay)"
-                      strokeWidth="2"
+                      x1={cx + Math.cos(rad) * 6.2}
+                      y1={cy + Math.sin(rad) * 6.2}
+                      x2={cx + Math.cos(rad) * 8.2}
+                      y2={cy + Math.sin(rad) * 8.2}
+                      stroke="white"
+                      strokeWidth="1.5"
                       strokeLinecap="round"
+                      opacity="0.95"
                     />
                   );
                 })}
-                {/* Core with gradient */}
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="url(#sunCore)" />
-                {/* Core top highlight */}
-                <circle cx={KNOB / 2 - 0.5} cy={TRACK_H / 2 - 1} r="4.5" fill="none" stroke="rgba(255,255,220,0.6)" strokeWidth="0.8" />
-                {/* Core bottom shadow */}
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="none" stroke="rgba(180,90,0,0.2)" strokeWidth="1" />
               </g>
             )}
           </g>
@@ -368,7 +363,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
       <div
         className="hidden sm:block pointer-events-none fixed"
         style={{
-          top: 32 + TRACK_H + 6,
+          top: 32 + TRACK_H + 2,
           left: "50%",
           transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
           opacity: hover ? 1 : 0,
