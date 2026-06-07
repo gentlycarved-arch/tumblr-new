@@ -403,6 +403,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
             : "Light mode changes to lighter coloured images."}
         </div>
       </div>
+      </div>
     </div>
   );
 }
