@@ -242,33 +242,9 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
               <stop offset="0%" stopColor="#a8a5a5" />
               <stop offset="100%" stopColor="#707070" />
             </radialGradient>
-            {/* Sun gradients */}
-            <radialGradient id="sunCore" cx="50%" cy="40%" r="60%">
-              <stop offset="0%" stopColor="#FFF5A0" />
-              <stop offset="50%" stopColor="#FFD200" />
-              <stop offset="100%" stopColor="#FF9500" />
-            </radialGradient>
-            <radialGradient id="sunRay" cx="50%" cy="0%" r="100%">
-              <stop offset="0%" stopColor="#FFE566" />
-              <stop offset="100%" stopColor="#FF8C00" />
-            </radialGradient>
-            {/* Moon gradient */}
-            <radialGradient id="moonFill" cx="35%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#FFFDE0" />
-              <stop offset="60%" stopColor="#FFE89A" />
-              <stop offset="100%" stopColor="#E8C76A" />
-            </radialGradient>
-            <radialGradient id="moonShadow" cx="80%" cy="60%" r="60%">
-              <stop offset="0%" stopColor="#B8914A" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#B8914A" stopOpacity="0" />
-            </radialGradient>
             <clipPath id="moonClip">
               <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" />
             </clipPath>
-            <filter id="sunGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="1.2" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
           </defs>
 
           {/* Track — light layer (white/light gray) */}
