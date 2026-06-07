@@ -354,14 +354,23 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
   );
 }
 
-function Typewriter() {
+function Typewriter({ darkMode }: { darkMode: boolean }) {
   const { displayed, pausing } = useTypewriter();
+  const color = darkMode ? "#c0bcbc" : "#afacac";
   return (
-    <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]">
+    <p
+      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]"
+      style={{ color, transition: "color 600ms ease" }}
+    >
       {displayed}
       <span
-        className="inline-block w-[2px] h-[22px] max-sm:h-[18px] bg-[#afacac] ml-[2px] align-[-4px]"
-        style={{ animation: pausing ? "blink 1s steps(1) infinite" : "none", opacity: pausing ? undefined : 1 }}
+        className="inline-block w-[2px] h-[22px] max-sm:h-[18px] ml-[2px] align-[-4px]"
+        style={{
+          background: color,
+          transition: "background 600ms ease",
+          animation: pausing ? "blink 1s steps(1) infinite" : "none",
+          opacity: pausing ? undefined : 1,
+        }}
       />
     </p>
   );
@@ -401,13 +410,15 @@ export default function Wireframe() {
         {/* Dark / Light mode toggle */}
         <ModeToggle darkMode={darkMode} onToggle={() => setDarkMode((v) => !v)} />
         <Group />
+        {/* Portfolio Request button */}
         <a
           href="mailto:gentlycarved@gmail.com"
           style={{
-            backgroundImage:
-              "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
-            boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25)",
+            backgroundImage: darkMode
+              ? "radial-gradient(ellipse at 50% 35%, #2a4a72 0%, #1e3a5f 35%, #152e50 70%, #0f2340 100%)"
+              : "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25)",
+            transition: "background-image 600ms ease",
           }}
           className="absolute hover:brightness-90 active:brightness-90 active:translate-y-px transition-all border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
         >
@@ -418,14 +429,40 @@ export default function Wireframe() {
             Portfolio Request
           </span>
         </a>
-        <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]">
-          <div aria-hidden="true" className="absolute bg-white inset-0 rounded-[13px]" />
+
+        {/* Input field box */}
+        <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"
+          style={{ transition: "background 600ms ease" }}
+        >
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 rounded-[13px]"
+            style={{
+              background: darkMode ? "#2a2a2a" : "white",
+              transition: "background 600ms ease",
+            }}
+          />
           <div className="absolute inset-0 rounded-[inherit] shadow-[inset_0px_0px_5.8px_-1px_black]" />
-          <div aria-hidden="true" className="absolute border-0 border-[#2f2f2f] border-solid inset-0 rounded-[13px]" />
         </div>
-        <div className="absolute h-px left-[37.68%] right-[37.62%] top-[52%] max-sm:left-[10%] max-sm:right-[10%] max-sm:top-[51%] bg-[#CAC5C5]" />
-        <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[47.8%] max-sm:top-[46%] tracking-[-0.44px]">Product Designer</p>
-        <Typewriter />
+
+        {/* Divider */}
+        <div
+          className="absolute h-px left-[37.68%] right-[37.62%] top-[52%] max-sm:left-[10%] max-sm:right-[10%] max-sm:top-[51%]"
+          style={{
+            background: darkMode ? "#4a4a4a" : "#CAC5C5",
+            transition: "background 600ms ease",
+          }}
+        />
+
+        {/* Product Designer text */}
+        <p
+          className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[47.8%] max-sm:top-[46%] tracking-[-0.44px]"
+          style={{
+            color: darkMode ? "#c0bcbc" : "#afacac",
+            transition: "color 600ms ease",
+          }}
+        >Product Designer</p>
+        <Typewriter darkMode={darkMode} />
         <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} />
       </div>
 
