@@ -12,9 +12,19 @@ const PHRASES = [
   "& Turkish Eggs Addict",
 ];
 
-const TYPE_SPEED = 75;
-const BACKSPACE_SPEED = 45;
-const PAUSE_MS = 2200;
+const PAUSE_MS = 2800;
+
+function typeDelay() {
+  // Occasionally pause mid-word like a real person thinking
+  if (Math.random() < 0.1) return 300 + Math.random() * 300;
+  return 90 + Math.random() * 120;
+}
+
+function backspaceDelay() {
+  // Backspacing is mostly quick but sometimes hesitates
+  if (Math.random() < 0.12) return 180 + Math.random() * 150;
+  return 55 + Math.random() * 60;
+}
 
 function commonPrefixLen(a: string, b: string) {
   let i = 0;
@@ -39,7 +49,7 @@ function useTypewriter() {
 
     if (phase === "deleting") {
       if (displayed.length > stopAt) {
-        const t = setTimeout(() => setDisplayed((d) => d.slice(0, -1)), BACKSPACE_SPEED);
+        const t = setTimeout(() => setDisplayed((d) => d.slice(0, -1)), backspaceDelay());
         return () => clearTimeout(t);
       } else {
         setPhraseIdx((i) => (i + 1) % PHRASES.length);
@@ -49,7 +59,7 @@ function useTypewriter() {
 
     if (phase === "typing") {
       if (displayed.length < next.length) {
-        const t = setTimeout(() => setDisplayed(next.slice(0, displayed.length + 1)), TYPE_SPEED);
+        const t = setTimeout(() => setDisplayed(next.slice(0, displayed.length + 1)), typeDelay());
         return () => clearTimeout(t);
       } else {
         setPhase("pausing");
