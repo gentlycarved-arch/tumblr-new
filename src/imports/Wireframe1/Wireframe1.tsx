@@ -209,6 +209,102 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   );
 }
 
+function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
+  const [hover, setHover] = useState(false);
+
+  return (
+    <div
+      className="absolute top-4 left-1/2 -translate-x-1/2"
+      style={{ zIndex: 10 }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      {/* Hover tooltip — desktop only, slides up */}
+      <div
+        className="hidden sm:block absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 pointer-events-none"
+        style={{
+          opacity: hover ? 1 : 0,
+          transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(6px)",
+          transition: "opacity 200ms ease, transform 200ms ease",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <div
+          className="px-3 py-2 rounded-[10px] text-[12px] font-['Inter:Regular',sans-serif] text-[#444] leading-snug max-w-[200px] whitespace-normal text-center"
+          style={{
+            background: "rgba(255,255,255,0.88)",
+            backdropFilter: "blur(8px)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(0,0,0,0.07)",
+          }}
+        >
+          {darkMode
+            ? "Dark mode — showing moodier images from your curated collection."
+            : "Light mode — showing brighter images from your curated collection."}
+        </div>
+        {/* little arrow */}
+        <div className="flex justify-center mt-[-1px]">
+          <div
+            className="w-2 h-2 rotate-45"
+            style={{
+              background: "rgba(255,255,255,0.88)",
+              boxShadow: "2px 2px 4px rgba(0,0,0,0.08)",
+              clipPath: "polygon(0 0, 100% 100%, 0 100%)",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* The toggle button */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label="Toggle dark/light mode"
+        className="relative size-[23px] flex items-center justify-center"
+      >
+        <svg className="absolute inset-0 size-full" fill="none" viewBox="0 0 28 28">
+          <defs>
+            <radialGradient id="modeGradBase" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#b8b5b5" />
+              <stop offset="100%" stopColor="#848181" />
+            </radialGradient>
+            <radialGradient id="modeGradActive" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#a5a2a2" />
+              <stop offset="100%" stopColor="#6e6b6b" />
+            </radialGradient>
+          </defs>
+          <circle cx="14" cy="14" r="13.5" fill={`url(#modeGrad${hover ? "Active" : "Base"})`} />
+          <circle cx="14" cy="14" r="13.5" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
+          {hover && (
+            <circle cx="14" cy="14" r="12.5" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1" />
+          )}
+
+          {darkMode ? (
+            /* Moon icon */
+            <path
+              d="M17 14.5a5 5 0 01-5-5 5 5 0 01.5-2.2A5 5 0 1017 14.5z"
+              fill="white"
+              style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.3))" }}
+            />
+          ) : (
+            /* Sun icon */
+            <g fill="white" style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.3))" }}>
+              <circle cx="14" cy="14" r="3.2" />
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
+                const r = deg * Math.PI / 180;
+                const x1 = 14 + Math.cos(r) * 5.2;
+                const y1 = 14 + Math.sin(r) * 5.2;
+                const x2 = 14 + Math.cos(r) * 6.8;
+                const y2 = 14 + Math.sin(r) * 6.8;
+                return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth="1.4" strokeLinecap="round" />;
+              })}
+            </g>
+          )}
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 function Typewriter() {
   const { displayed, pausing } = useTypewriter();
   return (
@@ -254,22 +350,7 @@ export default function Wireframe() {
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
-        <button
-          type="button"
-          onClick={() => setDarkMode((v) => !v)}
-          aria-label="Toggle dark/light mode"
-          className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-['Inter:Medium',sans-serif] font-medium transition-all"
-          style={{
-            background: darkMode ? "rgba(30,30,30,0.6)" : "rgba(255,255,255,0.55)",
-            color: darkMode ? "#e0e0e0" : "#555",
-            backdropFilter: "blur(6px)",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
-            border: darkMode ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.1)",
-          }}
-        >
-          <span>{darkMode ? "🌙" : "☀️"}</span>
-          <span>{darkMode ? "Dark" : "Light"}</span>
-        </button>
+        <ModeToggle darkMode={darkMode} onToggle={() => setDarkMode((v) => !v)} />
         <Group />
         <a
           href="mailto:gentlycarved@gmail.com"
