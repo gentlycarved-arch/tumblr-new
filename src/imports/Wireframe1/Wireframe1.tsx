@@ -4,24 +4,71 @@ import logoImage from "../Group_3.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { useArenaSlideshow } from "../../hooks/useArenaSlideshow";
 
-const PHRASES = [
-  "& Daydreamer",
-  "& Drip Coffee Drinker",
-  "& Watching Mad Men",
-  "& Film Photographer",
-  "& Turkish Eggs Addict",
+// Each phrase can have typos: { after: string, wrong: string }
+// meaning: after typing `after`, type `wrong` chars then backspace before continuing
+type Typo = { after: string; wrong: string };
+type PhraseConfig = { text: string; typos?: Typo[] };
+
+const PHRASE_CONFIGS: PhraseConfig[] = [
+  { text: "& Daydreamer" },
+  // Types "Coph" then backtracks to "Co" and continues with "ffee Drinker"
+  { text: "& Drip Coffee Drinker", typos: [{ after: "& Drip Co", wrong: "ph" }] },
+  // Types "Watv" then backtracks and continues with "ching Mad Men"
+  { text: "& Watching Mad Men", typos: [{ after: "& Wat", wrong: "v" }] },
+  // Types "Photg" then backtracks to "Phot" and continues with "ographer"
+  { text: "& Film Photographer", typos: [{ after: "& Film Phot", wrong: "g" }] },
+  // Types "Eggss" then backtracks and continues with " Addict"
+  { text: "& Turkish Eggs Addict", typos: [{ after: "& Turkish Eggs", wrong: "s" }] },
 ];
+
+// Build the full sequence of displayed strings for typing a phrase from `startFrom`
+function buildTypingScript(from: string, config: PhraseConfig): string[] {
+  const { text, typos = [] } = config;
+  const steps: string[] = [];
+  let current = from;
+
+  // Collect typo triggers keyed by the string state that triggers them
+  const typoMap = new Map<string, Typo>();
+  for (const typo of typos) {
+    typoMap.set(typo.after, typo);
+  }
+
+  let i = from.length;
+  while (i <= text.length) {
+    // Check if current string triggers a typo
+    const typo = typoMap.get(current);
+    if (typo && typo.wrong.length > 0) {
+      // Type wrong chars
+      let withWrong = current;
+      for (const ch of typo.wrong) {
+        withWrong += ch;
+        steps.push(withWrong);
+      }
+      // Backspace wrong chars
+      for (let b = 0; b < typo.wrong.length; b++) {
+        withWrong = withWrong.slice(0, -1);
+        steps.push(withWrong);
+      }
+      typoMap.delete(current);
+    }
+    if (i < text.length) {
+      current = text.slice(0, i + 1);
+      steps.push(current);
+    }
+    i++;
+  }
+  return steps;
+}
 
 const PAUSE_MS = 2800;
 
 function typeDelay() {
-  // Occasionally pause mid-word like a real person thinking
-  if (Math.random() < 0.1) return 300 + Math.random() * 300;
-  return 90 + Math.random() * 120;
+  if (Math.random() < 0.1) return 280 + Math.random() * 250;
+  return 90 + Math.random() * 110;
 }
 
-function backspaceDelay() {
-  // Backspacing is mostly quick but sometimes hesitates
+function backspaceDelay(isCorrection = false) {
+  if (isCorrection) return 80 + Math.random() * 60; // faster when fixing typo
   if (Math.random() < 0.12) return 180 + Math.random() * 150;
   return 55 + Math.random() * 60;
 }
@@ -34,13 +81,16 @@ function commonPrefixLen(a: string, b: string) {
 
 function useTypewriter() {
   const [phraseIdx, setPhraseIdx] = useState(0);
-  const [displayed, setDisplayed] = useState(PHRASES[0]);
+  const [displayed, setDisplayed] = useState(PHRASE_CONFIGS[0].text);
   const [phase, setPhase] = useState<"pausing" | "deleting" | "typing">("pausing");
+  const [script, setScript] = useState<string[]>([]);
+  const [scriptIdx, setScriptIdx] = useState(0);
 
   useEffect(() => {
-    const current = PHRASES[phraseIdx];
-    const next = PHRASES[(phraseIdx + 1) % PHRASES.length];
-    const stopAt = commonPrefixLen(current, next);
+    const current = PHRASE_CONFIGS[phraseIdx].text;
+    const nextIdx = (phraseIdx + 1) % PHRASE_CONFIGS.length;
+    const next = PHRASE_CONFIGS[nextIdx];
+    const stopAt = commonPrefixLen(current, next.text);
 
     if (phase === "pausing") {
       const t = setTimeout(() => setPhase("deleting"), PAUSE_MS);
@@ -52,20 +102,30 @@ function useTypewriter() {
         const t = setTimeout(() => setDisplayed((d) => d.slice(0, -1)), backspaceDelay());
         return () => clearTimeout(t);
       } else {
-        setPhraseIdx((i) => (i + 1) % PHRASES.length);
+        // Build the typing script for the next phrase
+        const newScript = buildTypingScript(displayed, next);
+        setScript(newScript);
+        setScriptIdx(0);
+        setPhraseIdx(nextIdx);
         setPhase("typing");
       }
     }
 
     if (phase === "typing") {
-      if (displayed.length < next.length) {
-        const t = setTimeout(() => setDisplayed(next.slice(0, displayed.length + 1)), typeDelay());
+      if (scriptIdx < script.length) {
+        // Detect if this step is a correction (going backwards in length)
+        const isCorrection = scriptIdx > 0 && script[scriptIdx].length < script[scriptIdx - 1].length;
+        const delay = isCorrection ? backspaceDelay(true) : typeDelay();
+        const t = setTimeout(() => {
+          setDisplayed(script[scriptIdx]);
+          setScriptIdx((s) => s + 1);
+        }, delay);
         return () => clearTimeout(t);
       } else {
         setPhase("pausing");
       }
     }
-  }, [phase, displayed, phraseIdx]);
+  }, [phase, displayed, phraseIdx, script, scriptIdx]);
 
   const pausing = phase === "pausing";
   return { displayed, pausing };
