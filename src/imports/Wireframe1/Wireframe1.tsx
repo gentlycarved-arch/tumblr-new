@@ -447,20 +447,29 @@ export default function Wireframe() {
         {/* Dark / Light mode toggle */}
         <ModeToggle darkMode={darkMode} onToggle={() => setDarkMode((v) => !v)} />
         <Group />
-        {/* Portfolio Request button */}
+        {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <a
           href="mailto:gentlycarved@gmail.com"
           style={{
-            backgroundImage: darkMode
-              ? "radial-gradient(ellipse at 50% 35%, #2a4a72 0%, #1e3a5f 35%, #152e50 70%, #0f2340 100%)"
-              : "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25)",
-            transition: "background-image 600ms ease",
+            position: "absolute",
           }}
-          className="absolute hover:brightness-90 active:brightness-90 active:translate-y-px transition-all border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
+          className="absolute hover:brightness-90 active:brightness-90 active:translate-y-px transition-all border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center overflow-hidden"
         >
+          {/* Light gradient layer */}
+          <div className="absolute inset-0 rounded-[inherit]" style={{
+            backgroundImage: "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
+            opacity: darkMode ? 0 : 1,
+            transition: "opacity 600ms ease",
+          }} />
+          {/* Dark gradient layer */}
+          <div className="absolute inset-0 rounded-[inherit]" style={{
+            backgroundImage: "radial-gradient(ellipse at 50% 35%, #2a4a72 0%, #1e3a5f 35%, #152e50 70%, #0f2340 100%)",
+            opacity: darkMode ? 1 : 0,
+            transition: "opacity 600ms ease",
+          }} />
           <span
-            style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)" }}
+            style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)", position: "relative", zIndex: 1 }}
             className="font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] not-italic text-[22px] max-sm:text-[18px] text-center text-white tracking-[-0.52px]"
           >
             Portfolio Request
