@@ -492,8 +492,8 @@ export default function Wireframe() {
         <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"
           style={{
             boxShadow: darkMode
-              ? "0 0 0 1px rgba(255,255,255,0.18), 0 0 24px rgba(255,255,255,0.08)"
-              : "none",
+              ? "0 0 0 1.5px rgba(255,255,255,0.3), 0 0 24px rgba(255,255,255,0.08)"
+              : "0 0 0 1.5px rgba(0,0,0,0.1)",
             transition: "box-shadow 600ms ease",
           }}
         >
