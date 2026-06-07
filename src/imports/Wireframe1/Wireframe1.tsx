@@ -164,8 +164,8 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
         <svg className="absolute inset-0 size-full" fill="none" viewBox="0 0 28 28">
           <defs>
             <radialGradient id="btnGradBase" cx="50%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#b8b5b5" />
-              <stop offset="100%" stopColor="#848181" />
+              <stop offset="0%" stopColor="#9e9b9b" />
+              <stop offset="100%" stopColor="#636060" />
             </radialGradient>
             <radialGradient id="btnGradHover" cx="50%" cy="30%" r="70%">
               <stop offset="0%" stopColor="#a5a2a2" />
@@ -235,8 +235,8 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         <svg width={TRACK_W} height={TRACK_H} viewBox={`0 0 ${TRACK_W} ${TRACK_H}`} fill="none">
           <defs>
             <radialGradient id="knobGrad" cx="50%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#c8c5c5" />
-              <stop offset="100%" stopColor="#909090" />
+              <stop offset="0%" stopColor="#a8a5a5" />
+              <stop offset="100%" stopColor="#707070" />
             </radialGradient>
             {/* Sun gradients */}
             <radialGradient id="sunCore" cx="50%" cy="40%" r="60%">
