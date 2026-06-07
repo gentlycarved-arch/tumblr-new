@@ -12,6 +12,8 @@ type PhraseConfig = { text: string; typos?: Typo[] };
 const PHRASE_CONFIGS: PhraseConfig[] = [
   // "Daydreaner" → fixes to "Daydreamer"
   { text: "& Daydreamer", typos: [{ after: "& Daydrea", wrong: "ner" }] },
+  // backtracks "mer" → types "ming on the Internet"
+  { text: "& Daydreaming on the Internet" },
   // "Coph" → backtracks → "Coffee Drinker"
   { text: "& Drip Coffee Drinker", typos: [{ after: "& Drip Co", wrong: "ph" }] },
   // "Watv" → backtracks → "Watching Mad Men"
