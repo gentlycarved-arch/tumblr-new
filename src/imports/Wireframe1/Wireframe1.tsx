@@ -267,11 +267,19 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
             </filter>
           </defs>
 
-          {/* Track */}
+          {/* Track — light layer */}
           <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
             fill="rgba(200,198,198,0.55)"
             stroke="rgba(0,0,0,0.13)"
             strokeWidth="1"
+            style={{ opacity: darkMode ? 0 : 1, transition: "opacity 600ms ease" }}
+          />
+          {/* Track — dark layer */}
+          <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
+            fill="#1e3a5f"
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth="1"
+            style={{ opacity: darkMode ? 1 : 0, transition: "opacity 600ms ease" }}
           />
           {/* Track inset shadow top */}
           <rect x="1" y="1" width={TRACK_W - 2} height={TRACK_H / 2} rx={(TRACK_H / 2) - 1} ry={(TRACK_H / 2) - 1}
