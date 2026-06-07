@@ -30,42 +30,38 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
         aria-label="About this site"
       >
         <svg className="absolute inset-0 size-full" fill="none" viewBox="0 0 28 28">
-          {/* Base circle with skeuomorphic gradient */}
+          <defs>
+            <radialGradient id="btnGradBase" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#b8b5b5" />
+              <stop offset="100%" stopColor="#848181" />
+            </radialGradient>
+            <radialGradient id="btnGradHover" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#a5a2a2" />
+              <stop offset="100%" stopColor="#6e6b6b" />
+            </radialGradient>
+            <linearGradient id="btnStroke" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.45)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0.2)" />
+            </linearGradient>
+          </defs>
+          {/* Base fill */}
           <circle cx="14" cy="14" r="13.5"
             fill={`url(#btnGrad${ringed ? "Hover" : "Base"})`}
           />
-          {/* Top highlight */}
+          {/* Single smooth border with top-light/bottom-dark gradient */}
           <circle cx="14" cy="14" r="13.5"
             fill="none"
-            stroke="rgba(255,255,255,0.35)"
+            stroke="url(#btnStroke)"
             strokeWidth="1"
-          />
-          {/* Inner shadow at bottom */}
-          <circle cx="14" cy="14" r="13.5"
-            fill="none"
-            stroke="rgba(0,0,0,0.18)"
-            strokeWidth="1.5"
-            strokeDasharray="44 44"
-            strokeDashoffset="22"
           />
           {/* Outer ring on hover */}
           {ringed && !open && (
             <circle cx="14" cy="14" r="12.5"
               fill="none"
-              stroke="rgba(255,255,255,0.7)"
+              stroke="rgba(255,255,255,0.6)"
               strokeWidth="1"
             />
           )}
-          <defs>
-            <radialGradient id="btnGradBase" cx="50%" cy="35%" r="65%">
-              <stop offset="0%" stopColor="#b0adad" />
-              <stop offset="100%" stopColor="#888585" />
-            </radialGradient>
-            <radialGradient id="btnGradHover" cx="50%" cy="35%" r="65%">
-              <stop offset="0%" stopColor="#9e9b9b" />
-              <stop offset="100%" stopColor="#707070" />
-            </radialGradient>
-          </defs>
         </svg>
         <span className="relative z-10 font-['Inter:Medium',sans-serif] font-medium text-[14px] text-white leading-none select-none"
           style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}>?</span>
