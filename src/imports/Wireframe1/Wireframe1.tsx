@@ -346,8 +346,8 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           }}
         >
           {darkMode
-            ? "Dark mode — showing moodier images from your curated collection."
-            : "Light mode — showing brighter images from your curated collection."}
+            ? "Dark mode changes to darker coloured images."
+            : "Light mode changes to lighter coloured images."}
         </div>
       </div>
     </div>
