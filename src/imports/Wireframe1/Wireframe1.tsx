@@ -352,12 +352,13 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         </svg>
       </button>
 
-      {/* Tooltip — desktop only, slides down below toggle */}
+      {/* Tooltip — desktop only, slides down directly below toggle */}
       <div
-        className="hidden sm:block absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 pointer-events-none"
+        className="hidden sm:block pointer-events-none"
         style={{
+          marginTop: 8,
           opacity: hover ? 1 : 0,
-          transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
+          transform: hover ? "translateY(0)" : "translateY(-4px)",
           transition: "opacity 200ms ease, transform 200ms ease",
         }}
       >
@@ -365,19 +366,20 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         <div className="flex justify-center mb-[-1px]">
           <div className="w-0 h-0"
             style={{
-              borderLeft: "5px solid transparent",
-              borderRight: "5px solid transparent",
-              borderBottom: "5px solid rgba(255,255,255,0.92)",
+              borderLeft: "6px solid transparent",
+              borderRight: "6px solid transparent",
+              borderBottom: "6px solid rgba(240,238,235,1)",
             }}
           />
         </div>
+        {/* Skeuomorphic card */}
         <div
           className="px-3 py-2 rounded-[10px] text-[12px] font-['Inter:Regular',sans-serif] text-[#444] leading-snug text-center"
           style={{
             width: 190,
-            background: "rgba(255,255,255,0.92)",
-            backdropFilter: "blur(8px)",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(0,0,0,0.07)",
+            background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.08)",
+            border: "1px solid rgba(0,0,0,0.12)",
           }}
         >
           {darkMode
