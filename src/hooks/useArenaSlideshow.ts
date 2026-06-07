@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const INTERVAL_MS = 15_000; // time between transitions
-const FADE_MS = 800;        // fade out duration (then same to fade back in)
+const FADE_MS = 800;        // crossfade duration (quick)
 
 async function fetchArenaImages(slug: string, token?: string): Promise<string[]> {
   const headers: Record<string, string> = { Accept: "application/json" };
@@ -31,24 +31,22 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export interface SlideshowState {
-  /** The src to show — only swaps after fade-out completes */
-  displaySrc: string;
-  /** 0 = fully visible, 1 = fully hidden */
-  opacity: number;
-  /** Duration of the CSS transition in ms */
+  currentSrc: string;
+  nextSrc: string;
+  fading: boolean;
   fadeDuration: number;
 }
 
 export function useArenaSlideshow(fallback: string, channelSlug: string): SlideshowState {
   const [images, setImages] = useState<string[]>([]);
-  const [displaySrc, setDisplaySrc] = useState(fallback);
-  const [opacity, setOpacity] = useState(1);
+  const [idx, setIdx] = useState(0);
+  const [fading, setFading] = useState(false);
   const idxRef = useRef(0);
-  const imagesRef = useRef<string[]>([]);
+  const lenRef = useRef(0);
 
-  // Fetch images when channel slug changes
   useEffect(() => {
     setImages([]);
+    setIdx(0);
     idxRef.current = 0;
     const token = (import.meta.env.VITE_ARENA_TOKEN as string | undefined) || undefined;
     fetchArenaImages(channelSlug, token)
@@ -56,31 +54,30 @@ export function useArenaSlideshow(fallback: string, channelSlug: string): Slides
         if (imgs.length === 0) return;
         const shuffled = shuffle(imgs);
         setImages(shuffled);
-        imagesRef.current = shuffled;
-        setDisplaySrc(shuffled[0]);
+        lenRef.current = shuffled.length;
       })
       .catch((err) => console.warn("[Arena slideshow]", err));
   }, [channelSlug]);
 
-  // Cycle: fade out → swap src → fade in
   useEffect(() => {
     if (images.length < 2) return;
-    imagesRef.current = images;
+    lenRef.current = images.length;
 
     const timer = setInterval(() => {
-      // 1. Fade out
-      setOpacity(0);
-
-      // 2. After fade-out: swap image, start fade-in
+      setFading(true);
       setTimeout(() => {
-        idxRef.current = (idxRef.current + 1) % imagesRef.current.length;
-        setDisplaySrc(imagesRef.current[idxRef.current]);
-        setOpacity(1);
+        idxRef.current = (idxRef.current + 1) % lenRef.current;
+        setIdx(idxRef.current);
+        setFading(false);
       }, FADE_MS);
     }, INTERVAL_MS);
 
     return () => clearInterval(timer);
   }, [images]);
 
-  return { displaySrc, opacity, fadeDuration: FADE_MS };
+  const len = images.length;
+  const currentSrc = len > 0 ? images[idx] : fallback;
+  const nextSrc = len > 1 ? images[(idx + 1) % len] : fallback;
+
+  return { currentSrc, nextSrc, fading, fadeDuration: FADE_MS };
 }

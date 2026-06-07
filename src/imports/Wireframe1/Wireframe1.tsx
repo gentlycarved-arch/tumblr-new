@@ -419,19 +419,26 @@ const LIGHT_SLUG = "gently-carved-light-mode";
 export default function Wireframe() {
   const [darkMode, setDarkMode] = useState(false);
   const slug = darkMode ? DARK_SLUG : LIGHT_SLUG;
-  const { displaySrc, opacity, fadeDuration } = useArenaSlideshow(bgImage, slug);
+  const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage, slug);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   return (
     <div className="bg-white relative size-full overflow-hidden" data-name="Wireframe - 1">
-      {/* Single image — fades out, swaps src, fades back in */}
+      {/* Next image sits beneath, preloaded and ready */}
       <img
         alt=""
-        src={displaySrc}
+        src={nextSrc}
+        className="absolute inset-0 size-full object-cover pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
+      {/* Current image on top — fades out to reveal next */}
+      <img
+        alt=""
+        src={currentSrc}
         className="absolute inset-0 size-full object-cover pointer-events-none"
         style={{
-          zIndex: 0,
-          opacity,
+          zIndex: 1,
+          opacity: fading ? 0 : 1,
           transition: `opacity ${fadeDuration}ms ease-in-out`,
         }}
       />
