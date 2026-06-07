@@ -221,7 +221,11 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
   return (
     <div
       className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
-      style={{ zIndex: 10 }}
+      style={{
+        zIndex: 10,
+        filter: darkMode ? "drop-shadow(0 0 10px rgba(255,255,255,0.18))" : "none",
+        transition: "filter 600ms ease",
+      }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -267,18 +271,18 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
             </filter>
           </defs>
 
-          {/* Track — light layer */}
+          {/* Track — light layer (white/light gray) */}
           <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
-            fill="rgba(200,198,198,0.55)"
-            stroke="rgba(0,0,0,0.13)"
+            fill="rgba(235,233,233,0.85)"
+            stroke="rgba(0,0,0,0.12)"
             strokeWidth="1"
             style={{ opacity: darkMode ? 0 : 1, transition: "opacity 600ms ease" }}
           />
-          {/* Track — dark layer */}
+          {/* Track — dark layer (charcoal) */}
           <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
-            fill="#1e3a5f"
-            stroke="rgba(255,255,255,0.1)"
-            strokeWidth="1"
+            fill="#2c2c2c"
+            stroke="rgba(255,255,255,0.25)"
+            strokeWidth="1.5"
             style={{ opacity: darkMode ? 1 : 0, transition: "opacity 600ms ease" }}
           />
           {/* Track inset shadow top */}
@@ -486,7 +490,12 @@ export default function Wireframe() {
 
         {/* Input field box */}
         <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"
-          style={{ transition: "background 600ms ease" }}
+          style={{
+            boxShadow: darkMode
+              ? "0 0 0 1px rgba(255,255,255,0.18), 0 0 24px rgba(255,255,255,0.08)"
+              : "none",
+            transition: "box-shadow 600ms ease",
+          }}
         >
           <div
             aria-hidden="true"
