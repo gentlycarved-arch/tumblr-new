@@ -364,25 +364,26 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         </svg>
       </button>
 
-      {/* Tooltip — desktop only, slides down directly below toggle */}
+      {/* Tooltip — desktop only, absolutely centered under the toggle */}
       <div
-        className="hidden sm:block pointer-events-none"
+        className="hidden sm:block pointer-events-none absolute"
         style={{
-          marginTop: 8,
+          top: TRACK_H + 8,
+          left: TRACK_W / 2,
+          transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
           opacity: hover ? 1 : 0,
-          transform: hover ? "translateY(0)" : "translateY(-4px)",
           transition: "opacity 200ms ease, transform 200ms ease",
+          width: 190,
         }}
       >
-        {/* Arrow pointing up */}
-        <div className="flex justify-center mb-[-1px]">
-          <div className="w-0 h-0"
-            style={{
-              borderLeft: "6px solid transparent",
-              borderRight: "6px solid transparent",
-              borderBottom: "6px solid rgba(240,238,235,1)",
-            }}
-          />
+        {/* Arrow — centered on toggle midpoint */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: -1 }}>
+          <div style={{
+            width: 0, height: 0,
+            borderLeft: "6px solid transparent",
+            borderRight: "6px solid transparent",
+            borderBottom: "6px solid rgba(240,238,235,1)",
+          }} />
         </div>
         {/* Skeuomorphic card */}
         <div
