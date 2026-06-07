@@ -27,7 +27,7 @@ function Frame() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative size-[28px] flex items-center justify-center z-[51]"
+        className={`relative size-[28px] flex items-center justify-center z-[51] max-sm:${open ? "invisible" : "visible"}`}
         aria-label="About this site"
       >
         <svg className="absolute inset-0 size-full" fill="none" viewBox="0 0 28 28">
@@ -79,7 +79,7 @@ function Frame() {
             className="hidden max-sm:block fixed inset-0 z-40"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute left-[32px] top-1/2 -translate-y-1/2 z-50 max-sm:fixed max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2">
+          <div className="absolute left-[32px] top-1/2 -translate-y-1/2 z-50 max-sm:fixed max-sm:inset-0 max-sm:flex max-sm:items-center max-sm:justify-center max-sm:translate-x-0 max-sm:translate-y-0 max-sm:left-0 max-sm:top-0">
             <ConnectTooltip />
           </div>
         </>
