@@ -238,6 +238,33 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
               <stop offset="0%" stopColor="#c8c5c5" />
               <stop offset="100%" stopColor="#909090" />
             </radialGradient>
+            {/* Sun gradients */}
+            <radialGradient id="sunCore" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stopColor="#FFF5A0" />
+              <stop offset="50%" stopColor="#FFD200" />
+              <stop offset="100%" stopColor="#FF9500" />
+            </radialGradient>
+            <radialGradient id="sunRay" cx="50%" cy="0%" r="100%">
+              <stop offset="0%" stopColor="#FFE566" />
+              <stop offset="100%" stopColor="#FF8C00" />
+            </radialGradient>
+            {/* Moon gradient */}
+            <radialGradient id="moonFill" cx="35%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#FFFDE0" />
+              <stop offset="60%" stopColor="#FFE89A" />
+              <stop offset="100%" stopColor="#E8C76A" />
+            </radialGradient>
+            <radialGradient id="moonShadow" cx="80%" cy="60%" r="60%">
+              <stop offset="0%" stopColor="#B8914A" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#B8914A" stopOpacity="0" />
+            </radialGradient>
+            <clipPath id="moonClip">
+              <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" />
+            </clipPath>
+            <filter id="sunGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.2" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
           </defs>
 
           {/* Track */}
@@ -283,20 +310,19 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           {/* Icon inside knob */}
           <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
             {darkMode ? (
-              // Moon — crescent made with a clip path
-              <g opacity="0.9">
-                <defs>
-                  <clipPath id="moonClip">
-                    <circle cx={KNOB / 2} cy={TRACK_H / 2} r="6" />
-                  </clipPath>
-                </defs>
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="6" fill="white" clipPath="url(#moonClip)" />
-                <circle cx={KNOB / 2 + 4} cy={TRACK_H / 2 - 1} r="5" fill={`url(#knobGrad)`} clipPath="url(#moonClip)" />
+              // Skeuomorphic Moon — warm crescent with gradient and inner shadow
+              <g>
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" fill="url(#moonFill)" clipPath="url(#moonClip)" />
+                <circle cx={KNOB / 2 + 5} cy={TRACK_H / 2 - 1.5} r="6" fill="url(#knobGrad)" clipPath="url(#moonClip)" />
+                {/* Inner glow on concave edge */}
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" fill="url(#moonShadow)" clipPath="url(#moonClip)" />
+                {/* Crescent highlight top */}
+                <circle cx={KNOB / 2 - 1} cy={TRACK_H / 2 - 2} r="7" fill="none" stroke="rgba(255,248,200,0.5)" strokeWidth="1" clipPath="url(#moonClip)" />
               </g>
             ) : (
-              // Sun
-              <g>
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="3" fill="white" opacity="0.9" />
+              // Skeuomorphic Sun — warm golden core with glowing rays
+              <g filter="url(#sunGlow)">
+                {/* Rays */}
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
                   const rad = deg * Math.PI / 180;
                   const cx = KNOB / 2;
@@ -304,17 +330,22 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
                   return (
                     <line
                       key={deg}
-                      x1={cx + Math.cos(rad) * 5}
-                      y1={cy + Math.sin(rad) * 5}
-                      x2={cx + Math.cos(rad) * 6.5}
-                      y2={cy + Math.sin(rad) * 6.5}
-                      stroke="white"
-                      strokeWidth="1.3"
+                      x1={cx + Math.cos(rad) * 5.5}
+                      y1={cy + Math.sin(rad) * 5.5}
+                      x2={cx + Math.cos(rad) * 8}
+                      y2={cy + Math.sin(rad) * 8}
+                      stroke="url(#sunRay)"
+                      strokeWidth="2"
                       strokeLinecap="round"
-                      opacity="0.9"
                     />
                   );
                 })}
+                {/* Core with gradient */}
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="url(#sunCore)" />
+                {/* Core top highlight */}
+                <circle cx={KNOB / 2 - 0.5} cy={TRACK_H / 2 - 1} r="4.5" fill="none" stroke="rgba(255,255,220,0.6)" strokeWidth="0.8" />
+                {/* Core bottom shadow */}
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="none" stroke="rgba(180,90,0,0.2)" strokeWidth="1" />
               </g>
             )}
           </g>
