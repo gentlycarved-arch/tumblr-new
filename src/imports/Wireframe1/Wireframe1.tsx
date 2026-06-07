@@ -12,9 +12,8 @@ function Group() {
   );
 }
 
-function Frame() {
+function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   const [hover, setHover] = useState(false);
-  const [open, setOpen] = useState(false);
 
   const ringed = hover || open;
 
@@ -26,7 +25,7 @@ function Frame() {
     >
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={onToggle}
         className="relative size-[28px] flex items-center justify-center z-[51]"
         aria-label="About this site"
       >
@@ -72,22 +71,10 @@ function Frame() {
           style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}>?</span>
       </button>
 
+      {/* Desktop tooltip — appears to the right of the button */}
       {open && (
-        /* Desktop tooltip — appears to the right of the button */
         <div className="hidden sm:block absolute left-[32px] top-1/2 -translate-y-1/2 z-50">
           <ConnectTooltip />
-        </div>
-      )}
-
-      {open && (
-        /* Mobile — full-screen overlay, card centered, tap outside to close */
-        <div
-          className="sm:hidden fixed inset-0 z-50 flex items-center justify-center"
-          onClick={() => setOpen(false)}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
-            <ConnectTooltip />
-          </div>
         </div>
       )}
     </div>
@@ -96,6 +83,7 @@ function Frame() {
 
 export default function Wireframe() {
   const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   return (
     <div className="bg-white relative size-full overflow-hidden" data-name="Wireframe - 1">
@@ -119,36 +107,49 @@ export default function Wireframe() {
       />
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
-      <Group />
-      <a
-        href="mailto:gentlycarved@gmail.com"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
-          boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25)",
-        }}
-        className="absolute hover:brightness-90 active:brightness-90 active:translate-y-px transition-all border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
-      >
-        <span
-          style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)" }}
-          className="font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] not-italic text-[22px] max-sm:text-[18px] text-center text-white tracking-[-0.52px]"
+        <Group />
+        <a
+          href="mailto:gentlycarved@gmail.com"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
+            boxShadow:
+              "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25)",
+          }}
+          className="absolute hover:brightness-90 active:brightness-90 active:translate-y-px transition-all border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
         >
-          Portfolio Request
-        </span>
-      </a>
-      <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]">
-        <div aria-hidden="true" className="absolute bg-white inset-0 rounded-[13px]" />
-        <div className="absolute inset-0 rounded-[inherit] shadow-[inset_0px_0px_5.8px_-1px_black]" />
-        <div aria-hidden="true" className="absolute border-0 border-[#2f2f2f] border-solid inset-0 rounded-[13px]" />
+          <span
+            style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)" }}
+            className="font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] not-italic text-[22px] max-sm:text-[18px] text-center text-white tracking-[-0.52px]"
+          >
+            Portfolio Request
+          </span>
+        </a>
+        <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]">
+          <div aria-hidden="true" className="absolute bg-white inset-0 rounded-[13px]" />
+          <div className="absolute inset-0 rounded-[inherit] shadow-[inset_0px_0px_5.8px_-1px_black]" />
+          <div aria-hidden="true" className="absolute border-0 border-[#2f2f2f] border-solid inset-0 rounded-[13px]" />
+        </div>
+        <div className="absolute h-px left-[37.68%] right-[37.62%] top-[52%] max-sm:left-[10%] max-sm:right-[10%] max-sm:top-[51%] bg-[#CAC5C5]" />
+        <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[47.8%] max-sm:top-[46%] tracking-[-0.44px]">Product Designer</p>
+        <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]">
+          & Daydreamer<span className="inline-block w-[2px] h-[22px] max-sm:h-[18px] bg-[#afacac] ml-[2px] align-[-4px] animate-[blink_1s_steps(1)_infinite]" />
+        </p>
+        <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} />
       </div>
-      <div className="absolute h-px left-[37.68%] right-[37.62%] top-[52%] max-sm:left-[10%] max-sm:right-[10%] max-sm:top-[51%] bg-[#CAC5C5]" />
-      <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[47.8%] max-sm:top-[46%] tracking-[-0.44px]">Product Designer</p>
-      <p className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[#afacac] text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]">
-        & Daydreamer<span className="inline-block w-[2px] h-[22px] max-sm:h-[18px] bg-[#afacac] ml-[2px] align-[-4px] animate-[blink_1s_steps(1)_infinite]" />
-      </p>
-      <Frame />
-      </div>
+
+      {/* Mobile overlay — rendered at root level so fixed positioning works correctly */}
+      {tooltipOpen && (
+        <div
+          className="sm:hidden fixed inset-0 flex items-center justify-center px-6"
+          style={{ zIndex: 100 }}
+          onClick={() => setTooltipOpen(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <ConnectTooltip />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
