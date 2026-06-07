@@ -384,49 +384,40 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         </svg>
       </button>
 
-      {/* Arrow + tooltip — fixed to viewport center, directly below toggle */}
-      <div
-        className="hidden sm:block pointer-events-none fixed"
-        style={{
-          top: 32 + TRACK_H - 4,
-          left: "50%",
-          transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
-          opacity: hover ? 1 : 0,
-          transition: "opacity 200ms ease, transform 200ms ease",
-          zIndex: 100,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-      {/* Unified callout — drop-shadow treats arrow+card as one shape */}
-      <div style={{ width: 190, filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.18))" }}>
-        {/* Arrow */}
-        <div style={{
-          width: 12, height: 12,
-          background: "#f0eeeb",
-          transform: "rotate(45deg)",
-          margin: "0 auto",
-          marginBottom: -6,
-          position: "relative",
-          zIndex: 0,
-          borderRadius: 2,
-        }} />
-        {/* Card */}
+      {/* Arrow + tooltip — desktop only, fixed to viewport center */}
+      {hover && (
         <div
-          className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
+          className="hidden sm:block pointer-events-none fixed"
           style={{
-            position: "relative",
-            zIndex: 1,
-            background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+            top: 32 + TRACK_H - 4,
+            left: "50%",
+            transform: "translateX(-50%)",
+            opacity: 1,
+            zIndex: 100,
+            filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.18))",
           }}
         >
-          {darkMode
-            ? "Dark mode changes to darker coloured images."
-            : "Light mode changes to lighter coloured images."}
+          <div style={{
+            width: 12, height: 12,
+            background: "#f0eeeb",
+            transform: "rotate(45deg)",
+            margin: "0 auto",
+            marginBottom: -6,
+            borderRadius: 2,
+          }} />
+          <div
+            className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
+            style={{
+              width: 190,
+              background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+            }}
+          >
+            {darkMode
+              ? "Dark mode changes to darker coloured images."
+              : "Light mode changes to lighter coloured images."}
+          </div>
         </div>
-      </div>
-      </div>
+      )}
 
       {/* Mobile toast — appears for 3s after toggling */}
       <div
