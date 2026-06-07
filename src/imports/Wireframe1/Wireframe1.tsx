@@ -19,7 +19,7 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
 
   return (
     <div
-      className="absolute right-[39%] top-[54%] max-sm:right-[10%] max-sm:top-[54.5%] max-sm:-translate-y-1/2"
+      className="absolute right-[39%] top-[53%] max-sm:right-[10%] max-sm:top-[54.5%] max-sm:-translate-y-1/2"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
