@@ -223,11 +223,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
   return (
     <div
       className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
-      style={{
-        zIndex: 10,
-        filter: darkMode ? "drop-shadow(0 0 10px rgba(255,255,255,0.18))" : "none",
-        transition: "filter 600ms ease",
-      }}
+      style={{ zIndex: 10 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -236,7 +232,11 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         type="button"
         onClick={onToggle}
         aria-label="Toggle dark/light mode"
-        style={{ width: TRACK_W, height: TRACK_H, position: "relative" }}
+        style={{
+          width: TRACK_W, height: TRACK_H, position: "relative",
+          filter: darkMode ? "drop-shadow(0 0 10px rgba(255,255,255,0.18))" : "none",
+          transition: "filter 600ms ease",
+        }}
       >
         <svg width={TRACK_W} height={TRACK_H} viewBox={`0 0 ${TRACK_W} ${TRACK_H}`} fill="none">
           <defs>
