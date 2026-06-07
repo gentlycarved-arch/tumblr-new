@@ -485,13 +485,22 @@ export default function Wireframe() {
         <ModeToggle darkMode={darkMode} onToggle={() => setDarkMode((v) => !v)} />
         <Group />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
+        <style>{`
+          @keyframes shimmer {
+            0%   { transform: translateX(-130%) skewX(-15deg); }
+            100% { transform: translateX(230%) skewX(-15deg); }
+          }
+          .btn-shimmer:hover .shimmer-sweep {
+            animation: shimmer 0.65s ease forwards;
+          }
+        `}</style>
         <a
           href="mailto:gentlycarved@gmail.com"
           style={{
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25)",
             position: "absolute",
           }}
-          className="absolute hover:brightness-90 active:brightness-90 active:translate-y-px transition-all border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center overflow-hidden"
+          className="btn-shimmer absolute active:brightness-90 active:translate-y-px transition-all border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center overflow-hidden"
         >
           {/* Light gradient layer */}
           <div className="absolute inset-0 rounded-[inherit]" style={{
@@ -505,8 +514,17 @@ export default function Wireframe() {
             opacity: darkMode ? 1 : 0,
             transition: "opacity 600ms ease",
           }} />
+          {/* Shimmer sweep */}
+          <div
+            className="shimmer-sweep absolute inset-0 pointer-events-none"
+            style={{
+              background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%)",
+              transform: "translateX(-130%) skewX(-15deg)",
+              zIndex: 2,
+            }}
+          />
           <span
-            style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)", position: "relative", zIndex: 1 }}
+            style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)", position: "relative", zIndex: 3 }}
             className="font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] not-italic text-[22px] max-sm:text-[18px] text-center text-white tracking-[-0.52px]"
           >
             Portfolio Request
