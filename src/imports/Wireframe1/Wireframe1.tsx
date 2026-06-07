@@ -18,7 +18,7 @@ const PHRASE_CONFIGS: PhraseConfig[] = [
   // Types "Photg" then backtracks to "Phot" and continues with "ographer"
   { text: "& Film Photographer", typos: [{ after: "& Film Phot", wrong: "g" }] },
   // Types "Eggss" then backtracks and continues with " Addict"
-  { text: "& Turkish Eggs Addict", typos: [{ after: "& Turkish Eggs", wrong: "s" }] },
+  { text: "& Addicted to Turkish Eggs", typos: [{ after: "& Addicted to Turki", wrong: "hs" }] },
   { text: "& Still on Tumblr" },
   { text: "& I collect Duvet Covers" },
 ];
