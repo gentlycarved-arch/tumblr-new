@@ -9,6 +9,7 @@ const PHRASES = [
   "& Drip Coffee Drinker",
   "& Watching Mad Men",
   "& Film Photographer",
+  "& Turkish Eggs Addict",
 ];
 
 const TYPE_SPEED = 75;
