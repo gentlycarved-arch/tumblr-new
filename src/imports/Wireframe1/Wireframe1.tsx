@@ -410,7 +410,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
       <div style={{ width: 190 }}>
         {/* Skeuomorphic card */}
         <div
-          className="px-3 py-2 rounded-[10px] text-[12px] font-['Inter:Regular',sans-serif] text-[#444] leading-snug text-center"
+          className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
           style={{
             width: 190,
             background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
