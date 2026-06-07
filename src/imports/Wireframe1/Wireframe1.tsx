@@ -10,17 +10,20 @@ type Typo = { after: string; wrong: string };
 type PhraseConfig = { text: string; typos?: Typo[] };
 
 const PHRASE_CONFIGS: PhraseConfig[] = [
-  { text: "& Daydreamer" },
-  // Types "Coph" then backtracks to "Co" and continues with "ffee Drinker"
+  // "Daydreaner" → fixes to "Daydreamer"
+  { text: "& Daydreamer", typos: [{ after: "& Daydrea", wrong: "ner" }] },
+  // "Coph" → backtracks → "Coffee Drinker"
   { text: "& Drip Coffee Drinker", typos: [{ after: "& Drip Co", wrong: "ph" }] },
-  // Types "Watv" then backtracks and continues with "ching Mad Men"
+  // "Watv" → backtracks → "Watching Mad Men"
   { text: "& Watching Mad Men", typos: [{ after: "& Wat", wrong: "v" }] },
-  // Types "Photg" then backtracks to "Phot" and continues with "ographer"
+  // "Photg" → backtracks → "Photographer"
   { text: "& Film Photographer", typos: [{ after: "& Film Phot", wrong: "g" }] },
-  // Types "Eggss" then backtracks and continues with " Addict"
+  // "Turkihs" → backtracks → "Turkish Eggs"
   { text: "& Addicted to Turkish Eggs", typos: [{ after: "& Addicted to Turki", wrong: "hs" }] },
-  { text: "& Still on Tumblr" },
-  { text: "& I collect Duvet Covers" },
+  // "Stillo" → backtracks → "Still on Tumblr"
+  { text: "& Still on Tumblr", typos: [{ after: "& Still", wrong: "o" }] },
+  // "Duvte" → backtracks → "Duvet Covers"
+  { text: "& I collect Duvet Covers", typos: [{ after: "& I collect Duv", wrong: "te" }] },
 ];
 
 // Build the full sequence of displayed strings for typing a phrase from `startFrom`
