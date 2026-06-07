@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 
-const CHANNEL_SLUG = "gently-carved-website";
 const INTERVAL_MS = 15_000; // time between transitions
 const FADE_MS = 2_500;      // crossfade duration
 
-async function fetchArenaImages(token?: string): Promise<string[]> {
+async function fetchArenaImages(slug: string, token?: string): Promise<string[]> {
   const headers: Record<string, string> = { Accept: "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const res = await fetch(
-    `https://api.are.na/v3/channels/${CHANNEL_SLUG}/contents?per=100`,
+    `https://api.are.na/v3/channels/${slug}/contents?per=100`,
     { headers }
   );
 
@@ -42,17 +41,20 @@ export interface SlideshowState {
   fadeDuration: number;
 }
 
-export function useArenaSlideshow(fallback: string): SlideshowState {
+export function useArenaSlideshow(fallback: string, channelSlug: string): SlideshowState {
   const [images, setImages] = useState<string[]>([]);
   const [idx, setIdx] = useState(0);
   const [fading, setFading] = useState(false);
   const idxRef = useRef(0);
   const lenRef = useRef(0);
 
-  // Fetch images once on mount
+  // Fetch images when channel slug changes
   useEffect(() => {
+    setImages([]);
+    setIdx(0);
+    idxRef.current = 0;
     const token = (import.meta.env.VITE_ARENA_TOKEN as string | undefined) || undefined;
-    fetchArenaImages(token)
+    fetchArenaImages(channelSlug, token)
       .then((imgs) => {
         if (imgs.length === 0) return;
         const shuffled = shuffle(imgs);
@@ -60,7 +62,7 @@ export function useArenaSlideshow(fallback: string): SlideshowState {
         lenRef.current = shuffled.length;
       })
       .catch((err) => console.warn("[Arena slideshow]", err));
-  }, []);
+  }, [channelSlug]);
 
   // Cycle on interval once images are loaded
   useEffect(() => {
@@ -68,10 +70,7 @@ export function useArenaSlideshow(fallback: string): SlideshowState {
     lenRef.current = images.length;
 
     const timer = setInterval(() => {
-      // Start fade
       setFading(true);
-
-      // After fade completes: advance index, stop fading
       setTimeout(() => {
         idxRef.current = (idxRef.current + 1) % lenRef.current;
         setIdx(idxRef.current);

@@ -222,8 +222,13 @@ function Typewriter() {
   );
 }
 
+const DARK_SLUG  = "gently-carved-dark-mode";
+const LIGHT_SLUG = "gently-carved-light-mode";
+
 export default function Wireframe() {
-  const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage);
+  const [darkMode, setDarkMode] = useState(false);
+  const slug = darkMode ? DARK_SLUG : LIGHT_SLUG;
+  const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage, slug);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   return (
@@ -248,6 +253,23 @@ export default function Wireframe() {
       />
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
+        {/* Dark / Light mode toggle */}
+        <button
+          type="button"
+          onClick={() => setDarkMode((v) => !v)}
+          aria-label="Toggle dark/light mode"
+          className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-['Inter:Medium',sans-serif] font-medium transition-all"
+          style={{
+            background: darkMode ? "rgba(30,30,30,0.6)" : "rgba(255,255,255,0.55)",
+            color: darkMode ? "#e0e0e0" : "#555",
+            backdropFilter: "blur(6px)",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+            border: darkMode ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.1)",
+          }}
+        >
+          <span>{darkMode ? "🌙" : "☀️"}</span>
+          <span>{darkMode ? "Dark" : "Light"}</span>
+        </button>
         <Group />
         <a
           href="mailto:gentlycarved@gmail.com"
