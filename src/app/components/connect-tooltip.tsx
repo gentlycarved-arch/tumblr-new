@@ -15,8 +15,8 @@ export function ConnectTooltip({ darkMode = false }: { darkMode?: boolean }) {
     <div
       style={{
         boxShadow: darkMode
-          ? "inset 0 0 6px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.4)"
-          : "inset 0 0 6px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.12)",
+          ? "inset 0 0 6px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)"
+          : "inset 0 0 6px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)",
         background: darkMode ? "#2a2a2a" : "white",
         transition: "background 600ms ease, box-shadow 600ms ease",
       }}
