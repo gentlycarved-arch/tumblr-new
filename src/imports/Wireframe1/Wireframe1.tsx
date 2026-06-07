@@ -393,7 +393,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
 
 function Typewriter({ darkMode }: { darkMode: boolean }) {
   const { displayed, pausing } = useTypewriter();
-  const color = darkMode ? "#c0bcbc" : "#afacac";
+  const color = darkMode ? "#c0bcbc" : "#888484";
   return (
     <p
       className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]"
@@ -488,7 +488,7 @@ export default function Wireframe() {
         <p
           className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[47.8%] max-sm:top-[46%] tracking-[-0.44px]"
           style={{
-            color: darkMode ? "#c0bcbc" : "#afacac",
+            color: darkMode ? "#c0bcbc" : "#888484",
             transition: "color 600ms ease",
           }}
         >Product Designer</p>
