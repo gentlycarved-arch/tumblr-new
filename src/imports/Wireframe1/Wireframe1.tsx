@@ -22,8 +22,8 @@ const PHRASE_CONFIGS: PhraseConfig[] = [
   { text: "& Addicted to Turkish Eggs", typos: [{ after: "& Addicted to Turki", wrong: "hs" }] },
   // "Stillo" → backtracks → "Still on Tumblr"
   { text: "& Still on Tumblr", typos: [{ after: "& Still", wrong: "o" }] },
-  // "Duvte" → backtracks → "Duvet Covers"
-  { text: "& I collect Duvet Covers", typos: [{ after: "& I collect Duv", wrong: "te" }] },
+  // "Obsesed" → backtracks → "Obsessed with Images"
+  { text: "& Obsessed with Images", typos: [{ after: "& Obses", wrong: "ed" }] },
 ];
 
 // Build the full sequence of displayed strings for typing a phrase from `startFrom`
