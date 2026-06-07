@@ -426,22 +426,22 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           opacity: mobileToast ? 1 : 0,
           transition: "opacity 400ms ease",
           zIndex: 100,
-          width: 190,
+          width: 240,
         }}
       >
         <div style={{ filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.18))" }}>
           <div style={{
-            width: 12, height: 12,
+            width: 14, height: 14,
             background: "#f0eeeb",
             transform: "rotate(45deg)",
             margin: "0 auto",
-            marginBottom: -6,
+            marginBottom: -7,
             position: "relative",
             zIndex: 0,
             borderRadius: 2,
           }} />
           <div
-            className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
+            className="px-4 py-3 rounded-[12px] text-[15px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
             style={{
               position: "relative",
               zIndex: 1,
