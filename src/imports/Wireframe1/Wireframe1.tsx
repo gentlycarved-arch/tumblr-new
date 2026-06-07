@@ -20,7 +20,7 @@ function Frame() {
 
   return (
     <div
-      className="absolute right-[39%] top-[54%] max-sm:right-[10%]"
+      className="absolute right-[39%] top-[54%] max-sm:right-[10%] max-sm:top-[54.5%] max-sm:-translate-y-1/2"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -73,9 +73,16 @@ function Frame() {
       </button>
 
       {open && (
-        <div className="absolute left-[32px] top-1/2 -translate-y-1/2 z-50 max-sm:fixed max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2">
-          <ConnectTooltip />
-        </div>
+        <>
+          {/* Mobile backdrop — tap anywhere to close */}
+          <div
+            className="hidden max-sm:block fixed inset-0 z-40"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute left-[32px] top-1/2 -translate-y-1/2 z-50 max-sm:fixed max-sm:left-1/2 max-sm:top-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2">
+            <ConnectTooltip />
+          </div>
+        </>
       )}
     </div>
   );
