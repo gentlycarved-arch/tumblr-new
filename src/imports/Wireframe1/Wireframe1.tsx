@@ -283,12 +283,16 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           {/* Icon inside knob */}
           <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
             {darkMode ? (
-              // Moon
-              <path
-                d={`M${KNOB / 2 + 3} ${TRACK_H / 2 - 1.5}a4 4 0 01-4-4 4 4 0 01.4-1.8A4 4 0 1${KNOB / 2 + 3} ${TRACK_H / 2 - 1.5}z`}
-                fill="white"
-                opacity="0.9"
-              />
+              // Moon — crescent made with a clip path
+              <g opacity="0.9">
+                <defs>
+                  <clipPath id="moonClip">
+                    <circle cx={KNOB / 2} cy={TRACK_H / 2} r="6" />
+                  </clipPath>
+                </defs>
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="6" fill="white" clipPath="url(#moonClip)" />
+                <circle cx={KNOB / 2 + 4} cy={TRACK_H / 2 - 1} r="5" fill={`url(#knobGrad)`} clipPath="url(#moonClip)" />
+              </g>
             ) : (
               // Sun
               <g>
