@@ -212,95 +212,144 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
 function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
   const [hover, setHover] = useState(false);
 
+  const TRACK_W = 52;
+  const TRACK_H = 28;
+  const KNOB = 22;
+  const PAD = (TRACK_H - KNOB) / 2;
+  const knobX = darkMode ? TRACK_W - KNOB - PAD : PAD;
+
   return (
     <div
-      className="absolute top-4 left-1/2 -translate-x-1/2"
+      className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
       style={{ zIndex: 10 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Hover tooltip — desktop only, slides up */}
+      {/* The toggle switch */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label="Toggle dark/light mode"
+        style={{ width: TRACK_W, height: TRACK_H, position: "relative" }}
+      >
+        <svg width={TRACK_W} height={TRACK_H} viewBox={`0 0 ${TRACK_W} ${TRACK_H}`} fill="none">
+          <defs>
+            <radialGradient id="knobGrad" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#c8c5c5" />
+              <stop offset="100%" stopColor="#909090" />
+            </radialGradient>
+          </defs>
+
+          {/* Track */}
+          <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
+            fill="rgba(200,198,198,0.55)"
+            stroke="rgba(0,0,0,0.13)"
+            strokeWidth="1"
+          />
+          {/* Track inset shadow top */}
+          <rect x="1" y="1" width={TRACK_W - 2} height={TRACK_H / 2} rx={(TRACK_H / 2) - 1} ry={(TRACK_H / 2) - 1}
+            fill="rgba(0,0,0,0.06)"
+          />
+
+          {/* Knob */}
+          <circle
+            cx={knobX + KNOB / 2}
+            cy={TRACK_H / 2}
+            r={KNOB / 2}
+            fill="url(#knobGrad)"
+            style={{ transition: "cx 250ms ease" }}
+          />
+          {/* Knob border */}
+          <circle
+            cx={knobX + KNOB / 2}
+            cy={TRACK_H / 2}
+            r={KNOB / 2}
+            fill="none"
+            stroke="rgba(0,0,0,0.15)"
+            strokeWidth="1"
+            style={{ transition: "cx 250ms ease" }}
+          />
+          {/* Knob top highlight */}
+          <circle
+            cx={knobX + KNOB / 2}
+            cy={TRACK_H / 2}
+            r={KNOB / 2 - 1}
+            fill="none"
+            stroke="rgba(255,255,255,0.45)"
+            strokeWidth="1"
+            style={{ transition: "cx 250ms ease" }}
+          />
+
+          {/* Icon inside knob */}
+          <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
+            {darkMode ? (
+              // Moon
+              <path
+                d={`M${KNOB / 2 + 3} ${TRACK_H / 2 - 1.5}a4 4 0 01-4-4 4 4 0 01.4-1.8A4 4 0 1${KNOB / 2 + 3} ${TRACK_H / 2 - 1.5}z`}
+                fill="white"
+                opacity="0.9"
+              />
+            ) : (
+              // Sun
+              <g>
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="3" fill="white" opacity="0.9" />
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
+                  const rad = deg * Math.PI / 180;
+                  const cx = KNOB / 2;
+                  const cy = TRACK_H / 2;
+                  return (
+                    <line
+                      key={deg}
+                      x1={cx + Math.cos(rad) * 5}
+                      y1={cy + Math.sin(rad) * 5}
+                      x2={cx + Math.cos(rad) * 6.5}
+                      y2={cy + Math.sin(rad) * 6.5}
+                      stroke="white"
+                      strokeWidth="1.3"
+                      strokeLinecap="round"
+                      opacity="0.9"
+                    />
+                  );
+                })}
+              </g>
+            )}
+          </g>
+        </svg>
+      </button>
+
+      {/* Tooltip — desktop only, slides down below toggle */}
       <div
-        className="hidden sm:block absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 pointer-events-none"
+        className="hidden sm:block absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 pointer-events-none"
         style={{
           opacity: hover ? 1 : 0,
-          transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(6px)",
+          transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
           transition: "opacity 200ms ease, transform 200ms ease",
-          whiteSpace: "nowrap",
         }}
       >
+        {/* Arrow pointing up */}
+        <div className="flex justify-center mb-[-1px]">
+          <div className="w-0 h-0"
+            style={{
+              borderLeft: "5px solid transparent",
+              borderRight: "5px solid transparent",
+              borderBottom: "5px solid rgba(255,255,255,0.92)",
+            }}
+          />
+        </div>
         <div
-          className="px-3 py-2 rounded-[10px] text-[12px] font-['Inter:Regular',sans-serif] text-[#444] leading-snug max-w-[200px] whitespace-normal text-center"
+          className="px-3 py-2 rounded-[10px] text-[12px] font-['Inter:Regular',sans-serif] text-[#444] leading-snug text-center"
           style={{
-            background: "rgba(255,255,255,0.88)",
+            width: 190,
+            background: "rgba(255,255,255,0.92)",
             backdropFilter: "blur(8px)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(0,0,0,0.07)",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(0,0,0,0.07)",
           }}
         >
           {darkMode
             ? "Dark mode — showing moodier images from your curated collection."
             : "Light mode — showing brighter images from your curated collection."}
         </div>
-        {/* little arrow */}
-        <div className="flex justify-center mt-[-1px]">
-          <div
-            className="w-2 h-2 rotate-45"
-            style={{
-              background: "rgba(255,255,255,0.88)",
-              boxShadow: "2px 2px 4px rgba(0,0,0,0.08)",
-              clipPath: "polygon(0 0, 100% 100%, 0 100%)",
-            }}
-          />
-        </div>
       </div>
-
-      {/* The toggle button */}
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-label="Toggle dark/light mode"
-        className="relative size-[23px] flex items-center justify-center"
-      >
-        <svg className="absolute inset-0 size-full" fill="none" viewBox="0 0 28 28">
-          <defs>
-            <radialGradient id="modeGradBase" cx="50%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#b8b5b5" />
-              <stop offset="100%" stopColor="#848181" />
-            </radialGradient>
-            <radialGradient id="modeGradActive" cx="50%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#a5a2a2" />
-              <stop offset="100%" stopColor="#6e6b6b" />
-            </radialGradient>
-          </defs>
-          <circle cx="14" cy="14" r="13.5" fill={`url(#modeGrad${hover ? "Active" : "Base"})`} />
-          <circle cx="14" cy="14" r="13.5" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="1" />
-          {hover && (
-            <circle cx="14" cy="14" r="12.5" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1" />
-          )}
-
-          {darkMode ? (
-            /* Moon icon */
-            <path
-              d="M17 14.5a5 5 0 01-5-5 5 5 0 01.5-2.2A5 5 0 1017 14.5z"
-              fill="white"
-              style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.3))" }}
-            />
-          ) : (
-            /* Sun icon */
-            <g fill="white" style={{ filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.3))" }}>
-              <circle cx="14" cy="14" r="3.2" />
-              {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
-                const r = deg * Math.PI / 180;
-                const x1 = 14 + Math.cos(r) * 5.2;
-                const y1 = 14 + Math.sin(r) * 5.2;
-                const x2 = 14 + Math.cos(r) * 6.8;
-                const y2 = 14 + Math.sin(r) * 6.8;
-                return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth="1.4" strokeLinecap="round" />;
-              })}
-            </g>
-          )}
-        </svg>
-      </button>
     </div>
   );
 }
