@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
+import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { useArenaSlideshow } from "../../hooks/useArenaSlideshow";
 
@@ -138,10 +139,21 @@ function useTypewriter() {
   return { displayed, pausing };
 }
 
-function Group() {
+function Group({ darkMode }: { darkMode: boolean }) {
   return (
     <div className="absolute inset-[33.3%_33.59%_57.08%_33.71%] max-sm:inset-[28%_10%_60%_10%]">
-      <img alt="" className="block size-full object-contain" src={logoImage} />
+      <img
+        alt=""
+        className="block size-full object-contain absolute inset-0"
+        src={logoImage}
+        style={{ opacity: darkMode ? 0 : 1, transition: "opacity 600ms ease" }}
+      />
+      <img
+        alt=""
+        className="block size-full object-contain absolute inset-0"
+        src={logoImageDark}
+        style={{ opacity: darkMode ? 1 : 0, transition: "opacity 600ms ease" }}
+      />
     </div>
   );
 }
@@ -513,7 +525,7 @@ export default function Wireframe() {
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
         <ModeToggle darkMode={darkMode} onToggle={() => setDarkMode((v) => !v)} />
-        <Group />
+        <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
           @keyframes shimmer {
