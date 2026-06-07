@@ -139,21 +139,10 @@ function useTypewriter() {
   return { displayed, pausing };
 }
 
-function Group({ darkMode }: { darkMode: boolean }) {
+function Group({ darkMode: _ }: { darkMode: boolean }) {
   return (
     <div className="absolute inset-[33.3%_33.59%_57.08%_33.71%] max-sm:inset-[28%_10%_60%_10%]">
-      <img
-        alt=""
-        className="block size-full object-contain absolute inset-0"
-        src={logoImage}
-        style={{ opacity: darkMode ? 0 : 1, transition: "opacity 600ms ease" }}
-      />
-      <img
-        alt=""
-        className="block size-full object-contain absolute inset-0"
-        src={logoImageDark}
-        style={{ opacity: darkMode ? 1 : 0, transition: "opacity 600ms ease" }}
-      />
+      <img alt="" className="block size-full object-contain" src={logoImage} />
     </div>
   );
 }
