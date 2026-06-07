@@ -364,11 +364,28 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         </svg>
       </button>
 
-      {/* Tooltip — desktop only, absolutely centered under the toggle */}
+      {/* Arrow — pinned exactly to the horizontal center of the toggle */}
       <div
         className="hidden sm:block pointer-events-none absolute"
         style={{
-          top: TRACK_H + 8,
+          top: TRACK_H + 4,
+          left: TRACK_W / 2,
+          transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
+          opacity: hover ? 1 : 0,
+          transition: "opacity 200ms ease, transform 200ms ease",
+          width: 0, height: 0,
+          borderLeft: "6px solid transparent",
+          borderRight: "6px solid transparent",
+          borderBottom: "6px solid rgba(240,238,235,1)",
+          zIndex: 1,
+        }}
+      />
+
+      {/* Tooltip card — centered on same toggle midpoint */}
+      <div
+        className="hidden sm:block pointer-events-none absolute"
+        style={{
+          top: TRACK_H + 10,
           left: TRACK_W / 2,
           transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
           opacity: hover ? 1 : 0,
@@ -376,15 +393,6 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           width: 190,
         }}
       >
-        {/* Arrow — centered on toggle midpoint */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: -1 }}>
-          <div style={{
-            width: 0, height: 0,
-            borderLeft: "6px solid transparent",
-            borderRight: "6px solid transparent",
-            borderBottom: "6px solid rgba(240,238,235,1)",
-          }} />
-        </div>
         {/* Skeuomorphic card */}
         <div
           className="px-3 py-2 rounded-[10px] text-[12px] font-['Inter:Regular',sans-serif] text-[#444] leading-snug text-center"
