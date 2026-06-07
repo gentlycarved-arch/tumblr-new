@@ -377,19 +377,27 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           alignItems: "center",
         }}
       >
-        {/* Arrow */}
+      {/* Unified callout — arrow merged into card */}
+      <div style={{ width: 190, position: "relative" }}>
+        {/* Rotated square that forms the arrow tip, overlaps card top */}
         <div style={{
-          width: 0, height: 0,
-          borderLeft: "6px solid transparent",
-          borderRight: "6px solid transparent",
-          borderBottom: "6px solid rgba(240,238,235,1)",
-          marginBottom: -1,
+          position: "absolute",
+          top: -6,
+          left: "50%",
+          transform: "translateX(-50%) rotate(45deg)",
+          width: 12,
+          height: 12,
+          background: "#f5f3f0",
+          border: "1px solid rgba(0,0,0,0.12)",
+          boxShadow: "-1px -1px 3px rgba(0,0,0,0.06)",
+          zIndex: 0,
         }} />
-      <div style={{ width: 190 }}>
-        {/* Skeuomorphic card */}
+        {/* Card — sits on top, covers bottom half of rotated square */}
         <div
           className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
           style={{
+            position: "relative",
+            zIndex: 1,
             width: 190,
             background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
             boxShadow: "0 4px 12px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.08)",
