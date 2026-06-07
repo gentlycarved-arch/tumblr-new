@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
@@ -213,12 +213,22 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
 
 function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
   const [hover, setHover] = useState(false);
+  const [mobileToast, setMobileToast] = useState(false);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const TRACK_W = 80;
   const TRACK_H = 42;
   const KNOB = 34;
   const PAD = (TRACK_H - KNOB) / 2;
   const knobX = darkMode ? TRACK_W - KNOB - PAD : PAD;
+
+  function handleToggle() {
+    onToggle();
+    // Show mobile toast for 3 seconds
+    setMobileToast(true);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setMobileToast(false), 3000);
+  }
 
   return (
     <div
@@ -230,7 +240,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
       {/* The toggle switch */}
       <button
         type="button"
-        onClick={onToggle}
+        onClick={handleToggle}
         aria-label="Toggle dark/light mode"
         style={{
           width: TRACK_W, height: TRACK_H, position: "relative",
@@ -366,7 +376,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
       <div
         className="hidden sm:block pointer-events-none fixed"
         style={{
-          top: 32 + TRACK_H + 2,
+          top: 32 + TRACK_H - 4,
           left: "50%",
           transform: hover ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-4px)",
           opacity: hover ? 1 : 0,
@@ -409,6 +419,51 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
             : "Light mode changes to lighter coloured images."}
         </div>
       </div>
+      </div>
+
+      {/* Mobile toast — appears for 3s after toggling */}
+      <div
+        className="sm:hidden fixed pointer-events-none"
+        style={{
+          top: 32 + TRACK_H - 4,
+          left: "50%",
+          transform: "translateX(-50%)",
+          opacity: mobileToast ? 1 : 0,
+          transition: "opacity 400ms ease",
+          zIndex: 100,
+          width: 190,
+        }}
+      >
+        <div style={{
+          position: "relative",
+        }}>
+          <div style={{
+            position: "absolute",
+            top: -6,
+            left: "50%",
+            transform: "translateX(-50%) rotate(45deg)",
+            width: 12,
+            height: 12,
+            background: "#f5f3f0",
+            border: "1px solid rgba(0,0,0,0.12)",
+            boxShadow: "-1px -1px 3px rgba(0,0,0,0.06)",
+            zIndex: 0,
+          }} />
+          <div
+            className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
+            style={{
+              position: "relative",
+              zIndex: 1,
+              background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.08)",
+              border: "1px solid rgba(0,0,0,0.12)",
+            }}
+          >
+            {darkMode
+              ? "Dark mode changes to darker coloured images."
+              : "Light mode changes to lighter coloured images."}
+          </div>
+        </div>
       </div>
     </div>
   );
