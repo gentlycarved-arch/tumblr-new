@@ -48,10 +48,10 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
           <circle cx="14" cy="14" r="13.5"
             fill={`url(#btnGrad${ringed ? "Hover" : "Base"})`}
           />
-          {/* Single smooth border with top-light/bottom-dark gradient */}
+          {/* Clean consistent border */}
           <circle cx="14" cy="14" r="13.5"
             fill="none"
-            stroke="url(#btnStroke)"
+            stroke="rgba(0,0,0,0.15)"
             strokeWidth="1"
           />
           {/* Outer ring on hover */}
