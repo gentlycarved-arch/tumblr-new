@@ -322,19 +322,39 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           {/* Icon inside knob */}
           <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
             {darkMode ? (
-              // Skeuomorphic Moon — warm crescent with gradient and inner shadow
+              // Skeuomorphic Moon — white crescent with depth
               <g>
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" fill="url(#moonFill)" clipPath="url(#moonClip)" />
-                <circle cx={KNOB / 2 + 5} cy={TRACK_H / 2 - 1.5} r="6" fill="url(#knobGrad)" clipPath="url(#moonClip)" />
-                {/* Inner glow on concave edge */}
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" fill="url(#moonShadow)" clipPath="url(#moonClip)" />
-                {/* Crescent highlight top */}
-                <circle cx={KNOB / 2 - 1} cy={TRACK_H / 2 - 2} r="7" fill="none" stroke="rgba(255,248,200,0.5)" strokeWidth="1" clipPath="url(#moonClip)" />
+                {/* Main crescent body */}
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" fill="white" clipPath="url(#moonClip)" />
+                {/* Cutout circle to form crescent */}
+                <circle cx={KNOB / 2 + 5} cy={TRACK_H / 2 - 1.5} r="5.8" fill="url(#knobGrad)" clipPath="url(#moonClip)" />
+                {/* Top-left highlight for depth */}
+                <circle cx={KNOB / 2 - 1} cy={TRACK_H / 2 - 2.5} r="7" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" clipPath="url(#moonClip)" />
+                {/* Bottom shadow for depth */}
+                <circle cx={KNOB / 2 + 1} cy={TRACK_H / 2 + 1} r="7" fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="1" clipPath="url(#moonClip)" />
               </g>
             ) : (
-              // Sun — clean circle with simple rays
+              // Skeuomorphic Sun — white with depth
               <g>
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="white" opacity="0.95" />
+                {/* Rays with slight shadow */}
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
+                  const rad = deg * Math.PI / 180;
+                  const cx = KNOB / 2;
+                  const cy = TRACK_H / 2;
+                  return (
+                    <line
+                      key={deg}
+                      x1={cx + Math.cos(rad) * 6.2}
+                      y1={cy + Math.sin(rad) * 6.2}
+                      x2={cx + Math.cos(rad) * 8.2}
+                      y2={cy + Math.sin(rad) * 8.2}
+                      stroke="rgba(0,0,0,0.15)"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                    />
+                  );
+                })}
+                {/* White rays on top */}
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
                   const rad = deg * Math.PI / 180;
                   const cx = KNOB / 2;
@@ -349,10 +369,15 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
                       stroke="white"
                       strokeWidth="1.5"
                       strokeLinecap="round"
-                      opacity="0.95"
                     />
                   );
                 })}
+                {/* Core shadow */}
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.8" fill="rgba(0,0,0,0.1)" />
+                {/* White core */}
+                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="white" />
+                {/* Top highlight */}
+                <circle cx={KNOB / 2 - 0.8} cy={TRACK_H / 2 - 1} r="4.5" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="0.8" />
               </g>
             )}
           </g>
