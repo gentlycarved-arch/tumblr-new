@@ -144,7 +144,7 @@ function Group() {
   );
 }
 
-function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => void; darkMode: boolean }) {
   const [hover, setHover] = useState(false);
 
   const ringed = hover || open;
@@ -202,7 +202,7 @@ function Frame({ open, onToggle }: { open: boolean; onToggle: () => void }) {
       {/* Desktop tooltip — appears to the right of the button */}
       {open && (
         <div className="hidden sm:block absolute left-[32px] top-1/2 -translate-y-1/2 z-50">
-          <ConnectTooltip />
+          <ConnectTooltip darkMode={darkMode} />
         </div>
       )}
     </div>
@@ -527,7 +527,7 @@ export default function Wireframe() {
           }}
         >Product Designer</p>
         <Typewriter darkMode={darkMode} />
-        <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} />
+        <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} darkMode={darkMode} />
       </div>
 
       {/* Mobile overlay — rendered at root level so fixed positioning works correctly */}
@@ -538,7 +538,7 @@ export default function Wireframe() {
           onClick={() => setTooltipOpen(false)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <ConnectTooltip />
+            <ConnectTooltip darkMode={darkMode} />
           </div>
         </div>
       )}
