@@ -514,7 +514,7 @@ export default function Wireframe() {
             inset: -1.5px;
             border-radius: 11.5px;
             padding: 1.5px;
-            background: linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.95) 50%, transparent 80%);
+            background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.5) 50%, transparent 75%);
             background-size: 300% 100%;
             background-position: -200% 0;
             -webkit-mask:
