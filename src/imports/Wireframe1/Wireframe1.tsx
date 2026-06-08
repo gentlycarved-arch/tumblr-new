@@ -420,18 +420,21 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         {/* Arrow */}
         <div style={{
           width: 14, height: 14,
-          background: "#f5f3f0",
+          background: darkMode ? "#2a2a2a" : "#f5f3f0",
           transform: "rotate(45deg)",
           margin: "0 auto",
           marginBottom: -7,
           borderRadius: 2,
+          transition: "background 600ms ease",
         }} />
         {/* Card */}
         <div
-          className="px-4 py-3 rounded-[12px] text-[15px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
+          className="px-4 py-3 rounded-[12px] text-[15px] font-['Favorit_Tumblr:Medium',sans-serif] leading-snug text-center"
           style={{
             width: 240,
-            background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+            background: darkMode ? "#2a2a2a" : "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+            color: darkMode ? "#f0f0f0" : "#444",
+            transition: "background 600ms ease, color 600ms ease",
           }}
         >
             {darkMode
