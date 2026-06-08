@@ -503,10 +503,35 @@ export default function Wireframe() {
         <style>{`
           .btn-glow {
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25);
-            transition: box-shadow 300ms ease, filter 300ms ease;
+            transition: box-shadow 300ms ease;
           }
           .btn-glow:hover {
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.9), 0 0 16px 4px rgba(255,255,255,0.45);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25);
+          }
+          @keyframes strokeSweep {
+            0%   { background-position: -150% 0; }
+            100% { background-position: 250% 0; }
+          }
+          .btn-glow::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 11px;
+            padding: 1.5px;
+            background: linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.9) 50%, transparent 80%);
+            background-size: 200% 100%;
+            background-position: -150% 0;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 150ms ease;
+            pointer-events: none;
+          }
+          .btn-glow:hover::after {
+            opacity: 1;
+            animation: strokeSweep 0.85s ease forwards;
           }
         `}</style>
         <a
