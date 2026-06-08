@@ -503,41 +503,43 @@ export default function Wireframe() {
         <style>{`
           .btn-glow {
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25);
-            transition: box-shadow 300ms ease;
-          }
-          .btn-glow:hover {
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25);
           }
           @keyframes strokeSweep {
-            0%   { background-position: -150% 0; }
-            100% { background-position: 250% 0; }
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
           }
-          .btn-glow::after {
-            content: '';
+          .btn-sweep {
             position: absolute;
-            inset: -1px;
-            border-radius: 11px;
+            inset: -1.5px;
+            border-radius: 11.5px;
             padding: 1.5px;
-            background: linear-gradient(90deg, transparent 15%, rgba(255,255,255,1) 50%, transparent 85%);
-            background-size: 200% 100%;
-            background-position: -150% 0;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            background: linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.95) 50%, transparent 80%);
+            background-size: 300% 100%;
+            background-position: -200% 0;
+            -webkit-mask:
+              linear-gradient(#fff 0 0) content-box,
+              linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask:
+              linear-gradient(#fff 0 0) content-box,
+              linear-gradient(#fff 0 0);
             mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 150ms ease;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 120ms ease;
+            z-index: 20;
           }
-          .btn-glow:hover::after {
+          .btn-glow:hover .btn-sweep {
             opacity: 1;
-            animation: strokeSweep 0.85s ease forwards;
+            animation: strokeSweep 1s ease forwards;
           }
         `}</style>
         <a
           href="mailto:gentlycarved@gmail.com"
           className="btn-glow absolute active:translate-y-px border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
         >
+          {/* Traveling border glow */}
+          <div className="btn-sweep" />
           {/* Light gradient layer */}
           <div className="absolute inset-0 rounded-[inherit]" style={{
             backgroundImage: "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
