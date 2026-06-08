@@ -433,7 +433,6 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
             width: 240,
             background: darkMode ? "#2a2a2a" : "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
             color: darkMode ? "#f0f0f0" : "#444",
-            transition: "background 600ms ease, color 600ms ease",
           }}
         >
             {darkMode
