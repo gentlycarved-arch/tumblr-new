@@ -425,7 +425,6 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           margin: "0 auto",
           marginBottom: -7,
           borderRadius: 2,
-          transition: "background 600ms ease",
         }} />
         {/* Card */}
         <div
