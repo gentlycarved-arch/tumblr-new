@@ -35,7 +35,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
           className="text-[16px] leading-[1.55] mb-3 whitespace-pre-line"
           style={{ color: darkMode ? "#aaaaaa" : "#555", transition: "color 600ms ease" }}
         >
-          {"I craft made-to-measure interfaces for experts in their fields.\n\nCurrently the Founding Designer at GeologicAI, where I help Geologists use AI to find minerals.\n\nI live in Toronto, Canada.\n\nThis page was inspired by a screenshot of Lindsay Lohan on Tumblr's login page, from years ago. It's sitting here as a fun placeholder while I build out my new website."}
+          {"I design made-to-measure interfaces, tools shaped around how experts think, not the other way around. These days that means helping geologists use AI to find minerals, as Founding Designer at GeologicAI.\n\nThis page is a placeholder for now, inspired by a Lindsay Lohan screenshot on Tumblr's login page I stumbled on years ago and never forgot. You can request for my portfolio or just to chat."}
         </p>
 
         <button
