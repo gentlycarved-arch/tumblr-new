@@ -154,7 +154,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
 
   return (
     <div
-      className="absolute right-[37.5%] top-[54%] -translate-y-1/2 max-sm:right-[8.5%] max-sm:top-[53.5%]"
+      className="absolute right-[37.5%] top-[55%] -translate-y-1/2 max-sm:right-[8.5%] max-sm:top-[54.5%]"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -449,7 +449,7 @@ function Typewriter({ darkMode }: { darkMode: boolean }) {
   const color = darkMode ? "#c0bcbc" : "#888484";
   return (
     <p
-      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[52.9%] max-sm:top-[52%] tracking-[-0.44px]"
+      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]"
       style={{ color, transition: "color 600ms ease" }}
     >
       {displayed}
@@ -562,7 +562,7 @@ export default function Wireframe() {
         </a>
 
         {/* Input field box */}
-        <div className="absolute inset-[45.19%_37.62%_40.41%_37.68%] max-sm:inset-[43%_8%_41%_8%] pointer-events-none rounded-[13px]"
+        <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"
           style={{
             boxShadow: darkMode
               ? "0 0 0 1.5px rgba(255,255,255,0.3), 0 0 24px rgba(255,255,255,0.08)"
@@ -583,7 +583,7 @@ export default function Wireframe() {
 
         {/* Divider */}
         <div
-          className="absolute h-px left-[37.68%] right-[37.62%] top-[51.5%] max-sm:left-[10%] max-sm:right-[10%] max-sm:top-[50.5%]"
+          className="absolute h-px left-[37.68%] right-[37.62%] top-[52%] max-sm:left-[10%] max-sm:right-[10%] max-sm:top-[51%]"
           style={{
             background: darkMode ? "#4a4a4a" : "#CAC5C5",
             transition: "background 600ms ease",
@@ -592,7 +592,7 @@ export default function Wireframe() {
 
         {/* Product Designer text */}
         <p
-          className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[46.8%] max-sm:top-[45%] tracking-[-0.44px]"
+          className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[47.8%] max-sm:top-[46%] tracking-[-0.44px]"
           style={{
             color: darkMode ? "#c0bcbc" : "#888484",
             transition: "color 600ms ease",
