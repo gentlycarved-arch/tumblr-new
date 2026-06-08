@@ -506,7 +506,7 @@ export default function Wireframe() {
             100% { transform: translateX(230%) skewX(-15deg); }
           }
           .btn-shimmer:hover .shimmer-sweep {
-            animation: shimmer 0.65s ease forwards;
+            animation: shimmer 0.9s ease forwards;
           }
         `}</style>
         <a
@@ -533,7 +533,7 @@ export default function Wireframe() {
           <div
             className="shimmer-sweep absolute inset-0 pointer-events-none"
             style={{
-              background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%)",
+              background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.45) 50%, transparent 65%)",
               transform: "translateX(-130%) skewX(-15deg)",
               zIndex: 2,
             }}
