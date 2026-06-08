@@ -154,7 +154,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
 
   return (
     <div
-      className="absolute right-[39%] top-[54%] -translate-y-1/2 max-sm:right-[10%] max-sm:top-[53.5%]"
+      className="absolute right-[37.5%] top-[54%] -translate-y-1/2 max-sm:right-[8.5%] max-sm:top-[53.5%]"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
