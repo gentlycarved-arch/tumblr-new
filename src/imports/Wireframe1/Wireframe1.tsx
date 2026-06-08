@@ -506,7 +506,7 @@ export default function Wireframe() {
             transition: box-shadow 300ms ease, filter 300ms ease;
           }
           .btn-glow:hover {
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25), 0 0 0 1.5px rgba(255,255,255,0.55), 0 0 10px 2px rgba(255,255,255,0.25);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.9), 0 0 16px 4px rgba(255,255,255,0.45);
           }
         `}</style>
         <a
