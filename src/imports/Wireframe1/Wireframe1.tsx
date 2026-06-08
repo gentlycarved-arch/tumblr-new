@@ -609,7 +609,7 @@ export default function Wireframe() {
           onClick={() => setTooltipOpen(false)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <ConnectTooltip darkMode={darkMode} />
+            <ConnectTooltip darkMode={darkMode} onClose={() => setTooltipOpen(false)} />
           </div>
         </div>
       )}
