@@ -26,13 +26,13 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
       {/* Card content */}
       <div className="p-4">
         <p
-          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] mb-1.5"
+          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[15px] mb-1.5"
           style={{ color: darkMode ? "#f0f0f0" : "#1a1a1a", transition: "color 600ms ease" }}
         >
           Hi! I'm Tahreem Rehman.
         </p>
         <p
-          className="text-[13px] leading-[1.5] mb-3 whitespace-pre-line"
+          className="text-[15px] leading-[1.55] mb-3 whitespace-pre-line"
           style={{ color: darkMode ? "#aaaaaa" : "#555", transition: "color 600ms ease" }}
         >
           {"I craft made-to-measure interfaces for experts in their fields.\n\nCurrently the Founding Designer at GeologicAI, where I help Geologists use AI to find minerals.\n\nI live in Toronto, Canada.\n\nThis page was inspired by a screenshot of Lindsay Lohan on Tumblr's login page, from years ago. It's sitting here as a fun placeholder while I build out my new website."}
@@ -41,7 +41,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1 text-[13px] text-[#7eb8f7] hover:text-[#a8d0fb] transition-colors"
+          className="flex items-center gap-1 text-[15px] text-[#7eb8f7] hover:text-[#a8d0fb] transition-colors"
         >
           <span>{open ? "Close" : "My digital footprint"}</span>
           <ChevronDown
@@ -66,7 +66,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
                     <span
-                      className="text-[13px]"
+                      className="text-[15px]"
                       style={{ color: darkMode ? "#e0e0e0" : "#1a1a1a" }}
                     >{link.name}</span>
                     <ArrowUpRight className="w-3.5 h-3.5" style={{ color: darkMode ? "#888" : "#888" }} />
