@@ -41,7 +41,8 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1 text-[16px] text-[#7eb8f7] hover:text-[#a8d0fb] transition-colors"
+          className="flex items-center gap-1 text-[16px] transition-colors"
+          style={{ color: darkMode ? "#7eb8f7" : "#3a7fd4" }}
         >
           <span>{open ? "Close" : "My digital footprint"}</span>
           <ChevronDown
