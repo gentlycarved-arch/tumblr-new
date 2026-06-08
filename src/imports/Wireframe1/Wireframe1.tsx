@@ -449,7 +449,7 @@ function Typewriter({ darkMode }: { darkMode: boolean }) {
   const color = darkMode ? "#c0bcbc" : "#888484";
   return (
     <p
-      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] max-sm:left-[11%] max-sm:right-[11%] not-italic text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px]"
+      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] right-[41%] max-sm:left-[11%] max-sm:right-[16%] not-italic text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px] overflow-hidden whitespace-nowrap"
       style={{ color, transition: "color 600ms ease" }}
     >
       {displayed}
