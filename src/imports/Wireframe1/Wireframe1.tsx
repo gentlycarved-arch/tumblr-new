@@ -518,7 +518,7 @@ export default function Wireframe() {
             inset: -1px;
             border-radius: 11px;
             padding: 1.5px;
-            background: linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.9) 50%, transparent 80%);
+            background: linear-gradient(90deg, transparent 15%, rgba(255,255,255,1) 50%, transparent 85%);
             background-size: 200% 100%;
             background-position: -150% 0;
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -536,7 +536,7 @@ export default function Wireframe() {
         `}</style>
         <a
           href="mailto:gentlycarved@gmail.com"
-          className="btn-glow absolute active:translate-y-px border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center overflow-hidden"
+          className="btn-glow absolute active:translate-y-px border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
         >
           {/* Light gradient layer */}
           <div className="absolute inset-0 rounded-[inherit]" style={{
