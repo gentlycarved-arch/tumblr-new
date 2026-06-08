@@ -29,13 +29,13 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
           className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1.5"
           style={{ color: darkMode ? "#f0f0f0" : "#1a1a1a", transition: "color 600ms ease" }}
         >
-          Tahreem Rehman.
+          Hi! I'm Tahreem Rehman.
         </p>
         <p
           className="text-[16px] leading-[1.55] mb-3 whitespace-pre-line"
           style={{ color: darkMode ? "#aaaaaa" : "#555", transition: "color 600ms ease" }}
         >
-          {"Hi, I'm Tahreem Rehman, interface designer, made-to-measure tool builder, and believer that great software thinks like its users. I'm currently helping geologists find minerals with AI at GeologicAI, and building interfaces for specialists who need more than off-the-shelf.\n\nThis page is a placeholder inspired by a Lindsay Lohan screenshot on Tumblr's login page I stumbled on years ago and never forgot. My actual site is on its way."}
+          {"Interface designer, made-to-measure tool builder, and believer that great software thinks like its users. I'm currently helping geologists find minerals with AI at GeologicAI, and building interfaces for specialists who need more than off-the-shelf.\n\nThis page is a placeholder inspired by a Lindsay Lohan screenshot on Tumblr's login page I stumbled on years ago and never forgot. My actual site is on its way."}
         </p>
 
         <button
