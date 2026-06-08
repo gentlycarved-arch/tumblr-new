@@ -198,8 +198,8 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
             />
           )}
         </svg>
-        <span className="relative z-10 font-['Inter:Medium',sans-serif] font-medium text-[14px] text-white leading-none select-none"
-          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)" , fontSize: "12px" }}>?</span>
+        <span className="relative z-10 font-['Inter:Medium',sans-serif] font-medium text-white leading-none select-none"
+          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)", fontSize: "15px", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>?</span>
       </button>
 
       {/* Desktop tooltip — appears to the right of the button */}
@@ -502,7 +502,7 @@ export default function Wireframe() {
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
           .btn-glow {
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.35);
           }
           @keyframes strokeSweep {
             0%   { background-position: -200% 0; }
@@ -536,7 +536,7 @@ export default function Wireframe() {
         `}</style>
         <a
           href="mailto:gentlycarved@gmail.com"
-          className="btn-glow absolute active:translate-y-px border border-[rgba(255,255,255,0.35)] border-solid inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
+          className="btn-glow absolute active:translate-y-px inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
         >
           {/* Traveling border glow */}
           <div className="btn-sweep" />
