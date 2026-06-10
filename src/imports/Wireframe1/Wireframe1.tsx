@@ -543,21 +543,44 @@ async function detectImageMode(src: string): Promise<'dark' | 'light'> {
 export default function Wireframe() {
   const [darkMode, setDarkMode] = useState(false);
   const [autoMode, setAutoMode] = useState(true); // auto-detect until user overrides
-  const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage, MAIN_SLUG);
+  const { currentSrc, nextSrc, fading, fadeDuration, images, jumpTo } = useArenaSlideshow(bgImage, MAIN_SLUG);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  // Cache each image's detected tone so manual toggles can jump instantly
+  const modeCache = useRef<Map<string, 'dark' | 'light'>>(new Map());
+
+  // Classify every image once it's loaded (runs in the background)
+  useEffect(() => {
+    images.forEach((src) => {
+      if (modeCache.current.has(src)) return;
+      detectImageMode(src).then((m) => modeCache.current.set(src, m));
+    });
+  }, [images]);
 
   // Auto-detect mode from current image until user manually toggles
   useEffect(() => {
     if (!autoMode) return;
     if (!currentSrc || currentSrc === bgImage) return;
     detectImageMode(currentSrc).then((detected) => {
+      modeCache.current.set(currentSrc, detected);
       setDarkMode(detected === 'dark');
     });
   }, [currentSrc, autoMode]);
 
   function handleToggle() {
-    setAutoMode(false); // user manually overriding — pause auto-detect
-    setDarkMode((v) => !v);
+    const target: 'dark' | 'light' = darkMode ? 'light' : 'dark';
+    setAutoMode(false);    // user manually overriding — pause auto-detect
+    setDarkMode(target === 'dark');
+
+    // Immediately swap to a background image that matches the chosen mode
+    const matches: number[] = [];
+    images.forEach((src, i) => {
+      if (src === currentSrc) return;
+      if (modeCache.current.get(src) === target) matches.push(i);
+    });
+    if (matches.length > 0) {
+      jumpTo(matches[Math.floor(Math.random() * matches.length)]);
+    }
   }
 
   return (

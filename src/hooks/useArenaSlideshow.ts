@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const INTERVAL_MS = 15_000; // time between transitions
 const FADE_MS = 800;        // crossfade duration (quick)
@@ -35,49 +35,64 @@ export interface SlideshowState {
   nextSrc: string;
   fading: boolean;
   fadeDuration: number;
+  images: string[];
+  jumpTo: (index: number) => void;
 }
 
 export function useArenaSlideshow(fallback: string, channelSlug: string): SlideshowState {
   const [images, setImages] = useState<string[]>([]);
-  const [idx, setIdx] = useState(0);
+  const [curIdx, setCurIdx] = useState(0);   // image currently shown (top layer)
+  const [incIdx, setIncIdx] = useState(0);   // incoming image (bottom layer, revealed on fade)
   const [fading, setFading] = useState(false);
-  const idxRef = useRef(0);
-  const lenRef = useRef(0);
+  const curRef = useRef(0);
+  const fadingRef = useRef(false);
 
   useEffect(() => {
     setImages([]);
-    setIdx(0);
-    idxRef.current = 0;
+    setCurIdx(0);
+    setIncIdx(0);
+    curRef.current = 0;
     const token = (import.meta.env.VITE_ARENA_TOKEN as string | undefined) || undefined;
     fetchArenaImages(channelSlug, token)
       .then((imgs) => {
         if (imgs.length === 0) return;
-        const shuffled = shuffle(imgs);
-        setImages(shuffled);
-        lenRef.current = shuffled.length;
+        setImages(shuffle(imgs));
       })
       .catch((err) => console.warn("[Arena slideshow]", err));
   }, [channelSlug]);
 
+  // Crossfade from the current image to a target index
+  const transition = useCallback((target: number, len: number) => {
+    if (fadingRef.current) return;
+    if (target === curRef.current) return;
+    fadingRef.current = true;
+    setIncIdx(target);
+    setFading(true);
+    setTimeout(() => {
+      curRef.current = target;
+      setCurIdx(target);
+      setFading(false);
+      fadingRef.current = false;
+    }, FADE_MS);
+  }, []);
+
+  // Auto-advance on a timer
   useEffect(() => {
     if (images.length < 2) return;
-    lenRef.current = images.length;
-
     const timer = setInterval(() => {
-      setFading(true);
-      setTimeout(() => {
-        idxRef.current = (idxRef.current + 1) % lenRef.current;
-        setIdx(idxRef.current);
-        setFading(false);
-      }, FADE_MS);
+      transition((curRef.current + 1) % images.length, images.length);
     }, INTERVAL_MS);
-
     return () => clearInterval(timer);
-  }, [images]);
+  }, [images, transition]);
+
+  const jumpTo = useCallback((index: number) => {
+    if (index < 0 || index >= images.length) return;
+    transition(index, images.length);
+  }, [images, transition]);
 
   const len = images.length;
-  const currentSrc = len > 0 ? images[idx] : fallback;
-  const nextSrc = len > 1 ? images[(idx + 1) % len] : fallback;
+  const currentSrc = len > 0 ? images[curIdx] : fallback;
+  const nextSrc = len > 0 ? images[incIdx] : fallback;
 
-  return { currentSrc, nextSrc, fading, fadeDuration: FADE_MS };
+  return { currentSrc, nextSrc, fading, fadeDuration: FADE_MS, images, jumpTo };
 }
