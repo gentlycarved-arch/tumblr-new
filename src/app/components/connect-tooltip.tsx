@@ -21,27 +21,27 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
         transition: "background 600ms ease, box-shadow 600ms ease",
         overflow: "hidden",
       }}
-      className="w-[280px] max-sm:w-[calc(100vw-32px)] max-sm:max-w-[320px] rounded-[13px] text-left font-['Favorit_Tumblr:Regular',sans-serif]"
+      className="w-[280px] max-sm:w-[calc(100vw-32px)] max-sm:max-w-[320px] rounded-[13px] text-left"
     >
       {/* Card content */}
       <div className="p-4">
         <p
-          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1.5"
+          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] max-sm:text-[15px] mb-1.5"
           style={{ color: darkMode ? "#E0E0E0" : "#212529", transition: "color 600ms ease" }}
         >
           Hi! I'm Tahreem Rehman.
         </p>
         <p
-          className="text-[16px] leading-[1.55] mb-3 whitespace-pre-line"
+          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.55] mb-3 whitespace-pre-line"
           style={{ color: darkMode ? "#A8A8A8" : "#4A4A4A", transition: "color 600ms ease" }}
         >
-          {"I am an interface designer, made-to-measure tool builder, and believer that great software thinks like its users.\n\nI'm currently helping geologists find minerals with AI at GeologicAI, and building interfaces for specialists who need more than off-the-shelf.\n\nThis page is a placeholder inspired by a Lindsay Lohan screenshot on Tumblr's login page I stumbled on years ago and never forgot. My actual site is on its way."}
+          {"Interfaces for specialists. Founding Designer at GeologicAI.\n\nThis page is a placeholder — my actual site is on its way."}
         </p>
 
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1 text-[16px] transition-colors"
+          className="flex items-center gap-1 text-[16px] max-sm:text-[15px] transition-colors"
           style={{ color: darkMode ? "#7ab2f0" : "#3a7fd4" }}
         >
           <span>{open ? "Close" : "My digital footprint"}</span>
@@ -67,7 +67,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
                     <span
-                      className="text-[16px]"
+                      className="text-[16px] max-sm:text-[15px]"
                       style={{ color: darkMode ? "#E0E0E0" : "#212529" }}
                     >{link.name}</span>
                     <ArrowUpRight className="w-3.5 h-3.5" style={{ color: darkMode ? "#888" : "#888" }} />
