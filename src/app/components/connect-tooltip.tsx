@@ -26,13 +26,13 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
       {/* Card content */}
       <div className="p-4">
         <p
-          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] max-sm:text-[15px] mb-1.5"
+          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[18px] max-sm:text-[17px] mb-2 leading-[1.3]"
           style={{ color: darkMode ? "#E0E0E0" : "#212529", transition: "color 600ms ease" }}
         >
 I'm Tahreem Rehman,
         </p>
         <p
-          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.55] mb-3 whitespace-pre-line"
+          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.6] mb-3 whitespace-pre-line"
           style={{ color: darkMode ? "#A8A8A8" : "#4A4A4A", transition: "color 600ms ease" }}
         >
           {"I design made-to-measure experiences for experts in their craft & daydreamers on the internet.\n\nThis is a placeholder website while I work on my portfolio, inspired by my first experience designing on the Internet, Tumblr. This is a replication of the old Tumblr landing page."}
