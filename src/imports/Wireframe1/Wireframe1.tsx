@@ -466,8 +466,7 @@ function Typewriter({ darkMode }: { darkMode: boolean }) {
   );
 }
 
-const DARK_SLUG  = "gently-carved-dark-mode";
-const LIGHT_SLUG = "gently-carved-light-mode";
+const MAIN_SLUG = "nothing-tykp-p8vhpo";
 
 /** Samples image pixels via canvas and returns 'dark' or 'light'. Falls back to 'light' on CORS errors. */
 async function detectImageMode(src: string): Promise<'dark' | 'light'> {
@@ -503,8 +502,7 @@ async function detectImageMode(src: string): Promise<'dark' | 'light'> {
 export default function Wireframe() {
   const [darkMode, setDarkMode] = useState(false);
   const [autoMode, setAutoMode] = useState(true); // auto-detect until user overrides
-  const slug = darkMode ? DARK_SLUG : LIGHT_SLUG;
-  const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage, slug);
+  const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage, MAIN_SLUG);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   // Auto-detect mode from current image
