@@ -392,7 +392,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         >
           <div style={{
             width: 12, height: 12,
-            background: "#F4F5F7",
+            background: darkMode ? "#1A1A1A" : "#F4F5F7",
             transform: "rotate(45deg)",
             margin: "0 auto",
             marginBottom: -6,
