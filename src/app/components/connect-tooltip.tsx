@@ -26,7 +26,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
       {/* Card content */}
       <div className="p-5 max-sm:p-4">
         <p
-          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[18px] max-sm:text-[17px] mb-2 leading-[1.3]"
+          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[18px] max-sm:text-[16px] mb-2 leading-[1.3]"
           style={{ color: darkMode ? "#E0E0E0" : "#212529", transition: "color 600ms ease" }}
         >
 I'm Tahreem Rehman,
