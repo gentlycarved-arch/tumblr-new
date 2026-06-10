@@ -141,10 +141,20 @@ function useTypewriter() {
   return { displayed, pausing };
 }
 
-function Group({ darkMode: _ }: { darkMode: boolean }) {
+function Group({ darkMode }: { darkMode: boolean }) {
   return (
     <div className="absolute inset-[33.3%_33.59%_57.08%_33.71%] max-sm:inset-[28%_10%_60%_10%]">
-      <img alt="" className="block size-full object-contain" src={logoImage} />
+      <img
+        alt=""
+        className="block size-full object-contain"
+        src={logoImage}
+        style={{
+          filter: darkMode
+            ? "drop-shadow(0 1px 6px rgba(0,0,0,0.45))"
+            : "drop-shadow(0 1px 3px rgba(0,0,0,0.55)) drop-shadow(0 0 1px rgba(0,0,0,0.4))",
+          transition: "filter 600ms ease",
+        }}
+      />
     </div>
   );
 }
@@ -156,7 +166,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
 
   return (
     <div
-      className="absolute right-[38.5%] top-[55%] -translate-y-1/2 max-sm:right-[9.5%] max-sm:top-[54.5%]"
+      className="absolute right-[38.5%] top-[55%] -translate-y-1/2 max-sm:right-[11%] max-sm:top-[53.5%]"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >

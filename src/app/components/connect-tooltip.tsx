@@ -35,7 +35,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
           className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.55] mb-3 whitespace-pre-line"
           style={{ color: darkMode ? "#A8A8A8" : "#4A4A4A", transition: "color 600ms ease" }}
         >
-          {"Interfaces for specialists. Founding Designer at GeologicAI.\n\nThis page is a placeholder — my actual site is on its way."}
+          {"I am an interface designer, made-to-measure tool builder, and believer that great software thinks like its users.\n\nI'm currently helping geologists find minerals with AI at GeologicAI, and building interfaces for specialists who need more than off-the-shelf.\n\nThis page is a placeholder inspired by a Lindsay Lohan screenshot on Tumblr's login page I stumbled on years ago and never forgot. My actual site is on its way."}
         </p>
 
         <button
