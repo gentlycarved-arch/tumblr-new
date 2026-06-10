@@ -21,10 +21,10 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
         transition: "background 600ms ease, box-shadow 600ms ease",
         overflow: "hidden",
       }}
-      className="w-[280px] max-sm:w-[calc(100vw-32px)] max-sm:max-w-[320px] rounded-[13px] text-left"
+      className="w-[340px] max-sm:w-[calc(100vw-32px)] max-sm:max-w-[320px] rounded-[13px] text-left"
     >
       {/* Card content */}
-      <div className="p-4">
+      <div className="p-5 max-sm:p-4">
         <p
           className="font-['Favorit_Tumblr:Medium',sans-serif] text-[18px] max-sm:text-[17px] mb-2 leading-[1.3]"
           style={{ color: darkMode ? "#E0E0E0" : "#212529", transition: "color 600ms ease" }}
@@ -32,8 +32,8 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
 I'm Tahreem Rehman,
         </p>
         <p
-          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.6] mb-3 whitespace-pre-line"
-          style={{ color: darkMode ? "#A8A8A8" : "#4A4A4A", transition: "color 600ms ease" }}
+          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.65] mb-3 whitespace-pre-line"
+          style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
         >
           {"I design made-to-measure experiences for experts in their craft and daydreamers on the internet. Currently, I'm doing that as Founding Designer at GeologicAI, where geologists use AI software to find minerals.\n\nThis is a placeholder website while I work on my portfolio, inspired by my first experience designing on the Internet, Tumblr. This is a replication of the old Tumblr landing page."}
         </p>
