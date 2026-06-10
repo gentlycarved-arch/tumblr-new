@@ -3,7 +3,7 @@ import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
-import { useArenaSlideshow } from "../../hooks/useArenaSlideshow";
+import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
 
 // Each phrase can have typos: { after: string, wrong: string }
 // meaning: after typing `after`, type `wrong` chars then backspace before continuing
@@ -489,98 +489,18 @@ function Typewriter({ darkMode }: { darkMode: boolean }) {
 
 const MAIN_SLUG = "nothing-tykp-p8vhpo";
 
-/**
- * Samples image pixels via canvas and returns 'dark' or 'light'.
- * Considers BOTH perceived brightness and color saturation: vivid, highly
- * saturated images bias toward dark mode (so the UI contrasts against them),
- * even when their raw brightness sits in the middle. Falls back to 'light' on CORS errors.
- */
-async function detectImageMode(src: string): Promise<'dark' | 'light'> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const SIZE = 64; // sample at 64×64 for speed
-      const canvas = document.createElement("canvas");
-      canvas.width = SIZE;
-      canvas.height = SIZE;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return resolve("light");
-      ctx.drawImage(img, 0, 0, SIZE, SIZE);
-      try {
-        const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
-        const pixels = data.length / 4;
-        let lumTotal = 0;
-        let satTotal = 0;
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i], g = data[i + 1], b = data[i + 2];
-          // Perceived luminance (ITU-R BT.601)
-          lumTotal += 0.299 * r + 0.587 * g + 0.114 * b;
-          // HSL-style saturation: (max-min)/(255-|max+min-255|)
-          const max = Math.max(r, g, b);
-          const min = Math.min(r, g, b);
-          const delta = max - min;
-          satTotal += delta === 0 ? 0 : delta / (255 - Math.abs(max + min - 255));
-        }
-        const avgLum = lumTotal / pixels;       // 0–255
-        const avgSat = satTotal / pixels;       // 0–1
-
-        // A saturated image needs darker UI to stay readable, so raise the
-        // brightness threshold: the more colorful, the more we lean dark.
-        // base 118, +up to ~40 for fully saturated images.
-        const threshold = 118 + avgSat * 42;
-
-        resolve(avgLum < threshold ? "dark" : "light");
-      } catch {
-        resolve("light"); // CORS blocked — fall back gracefully
-      }
-    };
-    img.onerror = () => resolve("light");
-    img.src = src;
-  });
-}
-
 export default function Wireframe() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [autoMode, setAutoMode] = useState(true); // auto-detect until user overrides
-  const { currentSrc, nextSrc, fading, fadeDuration, images, jumpTo } = useArenaSlideshow(bgImage, MAIN_SLUG);
+  // 'auto' until the user touches the toggle, then locked to 'dark' or 'light'
+  const [mode, setMode] = useState<SlideMode>('auto');
+  const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
-  // Cache each image's detected tone so manual toggles can jump instantly
-  const modeCache = useRef<Map<string, 'dark' | 'light'>>(new Map());
-
-  // Classify every image once it's loaded (runs in the background)
-  useEffect(() => {
-    images.forEach((src) => {
-      if (modeCache.current.has(src)) return;
-      detectImageMode(src).then((m) => modeCache.current.set(src, m));
-    });
-  }, [images]);
-
-  // Auto-detect mode from current image until user manually toggles
-  useEffect(() => {
-    if (!autoMode) return;
-    if (!currentSrc || currentSrc === bgImage) return;
-    detectImageMode(currentSrc).then((detected) => {
-      modeCache.current.set(currentSrc, detected);
-      setDarkMode(detected === 'dark');
-    });
-  }, [currentSrc, autoMode]);
+  // In auto mode the UI follows the current image's tone; in manual mode it's fixed.
+  const darkMode = mode === 'auto' ? currentMode === 'dark' : mode === 'dark';
 
   function handleToggle() {
-    const target: 'dark' | 'light' = darkMode ? 'light' : 'dark';
-    setAutoMode(false);    // user manually overriding — pause auto-detect
-    setDarkMode(target === 'dark');
-
-    // Immediately swap to a background image that matches the chosen mode
-    const matches: number[] = [];
-    images.forEach((src, i) => {
-      if (src === currentSrc) return;
-      if (modeCache.current.get(src) === target) matches.push(i);
-    });
-    if (matches.length > 0) {
-      jumpTo(matches[Math.floor(Math.random() * matches.length)]);
-    }
+    // Flip to the opposite of whatever's showing, and lock it in (filters the slideshow)
+    setMode(darkMode ? 'light' : 'dark');
   }
 
   return (
