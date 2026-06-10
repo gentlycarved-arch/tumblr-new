@@ -17,7 +17,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
         boxShadow: darkMode
           ? "inset 0 0 6px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)"
           : "inset 0 0 6px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)",
-        background: darkMode ? "#2a2a2a" : "white",
+        background: darkMode ? "#1A1A1A" : "#FAFAFA",
         transition: "background 600ms ease, box-shadow 600ms ease",
         overflow: "hidden",
       }}
@@ -27,13 +27,13 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
       <div className="p-4">
         <p
           className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1.5"
-          style={{ color: darkMode ? "#f0f0f0" : "#1a1a1a", transition: "color 600ms ease" }}
+          style={{ color: darkMode ? "#E0E0E0" : "#212529", transition: "color 600ms ease" }}
         >
           Hi! I'm Tahreem Rehman.
         </p>
         <p
           className="text-[16px] leading-[1.55] mb-3 whitespace-pre-line"
-          style={{ color: darkMode ? "#aaaaaa" : "#555", transition: "color 600ms ease" }}
+          style={{ color: darkMode ? "#A8A8A8" : "#4A4A4A", transition: "color 600ms ease" }}
         >
           {"I am an interface designer, made-to-measure tool builder, and believer that great software thinks like its users.\n\nI'm currently helping geologists find minerals with AI at GeologicAI, and building interfaces for specialists who need more than off-the-shelf.\n\nThis page is a placeholder inspired by a Lindsay Lohan screenshot on Tumblr's login page I stumbled on years ago and never forgot. My actual site is on its way."}
         </p>
@@ -42,7 +42,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
           type="button"
           onClick={() => setOpen((v) => !v)}
           className="flex items-center gap-1 text-[16px] transition-colors"
-          style={{ color: darkMode ? "#7eb8f7" : "#3a7fd4" }}
+          style={{ color: darkMode ? "#7ab2f0" : "#3a7fd4" }}
         >
           <span>{open ? "Close" : "My digital footprint"}</span>
           <ChevronDown
@@ -68,7 +68,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
                   >
                     <span
                       className="text-[16px]"
-                      style={{ color: darkMode ? "#e0e0e0" : "#1a1a1a" }}
+                      style={{ color: darkMode ? "#E0E0E0" : "#212529" }}
                     >{link.name}</span>
                     <ArrowUpRight className="w-3.5 h-3.5" style={{ color: darkMode ? "#888" : "#888" }} />
                   </a>

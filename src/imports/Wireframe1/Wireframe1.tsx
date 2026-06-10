@@ -269,7 +269,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           />
           {/* Track — dark layer (charcoal) */}
           <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
-            fill="#2c2c2c"
+            fill="#1A1A1A"
             stroke="rgba(255,255,255,0.25)"
             strokeWidth="1.5"
             style={{ opacity: darkMode ? 1 : 0, transition: "opacity 600ms ease" }}
@@ -383,17 +383,18 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         >
           <div style={{
             width: 12, height: 12,
-            background: "#f0eeeb",
+            background: "#F4F5F7",
             transform: "rotate(45deg)",
             margin: "0 auto",
             marginBottom: -6,
             borderRadius: 2,
           }} />
           <div
-            className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] text-[#444] leading-snug text-center"
+            className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] leading-snug text-center"
             style={{
               width: 190,
-              background: "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
+              background: darkMode ? "#1A1A1A" : "linear-gradient(180deg, #F4F5F7 0%, #E8E9EC 100%)",
+              color: darkMode ? "#E0E0E0" : "#212529",
             }}
           >
             {darkMode
@@ -420,7 +421,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         {/* Arrow */}
         <div style={{
           width: 14, height: 14,
-          background: darkMode ? "#2a2a2a" : "#f5f3f0",
+          background: darkMode ? "#1A1A1A" : "#F4F5F7",
           transform: "rotate(45deg)",
           margin: "0 auto",
           marginBottom: -7,
@@ -431,8 +432,8 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           className="px-4 py-3 rounded-[12px] text-[15px] font-['Favorit_Tumblr:Medium',sans-serif] leading-snug text-center"
           style={{
             width: 240,
-            background: darkMode ? "#2a2a2a" : "linear-gradient(180deg, #f5f3f0 0%, #e8e5e1 100%)",
-            color: darkMode ? "#f0f0f0" : "#444",
+            background: darkMode ? "#1A1A1A" : "linear-gradient(180deg, #F4F5F7 0%, #E8E9EC 100%)",
+            color: darkMode ? "#E0E0E0" : "#212529",
           }}
         >
             {darkMode
@@ -593,7 +594,7 @@ export default function Wireframe() {
           }} />
           {/* Dark gradient layer */}
           <div className="absolute inset-0 rounded-[inherit]" style={{
-            backgroundImage: "radial-gradient(ellipse at 50% 35%, #2a4a72 0%, #1e3a5f 35%, #152e50 70%, #0f2340 100%)",
+            backgroundImage: "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, #1f2e3e 70%, #151f2b 100%)",
             opacity: darkMode ? 1 : 0,
             transition: "opacity 600ms ease",
           }} />
@@ -618,7 +619,7 @@ export default function Wireframe() {
             aria-hidden="true"
             className="absolute inset-0 rounded-[13px]"
             style={{
-              background: darkMode ? "#2a2a2a" : "white",
+              background: darkMode ? "#1A1A1A" : "#FAFAFA",
               transition: "background 600ms ease",
             }}
           />
