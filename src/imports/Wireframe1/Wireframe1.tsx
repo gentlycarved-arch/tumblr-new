@@ -323,19 +323,30 @@ function ModeToggle({ mode, onCycle, darkMode }: { mode: Mode; onCycle: () => vo
           {/* Icon inside knob */}
           <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
             {mode === 'auto' ? (
-              // Auto — 4-pointed sparkle
+              // Auto — letter "A" mark with depth
               <g>
-                <polygon
-                  points={`${KNOB/2},${TRACK_H/2-7} ${KNOB/2+2},${TRACK_H/2-2} ${KNOB/2+7},${TRACK_H/2} ${KNOB/2+2},${TRACK_H/2+2} ${KNOB/2},${TRACK_H/2+7} ${KNOB/2-2},${TRACK_H/2+2} ${KNOB/2-7},${TRACK_H/2} ${KNOB/2-2},${TRACK_H/2-2}`}
+                {/* shadow */}
+                <text
+                  x={KNOB / 2}
+                  y={TRACK_H / 2 + 0.5}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontFamily="Inter, sans-serif"
+                  fontSize="14"
+                  fontWeight="700"
+                  fill="rgba(0,0,0,0.18)"
+                >A</text>
+                {/* white letter */}
+                <text
+                  x={KNOB / 2}
+                  y={TRACK_H / 2 - 0.5}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontFamily="Inter, sans-serif"
+                  fontSize="14"
+                  fontWeight="700"
                   fill="white"
-                  opacity="0.95"
-                />
-                <polygon
-                  points={`${KNOB/2},${TRACK_H/2-7} ${KNOB/2+2},${TRACK_H/2-2} ${KNOB/2+7},${TRACK_H/2} ${KNOB/2+2},${TRACK_H/2+2} ${KNOB/2},${TRACK_H/2+7} ${KNOB/2-2},${TRACK_H/2+2} ${KNOB/2-7},${TRACK_H/2} ${KNOB/2-2},${TRACK_H/2-2}`}
-                  fill="none"
-                  stroke="rgba(255,255,255,0.4)"
-                  strokeWidth="0.5"
-                />
+                >A</text>
               </g>
             ) : mode === 'dark' ? (
               // Skeuomorphic Moon — white crescent with depth
