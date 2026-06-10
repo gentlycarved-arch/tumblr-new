@@ -164,7 +164,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
 
   return (
     <div
-      className="absolute right-[38.5%] top-[55%] -translate-y-1/2 max-sm:right-[11%] max-sm:top-[55.5%]"
+      className="absolute right-[38.5%] top-[55%] -translate-y-1/2 max-sm:right-[11%] max-sm:top-[54.8%]"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -421,10 +421,13 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           left: "50%",
           transform: "translateX(-50%)",
           opacity: mobileToast ? 1 : 0,
-          transition: "opacity 400ms ease",
+          visibility: mobileToast ? "visible" : "hidden",
+          transition: mobileToast
+            ? "opacity 400ms ease, visibility 0s"
+            : "opacity 400ms ease, visibility 0s 400ms",
           zIndex: 100,
           background: "transparent",
-          filter: "drop-shadow(0 3px 10px rgba(0,0,0,0.18))",
+          filter: mobileToast ? "drop-shadow(0 3px 10px rgba(0,0,0,0.18))" : "none",
         }}
       >
         {/* Arrow */}
