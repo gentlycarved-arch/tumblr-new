@@ -5,8 +5,6 @@ import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { useArenaSlideshow } from "../../hooks/useArenaSlideshow";
 
-type Mode = 'light' | 'auto' | 'dark';
-
 // Each phrase can have typos: { after: string, wrong: string }
 // meaning: after typing `after`, type `wrong` chars then backspace before continuing
 type Typo = { after: string; wrong: string };
@@ -224,25 +222,19 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
   );
 }
 
-function ModeToggle({ mode, onCycle, darkMode }: { mode: Mode; onCycle: () => void; darkMode: boolean }) {
+function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
   const [hover, setHover] = useState(false);
   const [mobileToast, setMobileToast] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const TRACK_W = 114;
+  const TRACK_W = 80;
   const TRACK_H = 42;
   const KNOB = 34;
   const PAD = (TRACK_H - KNOB) / 2;
-  const knobX = mode === 'light' ? PAD : mode === 'dark' ? TRACK_W - KNOB - PAD : (TRACK_W - KNOB) / 2;
+  const knobX = darkMode ? TRACK_W - KNOB - PAD : PAD;
 
-  const toastText: Record<Mode, string> = {
-    light: "☀  Light mode — always bright.",
-    auto:  "✦  Auto — adapts to each image.",
-    dark:  "☽  Dark mode — always dim.",
-  };
-
-  function handleCycle() {
-    onCycle();
+  function handleToggle() {
+    onToggle();
     setMobileToast(true);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setMobileToast(false), 3000);
@@ -258,7 +250,7 @@ function ModeToggle({ mode, onCycle, darkMode }: { mode: Mode; onCycle: () => vo
       {/* The toggle switch */}
       <button
         type="button"
-        onClick={handleCycle}
+        onClick={handleToggle}
         aria-label="Cycle light / auto / dark mode"
         style={{
           width: TRACK_W, height: TRACK_H, position: "relative",
@@ -322,33 +314,7 @@ function ModeToggle({ mode, onCycle, darkMode }: { mode: Mode; onCycle: () => vo
 
           {/* Icon inside knob */}
           <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
-            {mode === 'auto' ? (
-              // Auto — letter "A" mark with depth
-              <g>
-                {/* shadow */}
-                <text
-                  x={KNOB / 2}
-                  y={TRACK_H / 2 + 0.5}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontFamily="Inter, sans-serif"
-                  fontSize="14"
-                  fontWeight="700"
-                  fill="rgba(0,0,0,0.18)"
-                >A</text>
-                {/* white letter */}
-                <text
-                  x={KNOB / 2}
-                  y={TRACK_H / 2 - 0.5}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontFamily="Inter, sans-serif"
-                  fontSize="14"
-                  fontWeight="700"
-                  fill="white"
-                >A</text>
-              </g>
-            ) : mode === 'dark' ? (
+            {darkMode ? (
               // Skeuomorphic Moon — white crescent with depth
               <g>
                 {/* Main crescent body */}
@@ -440,10 +406,9 @@ function ModeToggle({ mode, onCycle, darkMode }: { mode: Mode; onCycle: () => vo
               color: darkMode ? "#E0E0E0" : "#212529",
             }}
           >
-            <div className="font-['Favorit_Tumblr:Medium',sans-serif] mb-1">☀ Light · ✦ Auto · ☽ Dark</div>
-            <div style={{ color: darkMode ? "#A8A8A8" : "#4A4A4A", fontSize: 11 }}>
-              Auto adapts the UI to each image.
-            </div>
+            {darkMode
+              ? "Dark mode changes to darker coloured images."
+              : "Light mode changes to lighter coloured images."}
           </div>
         </div>
       )}
@@ -481,7 +446,9 @@ function ModeToggle({ mode, onCycle, darkMode }: { mode: Mode; onCycle: () => vo
             color: darkMode ? "#E0E0E0" : "#212529",
           }}
         >
-          {toastText[mode]}
+          {darkMode
+            ? "Dark mode changes to darker coloured images."
+            : "Light mode changes to lighter coloured images."}
         </div>
       </div>
     </div>
@@ -544,28 +511,23 @@ async function detectImageMode(src: string): Promise<'dark' | 'light'> {
 }
 
 export default function Wireframe() {
-  const [mode, setMode] = useState<Mode>('auto');
   const [darkMode, setDarkMode] = useState(false);
+  const [autoMode, setAutoMode] = useState(true); // auto-detect until user overrides
   const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage, MAIN_SLUG);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
-  // Auto-detect when in auto mode
+  // Auto-detect mode from current image until user manually toggles
   useEffect(() => {
-    if (mode !== 'auto') return;
+    if (!autoMode) return;
     if (!currentSrc || currentSrc === bgImage) return;
     detectImageMode(currentSrc).then((detected) => {
       setDarkMode(detected === 'dark');
     });
-  }, [currentSrc, mode]);
+  }, [currentSrc, autoMode]);
 
-  // Apply manual mode immediately
-  useEffect(() => {
-    if (mode === 'light') setDarkMode(false);
-    if (mode === 'dark') setDarkMode(true);
-  }, [mode]);
-
-  function handleCycle() {
-    setMode(prev => prev === 'light' ? 'auto' : prev === 'auto' ? 'dark' : 'light');
+  function handleToggle() {
+    setAutoMode(false); // user manually overriding — pause auto-detect
+    setDarkMode((v) => !v);
   }
 
   return (
@@ -591,7 +553,7 @@ export default function Wireframe() {
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
-        <ModeToggle mode={mode} onCycle={handleCycle} darkMode={darkMode} />
+        <ModeToggle darkMode={darkMode} onToggle={handleToggle} />
         <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
