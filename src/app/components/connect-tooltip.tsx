@@ -35,7 +35,7 @@ I'm Tahreem Rehman,
           className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.65] mb-3 whitespace-pre-line"
           style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
         >
-          {"I design made-to-measure experiences for experts in their craft and daydreamers on the internet.\n\nI'm the Founding Designer at GeologicAI, where geologists use AI to uncover minerals hidden within rock and scan data.\n\nA placeholder while I build my portfolio, inspired by Tumblr, where I first started designing on the internet."}
+          {"I design made-to-measure experiences for experts in their craft and daydreamers on the internet.\n\nI'm the Founding Designer at GeologicAI, where geologists use AI to uncover minerals hidden within rock and scan data.\n\nThis is a placeholder while I build my portfolio, inspired by Tumblr, where I first started designing on the internet."}
         </p>
 
         <button
