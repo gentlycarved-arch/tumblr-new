@@ -469,11 +469,57 @@ function Typewriter({ darkMode }: { darkMode: boolean }) {
 const DARK_SLUG  = "gently-carved-dark-mode";
 const LIGHT_SLUG = "gently-carved-light-mode";
 
+/** Samples image pixels via canvas and returns 'dark' or 'light'. Falls back to 'light' on CORS errors. */
+async function detectImageMode(src: string): Promise<'dark' | 'light'> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const SIZE = 64; // sample at 64×64 for speed
+      const canvas = document.createElement("canvas");
+      canvas.width = SIZE;
+      canvas.height = SIZE;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve("light");
+      ctx.drawImage(img, 0, 0, SIZE, SIZE);
+      try {
+        const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
+        let total = 0;
+        const pixels = data.length / 4;
+        for (let i = 0; i < data.length; i += 4) {
+          // Perceived luminance weights (ITU-R BT.601)
+          total += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        }
+        resolve(total / pixels < 118 ? "dark" : "light");
+      } catch {
+        resolve("light"); // CORS blocked — fall back gracefully
+      }
+    };
+    img.onerror = () => resolve("light");
+    img.src = src;
+  });
+}
+
 export default function Wireframe() {
   const [darkMode, setDarkMode] = useState(false);
+  const [autoMode, setAutoMode] = useState(true); // auto-detect until user overrides
   const slug = darkMode ? DARK_SLUG : LIGHT_SLUG;
   const { currentSrc, nextSrc, fading, fadeDuration } = useArenaSlideshow(bgImage, slug);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  // Auto-detect mode from current image
+  useEffect(() => {
+    if (!autoMode) return;
+    if (!currentSrc || currentSrc === bgImage) return;
+    detectImageMode(currentSrc).then((mode) => {
+      setDarkMode(mode === "dark");
+    });
+  }, [currentSrc, autoMode]);
+
+  function handleToggle() {
+    setAutoMode(false); // user manually overriding — pause auto-detect
+    setDarkMode((v) => !v);
+  }
 
   return (
     <div className="bg-white relative size-full overflow-hidden" data-name="Wireframe - 1">
@@ -498,7 +544,7 @@ export default function Wireframe() {
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
-        <ModeToggle darkMode={darkMode} onToggle={() => setDarkMode((v) => !v)} />
+        <ModeToggle darkMode={darkMode} onToggle={handleToggle} />
         <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
