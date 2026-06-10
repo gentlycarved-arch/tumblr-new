@@ -264,9 +264,16 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
               <stop offset="0%" stopColor="#a8a5a5" />
               <stop offset="100%" stopColor="#707070" />
             </radialGradient>
+            <radialGradient id="knobGradDark" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#5a5757" />
+              <stop offset="100%" stopColor="#3a3838" />
+            </radialGradient>
             <clipPath id="moonClip">
               <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" />
             </clipPath>
+            <filter id="moonSoft" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="0.45" />
+            </filter>
           </defs>
 
           {/* Track — light layer (white/light gray) */}
@@ -288,7 +295,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
             cx={knobX + KNOB / 2}
             cy={TRACK_H / 2}
             r={KNOB / 2}
-            fill="url(#knobGrad)"
+            fill={darkMode ? "url(#knobGradDark)" : "url(#knobGrad)"}
             style={{ transition: "cx 250ms ease" }}
           />
           {/* Knob border */}
@@ -315,12 +322,12 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
           {/* Icon inside knob */}
           <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
             {darkMode ? (
-              // Skeuomorphic Moon — white crescent with depth
-              <g>
+              // Skeuomorphic Moon — white crescent with softened glow edges
+              <g filter="url(#moonSoft)">
                 {/* Main crescent body */}
                 <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" fill="white" clipPath="url(#moonClip)" />
                 {/* Cutout circle to form crescent */}
-                <circle cx={KNOB / 2 + 5} cy={TRACK_H / 2 - 1.5} r="5.8" fill="url(#knobGrad)" clipPath="url(#moonClip)" />
+                <circle cx={KNOB / 2 + 5} cy={TRACK_H / 2 - 1.5} r="5.8" fill="url(#knobGradDark)" clipPath="url(#moonClip)" />
                 {/* Top-left highlight for depth */}
                 <circle cx={KNOB / 2 - 1} cy={TRACK_H / 2 - 2.5} r="7" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" clipPath="url(#moonClip)" />
                 {/* Bottom shadow for depth */}
