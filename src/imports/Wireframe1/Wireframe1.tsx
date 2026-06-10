@@ -479,7 +479,12 @@ function Typewriter({ darkMode }: { darkMode: boolean }) {
 
 const MAIN_SLUG = "nothing-tykp-p8vhpo";
 
-/** Samples image pixels via canvas and returns 'dark' or 'light'. Falls back to 'light' on CORS errors. */
+/**
+ * Samples image pixels via canvas and returns 'dark' or 'light'.
+ * Considers BOTH perceived brightness and color saturation: vivid, highly
+ * saturated images bias toward dark mode (so the UI contrasts against them),
+ * even when their raw brightness sits in the middle. Falls back to 'light' on CORS errors.
+ */
 async function detectImageMode(src: string): Promise<'dark' | 'light'> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -494,13 +499,28 @@ async function detectImageMode(src: string): Promise<'dark' | 'light'> {
       ctx.drawImage(img, 0, 0, SIZE, SIZE);
       try {
         const { data } = ctx.getImageData(0, 0, SIZE, SIZE);
-        let total = 0;
         const pixels = data.length / 4;
+        let lumTotal = 0;
+        let satTotal = 0;
         for (let i = 0; i < data.length; i += 4) {
-          // Perceived luminance weights (ITU-R BT.601)
-          total += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          // Perceived luminance (ITU-R BT.601)
+          lumTotal += 0.299 * r + 0.587 * g + 0.114 * b;
+          // HSL-style saturation: (max-min)/(255-|max+min-255|)
+          const max = Math.max(r, g, b);
+          const min = Math.min(r, g, b);
+          const delta = max - min;
+          satTotal += delta === 0 ? 0 : delta / (255 - Math.abs(max + min - 255));
         }
-        resolve(total / pixels < 118 ? "dark" : "light");
+        const avgLum = lumTotal / pixels;       // 0–255
+        const avgSat = satTotal / pixels;       // 0–1
+
+        // A saturated image needs darker UI to stay readable, so raise the
+        // brightness threshold: the more colorful, the more we lean dark.
+        // base 118, +up to ~40 for fully saturated images.
+        const threshold = 118 + avgSat * 42;
+
+        resolve(avgLum < threshold ? "dark" : "light");
       } catch {
         resolve("light"); // CORS blocked — fall back gracefully
       }
