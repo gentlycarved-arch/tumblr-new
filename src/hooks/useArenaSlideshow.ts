@@ -32,6 +32,17 @@ function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
+/**
+ * Are.na's CloudFront images sit behind an AWS WAF that challenges cross-origin
+ * (cookieless) requests, which tainted/blocked our canvas reads and made every
+ * image classify as 'light'. We route the tiny detection sample through the
+ * weserv.nl image proxy, which fetches server-side and re-serves with open CORS.
+ */
+function proxiedSample(src: string): string {
+  const noScheme = src.replace(/^https?:\/\//, "");
+  return `https://images.weserv.nl/?url=${encodeURIComponent(noScheme)}&w=64&h=64&output=png`;
+}
+
 /** Samples image pixels and returns 'dark' or 'light', weighing brightness + saturation. */
 export function detectImageMode(src: string): Promise<'dark' | 'light'> {
   return new Promise((resolve) => {
@@ -67,7 +78,7 @@ export function detectImageMode(src: string): Promise<'dark' | 'light'> {
       }
     };
     img.onerror = () => resolve("light");
-    img.src = src;
+    img.src = proxiedSample(src);
   });
 }
 
