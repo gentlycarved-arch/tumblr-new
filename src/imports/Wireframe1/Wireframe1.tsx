@@ -3,7 +3,7 @@ import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
-import { UploadButton } from "../../app/components/UploadButton";
+import { AddImageFlow } from "../../app/components/AddImageFlow";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
 import { useUploads } from "../../hooks/useUploads";
 
@@ -173,7 +173,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
       <button
         type="button"
         onClick={onToggle}
-        className="relative size-[23px] flex items-center justify-center z-[51]"
+        className="relative size-[26px] flex items-center justify-center z-[51]"
         aria-label="About this site"
       >
         <svg className="absolute inset-0 size-full" fill="none" viewBox="0 0 28 28">
@@ -211,7 +211,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
           )}
         </svg>
         <span className="relative z-10 font-['Inter:Medium',sans-serif] font-medium text-white leading-none select-none"
-          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)", fontSize: "15px", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>?</span>
+          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.4)", fontSize: "16px", lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>?</span>
       </button>
 
       {/* Desktop tooltip — appears to the right of the button */}
@@ -497,9 +497,20 @@ export default function Wireframe() {
   const { images: uploads, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
   const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode, uploads);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  // While a visitor is adding an image, blank the slideshow and show their pick as a preview.
+  const [addingImage, setAddingImage] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // Theme frozen at the moment the add flow opens, so the hidden slideshow can't flip it mid-add.
+  const frozenDark = useRef<boolean | null>(null);
 
   // In auto mode the UI follows the current image's tone; in manual mode it's fixed.
-  const darkMode = mode === 'auto' ? currentMode === 'dark' : mode === 'dark';
+  const liveDark = mode === 'auto' ? currentMode === 'dark' : mode === 'dark';
+  const darkMode = frozenDark.current !== null ? frozenDark.current : liveDark;
+
+  function handleAddingChange(adding: boolean) {
+    frozenDark.current = adding ? liveDark : null;
+    setAddingImage(adding);
+  }
 
   function handleToggle() {
     // Flip to the opposite of whatever's showing, and lock it in (filters the slideshow)
@@ -515,17 +526,34 @@ export default function Wireframe() {
         className="absolute inset-0 size-full object-cover pointer-events-none"
         style={{ zIndex: 0 }}
       />
-      {/* Current image on top — fades out to reveal next */}
+      {/* Current image on top — fades out to reveal next. Hidden while adding an image. */}
       <img
         alt=""
         src={currentSrc}
         className="absolute inset-0 size-full object-cover pointer-events-none"
         style={{
           zIndex: 1,
-          opacity: fading ? 0 : 1,
-          transition: `opacity ${fadeDuration}ms ease-in-out`,
+          opacity: addingImage ? 0 : fading ? 0 : 1,
+          transition: `opacity ${addingImage ? 300 : fadeDuration}ms ease-in-out`,
         }}
       />
+      {/* Blank canvas + live preview shown while a visitor is adding an image */}
+      {addingImage && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ zIndex: 1, background: darkMode ? "#141414" : "#ECECEC", transition: "background 300ms ease" }}
+        >
+          {previewUrl && (
+            <img
+              key={previewUrl}
+              alt=""
+              src={previewUrl}
+              className="absolute inset-0 size-full object-cover"
+              style={{ animation: "fadeIn 300ms ease" }}
+            />
+          )}
+        </div>
+      )}
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
@@ -539,6 +567,10 @@ export default function Wireframe() {
           @keyframes strokeSweep {
             0%   { background-position: -200% 0; }
             100% { background-position: 200% 0; }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
           }
           .btn-sweep {
             position: absolute;
@@ -633,12 +665,14 @@ export default function Wireframe() {
         <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} darkMode={darkMode} />
         {/* Visitor image upload — only shown once Supabase is configured */}
         {uploadsOn && (
-          <UploadButton
+          <AddImageFlow
             darkMode={darkMode}
             status={uploadStatus}
             error={uploadError}
             onFile={upload}
             onLink={addByLink}
+            onAddingChange={handleAddingChange}
+            onPreviewChange={setPreviewUrl}
           />
         )}
       </div>
