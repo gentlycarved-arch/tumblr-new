@@ -494,7 +494,7 @@ const MAIN_SLUG = "nothing-tykp-p8vhpo";
 export default function Wireframe() {
   // 'auto' until the user touches the toggle, then locked to 'dark' or 'light'
   const [mode, setMode] = useState<SlideMode>('auto');
-  const { images: uploads, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
+  const { images: uploads, commentByUrl, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
   const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode, uploads);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   // While a visitor is adding an image, blank the slideshow and show their pick as a preview.
@@ -506,6 +506,9 @@ export default function Wireframe() {
   // In auto mode the UI follows the current image's tone; in manual mode it's fixed.
   const liveDark = mode === 'auto' ? currentMode === 'dark' : mode === 'dark';
   const darkMode = frozenDark.current !== null ? frozenDark.current : liveDark;
+
+  // If the current background is a visitor upload with a note, caption it.
+  const caption = !addingImage ? (commentByUrl[currentSrc] || "") : "";
 
   function handleAddingChange(adding: boolean) {
     frozenDark.current = adding ? liveDark : null;
@@ -643,6 +646,31 @@ export default function Wireframe() {
             onAddingChange={handleAddingChange}
             onPreviewChange={setPreviewUrl}
           />
+        )}
+
+        {/* Caption for the current background, when it's a visitor upload with a note */}
+        {caption && (
+          <div
+            key={caption}
+            className="absolute max-sm:top-20 max-sm:left-4 sm:bottom-6 sm:left-6 max-w-[280px] max-sm:max-w-[62vw]"
+            style={{ zIndex: 30, animation: "fadeIn 500ms ease" }}
+          >
+            <div
+              className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] leading-snug px-3 py-2 rounded-[10px]"
+              style={{
+                background: darkMode ? "rgba(26,26,26,0.78)" : "rgba(248,248,248,0.9)",
+                color: darkMode ? "#E0E0E0" : "#3a3a3a",
+                boxShadow: darkMode
+                  ? "0 0 0 1px rgba(255,255,255,0.14), 0 2px 10px rgba(0,0,0,0.3)"
+                  : "0 0 0 1px rgba(0,0,0,0.07), 0 2px 10px rgba(0,0,0,0.14)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+                transition: "background 400ms ease, color 400ms ease",
+              }}
+            >
+              <span style={{ opacity: 0.55 }}>“</span>{caption}<span style={{ opacity: 0.55 }}>”</span>
+            </div>
+          </div>
         )}
       </div>
 
