@@ -564,46 +564,15 @@ export default function Wireframe() {
           .btn-glow {
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.35);
           }
-          @keyframes strokeSweep {
-            0%   { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-          }
           @keyframes fadeIn {
             from { opacity: 0; }
             to   { opacity: 1; }
-          }
-          .btn-sweep {
-            position: absolute;
-            inset: -1.5px;
-            border-radius: 11.5px;
-            padding: 1.5px;
-            background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.5) 50%, transparent 75%);
-            background-size: 300% 100%;
-            background-position: -200% 0;
-            -webkit-mask:
-              linear-gradient(#fff 0 0) content-box,
-              linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask:
-              linear-gradient(#fff 0 0) content-box,
-              linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 120ms ease;
-            z-index: 20;
-          }
-          .btn-glow:hover .btn-sweep {
-            opacity: 1;
-            animation: strokeSweep 1s ease forwards;
           }
         `}</style>
         <a
           href="mailto:gentlycarved@gmail.com"
           className="btn-glow absolute active:translate-y-px inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
         >
-          {/* Traveling border glow */}
-          <div className="btn-sweep" />
           {/* Light gradient layer */}
           <div className="absolute inset-0 rounded-[inherit]" style={{
             backgroundImage: "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",

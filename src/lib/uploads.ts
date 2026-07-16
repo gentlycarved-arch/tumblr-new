@@ -23,11 +23,19 @@ const MAX_STORED_BYTES = 2 * 1024 * 1024;    // after compression, never store o
 const CACHE_SECONDS = 2_592_000;        // 30-day CDN/browser cache → fewer repeat downloads
 const LINK_PREFIX = "link-";            // pointer-file naming
 const MAX_LINK_LEN = 700;
+export const MAX_COMMENT_LEN = 140;     // visitor's "why do you like this image?" note
+const COMMENT_SEP = "@";                // delimiter in filenames: allowed by Supabase, never in base64url
 
 const ALLOWED = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
 
 export function uploadsConfigured(): boolean {
   return Boolean(SUPABASE_URL && ANON_KEY);
+}
+
+/** A visitor addition: the image URL plus the optional note about it. */
+export interface Upload {
+  url: string;
+  comment: string;
 }
 
 function authHeaders(): Record<string, string> {
@@ -38,21 +46,49 @@ function publicUrl(name: string): string {
   return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(name)}`;
 }
 
-// URL <-> filename-safe base64 (UTF-8 safe), used to stash a link in a file name.
-function encodeLinkName(url: string): string {
-  const b64 = btoa(unescape(encodeURIComponent(url)))
+// filename-safe base64 (UTF-8 safe), used to stash links + comments in a file name.
+function b64urlEncode(s: string): string {
+  return btoa(unescape(encodeURIComponent(s)))
     .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  return `${LINK_PREFIX}${b64}.txt`;
 }
-function decodeLinkName(name: string): string | null {
-  if (!name.startsWith(LINK_PREFIX) || !name.endsWith(".txt")) return null;
-  let b64 = name.slice(LINK_PREFIX.length, -4).replace(/-/g, "+").replace(/_/g, "/");
+function b64urlDecode(s: string): string | null {
+  let b64 = s.replace(/-/g, "+").replace(/_/g, "/");
   while (b64.length % 4) b64 += "=";
   try {
     return decodeURIComponent(escape(atob(b64)));
   } catch {
     return null;
   }
+}
+
+// A trailing "~<base64url comment>" segment carries the note on either kind of file.
+function commentSuffix(comment: string): string {
+  const c = comment.trim().slice(0, MAX_COMMENT_LEN);
+  return c ? `${COMMENT_SEP}${b64urlEncode(c)}` : "";
+}
+function parseComment(stem: string): { head: string; comment: string } {
+  const i = stem.indexOf(COMMENT_SEP);
+  if (i === -1) return { head: stem, comment: "" };
+  return { head: stem.slice(0, i), comment: b64urlDecode(stem.slice(i + 1)) ?? "" };
+}
+
+function encodeLinkName(url: string, comment: string): string {
+  return `${LINK_PREFIX}${b64urlEncode(url)}${commentSuffix(comment)}.txt`;
+}
+
+/** Decodes a stored object name back into its image URL + comment. */
+function decodeRow(name: string): Upload | null {
+  if (name.startsWith(LINK_PREFIX) && name.endsWith(".txt")) {
+    const stem = name.slice(LINK_PREFIX.length, -4);
+    const { head, comment } = parseComment(stem);
+    const url = b64urlDecode(head);
+    return url ? { url, comment } : null;
+  }
+  // A device upload: the object itself is the image; only the comment is encoded.
+  const dot = name.lastIndexOf(".");
+  const stem = dot === -1 ? name : name.slice(0, dot);
+  const { comment } = parseComment(stem);
+  return { url: publicUrl(name), comment };
 }
 
 // ---- Reading -----------------------------------------------------------------
@@ -71,13 +107,13 @@ async function listRows(): Promise<StorageRow[]> {
   return rows.filter((r) => r.id !== null && r.name && !r.name.endsWith("/"));
 }
 
-/** Every visitor addition as a displayable image URL, newest first. */
-export async function listUploads(): Promise<string[]> {
+/** Every visitor addition (image URL + comment), newest first. */
+export async function listUploads(): Promise<Upload[]> {
   if (!uploadsConfigured()) return [];
   const rows = await listRows();
   return rows
-    .map((r) => decodeLinkName(r.name) ?? publicUrl(r.name))
-    .filter(Boolean) as string[];
+    .map((r) => decodeRow(r.name))
+    .filter((u): u is Upload => u !== null);
 }
 
 async function currentCount(): Promise<number> {
@@ -162,8 +198,8 @@ async function assertRoom(): Promise<void> {
   }
 }
 
-/** Compress + upload one device/camera-roll image. Returns its public URL. */
-export async function uploadImage(file: File): Promise<string> {
+/** Compress + upload one device/camera-roll image with an optional note. Returns its public URL. */
+export async function uploadImage(file: File, comment = ""): Promise<string> {
   if (!uploadsConfigured()) throw new Error("Uploads are not configured.");
   if (!ALLOWED.includes(file.type)) throw new Error("Please choose a JPEG, PNG, GIF, WebP, or AVIF image.");
   if (file.size > MAX_UPLOAD_BYTES) throw new Error("That image is over 12 MB — please pick a smaller one.");
@@ -173,7 +209,7 @@ export async function uploadImage(file: File): Promise<string> {
   if (body.size > MAX_STORED_BYTES) {
     throw new Error("That image is too large even after compression — please pick a smaller one.");
   }
-  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${commentSuffix(comment)}.${ext}`;
   await putObject(name, body, type);
   return publicUrl(name);
 }
@@ -182,7 +218,7 @@ export async function uploadImage(file: File): Promise<string> {
  * Add an image by URL (Cosmos / Are.na / any direct image link). Are.na block links
  * are auto-resolved. Stores only a tiny pointer — no image bytes. Returns the image URL.
  */
-export async function addLink(rawUrl: string): Promise<string> {
+export async function addLink(rawUrl: string, comment = ""): Promise<string> {
   if (!uploadsConfigured()) throw new Error("Uploads are not configured.");
   const input = rawUrl.trim();
   if (!input) throw new Error("Please paste an image link.");
@@ -199,7 +235,7 @@ export async function addLink(rawUrl: string): Promise<string> {
   }
 
   await assertRoom();
-  await putObject(encodeLinkName(resolved), "", "text/plain");
+  await putObject(encodeLinkName(resolved, comment), "", "text/plain");
   return resolved;
 }
 

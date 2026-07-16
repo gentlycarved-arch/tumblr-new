@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import type { UploadStatus } from "../../hooks/useUploads";
+import { MAX_COMMENT_LEN } from "../../lib/uploads";
 
 interface Props {
   darkMode: boolean;
   status: UploadStatus;
   error: string | null;
-  onFile: (file: File) => void;
-  onLink: (url: string) => void;
+  onFile: (file: File, comment: string) => void;
+  onLink: (url: string, comment: string) => void;
   onAddingChange: (adding: boolean) => void;   // blanks the background while true
   onPreviewChange: (url: string | null) => void; // shows a preview image on the background
 }
@@ -19,7 +20,8 @@ const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, 
 
 /**
  * "add your own image" flow. Opening it blanks the background; picking a file or link
- * shows it full-bleed so the visitor can see how it looks behind the site before adding.
+ * shows it full-bleed so the visitor can see how it looks behind the site, add a note,
+ * and submit. Sits bottom-center on mobile, top-right on desktop.
  */
 export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAddingChange, onPreviewChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,6 +33,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const [linkInput, setLinkInput] = useState("");
   const [linkErr, setLinkErr] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
+  const [comment, setComment] = useState("");
 
   const busy = status === "uploading";
 
@@ -41,7 +44,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const reset = useCallback(() => {
     clearObjUrl();
     setStep("idle"); setPendingFile(null); setPendingLink(null);
-    setLinkInput(""); setLinkErr(null); setChecking(false);
+    setLinkInput(""); setLinkErr(null); setChecking(false); setComment("");
     onAddingChange(false); onPreviewChange(null);
   }, [clearObjUrl, onAddingChange, onPreviewChange]);
 
@@ -69,12 +72,14 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
     e.target.value = "";
   }
 
-  function tryLink() {
-    const v = linkInput.trim();
-    if (!v || checking) return;
+  const previewingRef = useRef(false);
+  function previewLink(v: string) {
+    if (!v || previewingRef.current) return;
+    previewingRef.current = true;
     setChecking(true); setLinkErr(null);
     const img = new Image();
     img.onload = () => {
+      previewingRef.current = false;
       setChecking(false);
       clearObjUrl();
       setPendingLink(v); setPendingFile(null);
@@ -82,11 +87,21 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
       setStep("review");
     };
     img.onerror = () => {
+      previewingRef.current = false;
       setChecking(false);
       setLinkErr("Couldn't load that link — try right-click → Copy image address.");
     };
     img.src = v;
   }
+
+  // Auto-preview a pasted/typed link shortly after it looks like a complete URL.
+  useEffect(() => {
+    const v = linkInput.trim();
+    if (!v || !/^https?:\/\/.+\..+/i.test(v)) return;
+    const t = setTimeout(() => previewLink(v), 650);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkInput]);
 
   function chooseAnother() {
     clearObjUrl();
@@ -97,8 +112,8 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   function submit() {
     if (busy) return;
-    if (pendingFile) onFile(pendingFile);
-    else if (pendingLink) onLink(pendingLink);
+    if (pendingFile) onFile(pendingFile, comment);
+    else if (pendingLink) onLink(pendingLink, comment);
   }
 
   // ---- shared styling ----
@@ -109,15 +124,22 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const muted = darkMode ? "#c0bcbc" : "#888484";
   const heading = darkMode ? "#E5E1E1" : "#4a4a4a";
   const font = "font-['Favorit_Tumblr:Medium',sans-serif]";
-
+  const fieldStyle: React.CSSProperties = {
+    background: darkMode ? "#2a2a2a" : "#fff",
+    color: darkMode ? "#E0E0E0" : "#212529",
+    border: `1px solid ${darkMode ? "#3a3a3a" : "#d0d1d4"}`,
+  };
   const secondaryBtn: React.CSSProperties = {
     background: darkMode ? "#2a2a2a" : "#e9eaed",
     color: darkMode ? "#d8d4d4" : "#5a5757",
   };
+  const primaryBtn: React.CSSProperties = { background: darkMode ? BLUE_DARK : BLUE_LIGHT };
 
   return (
     <div
-      className="absolute bottom-8 max-sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center"
+      className={`absolute flex flex-col max-sm:items-center sm:items-end
+        max-sm:bottom-6 max-sm:left-1/2 max-sm:-translate-x-1/2
+        sm:top-6 sm:right-6`}
       style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -168,53 +190,50 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                 <div className="h-px flex-1" style={{ background: darkMode ? "#3a3a3a" : "#dcdde0" }} />
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 <input
                   value={linkInput}
                   onChange={(e) => { setLinkInput(e.target.value); setLinkErr(null); }}
-                  onKeyDown={(e) => { if (e.key === "Enter") tryLink(); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); previewLink(linkInput.trim()); } }}
                   placeholder="paste a link — cosmos, are.na, anywhere"
                   className="w-full rounded-[10px] px-3 py-2.5 text-[13px] outline-none"
-                  style={{
-                    background: darkMode ? "#2a2a2a" : "#fff",
-                    color: darkMode ? "#E0E0E0" : "#212529",
-                    border: `1px solid ${darkMode ? "#3a3a3a" : "#d0d1d4"}`,
-                  }}
+                  style={fieldStyle}
                 />
-                {linkErr && <div className="text-[12px] px-0.5" style={{ color: "#d05a5a" }}>{linkErr}</div>}
+                {checking
+                  ? <div className="text-[12px] px-0.5 opacity-70">loading…</div>
+                  : linkErr
+                    ? <div className="text-[12px] px-0.5" style={{ color: "#d05a5a" }}>{linkErr}</div>
+                    : <div className="text-[12px] px-0.5 opacity-50">paste a link — it previews automatically</div>}
               </div>
 
-              <div className="flex gap-2 pt-0.5">
-                <button type="button" onClick={reset} className="flex-1 rounded-[10px] py-2.5 text-[14px]" style={secondaryBtn}>
-                  cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={tryLink}
-                  disabled={!linkInput.trim() || checking}
-                  className="flex-1 rounded-[10px] py-2.5 text-[14px] text-white relative overflow-hidden"
-                  style={{
-                    background: darkMode ? BLUE_DARK : BLUE_LIGHT,
-                    opacity: linkInput.trim() && !checking ? 1 : 0.55,
-                    cursor: linkInput.trim() && !checking ? "pointer" : "default",
-                  }}
-                >
-                  {checking ? "loading…" : "preview"}
-                </button>
-              </div>
+              <button type="button" onClick={reset} className="rounded-[10px] py-2.5 text-[14px]" style={secondaryBtn}>
+                cancel
+              </button>
             </>
           )}
 
           {step === "review" && (
             <>
               <div className="text-[15px]" style={{ color: heading }}>how does it look? 👆</div>
-              <div className="text-[12px] opacity-70 -mt-1">that's your image on the background right now.</div>
+
+              <div className="flex flex-col gap-1">
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value.slice(0, MAX_COMMENT_LEN))}
+                  placeholder="why do you like this image?"
+                  rows={2}
+                  disabled={busy}
+                  className="w-full rounded-[10px] px-3 py-2.5 text-[13px] outline-none resize-none"
+                  style={fieldStyle}
+                />
+                <div className="text-[11px] opacity-45 text-right pr-0.5">{comment.length}/{MAX_COMMENT_LEN}</div>
+              </div>
 
               {status === "error" && error && (
                 <div className="text-[12px] px-0.5" style={{ color: "#d05a5a" }}>{error}</div>
               )}
 
-              <div className="flex gap-2 pt-0.5">
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={chooseAnother}
@@ -229,7 +248,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                   onClick={submit}
                   disabled={busy}
                   className="flex-1 rounded-[10px] py-2.5 text-[14px] text-white flex items-center justify-center gap-2"
-                  style={{ background: darkMode ? BLUE_DARK : BLUE_LIGHT, cursor: busy ? "default" : "pointer" }}
+                  style={{ ...primaryBtn, cursor: busy ? "default" : "pointer" }}
                 >
                   {busy ? (
                     <>
@@ -237,13 +256,13 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                         <circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,0.35)" strokeWidth="2" />
                         <path d="M14 8a6 6 0 0 0-6-6" stroke="white" strokeWidth="2" strokeLinecap="round" />
                       </svg>
-                      adding…
+                      submitting…
                     </>
-                  ) : "add to slideshow"}
+                  ) : "submit"}
                 </button>
               </div>
 
-              <button type="button" onClick={reset} disabled={busy} className="text-[12px] opacity-60 pt-0.5" style={{ color: muted }}>
+              <button type="button" onClick={reset} disabled={busy} className="text-[12px] opacity-60" style={{ color: muted }}>
                 cancel
               </button>
             </>
