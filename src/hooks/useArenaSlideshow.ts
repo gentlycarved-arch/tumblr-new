@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 const INTERVAL_MS = 15_000; // time between transitions
 const FADE_MS = 800;        // crossfade duration (quick)
@@ -90,8 +90,13 @@ export interface SlideshowState {
   currentMode: 'dark' | 'light'; // detected tone of the image currently shown
 }
 
-export function useArenaSlideshow(fallback: string, channelSlug: string, mode: SlideMode): SlideshowState {
-  const [images, setImages] = useState<string[]>([]);
+export function useArenaSlideshow(
+  fallback: string,
+  channelSlug: string,
+  mode: SlideMode,
+  extraImages: string[] = [],
+): SlideshowState {
+  const [arenaImages, setArenaImages] = useState<string[]>([]);
   const [curIdx, setCurIdx] = useState(0);
   const [incIdx, setIncIdx] = useState(0);
   const [fading, setFading] = useState(false);
@@ -99,34 +104,49 @@ export function useArenaSlideshow(fallback: string, channelSlug: string, mode: S
   const [, setClassifyTick] = useState(0);
 
   const modes = useRef<Map<string, 'dark' | 'light'>>(new Map());
+  const classifying = useRef<Set<string>>(new Set());
   const curRef = useRef(0);
   const fadingRef = useRef(false);
   const modeRef = useRef<SlideMode>(mode);
   modeRef.current = mode;
 
-  // Fetch + classify
+  // The live pool = Are.na images plus any visitor uploads, de-duplicated.
+  // Uploads go first so a freshly added image is eligible right away.
+  const images = useMemo(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const src of [...extraImages, ...arenaImages]) {
+      if (src && !seen.has(src)) { seen.add(src); out.push(src); }
+    }
+    return out;
+  }, [arenaImages, extraImages]);
+
+  // Fetch Are.na images
   useEffect(() => {
-    setImages([]);
+    setArenaImages([]);
     setCurIdx(0);
     setIncIdx(0);
     curRef.current = 0;
-    modes.current = new Map();
     const token = (import.meta.env.VITE_ARENA_TOKEN as string | undefined) || undefined;
     fetchArenaImages(channelSlug, token)
       .then((imgs) => {
         if (imgs.length === 0) return;
-        const shuffled = shuffle(imgs);
-        setImages(shuffled);
-        // classify each in the background
-        shuffled.forEach((src) => {
-          detectImageMode(src).then((m) => {
-            modes.current.set(src, m);
-            setClassifyTick((t) => t + 1);
-          });
-        });
+        setArenaImages(shuffle(imgs));
       })
       .catch((err) => console.warn("[Arena slideshow]", err));
   }, [channelSlug]);
+
+  // Classify any image (Are.na or upload) not yet classified, in the background.
+  useEffect(() => {
+    for (const src of images) {
+      if (modes.current.has(src) || classifying.current.has(src)) continue;
+      classifying.current.add(src);
+      detectImageMode(src).then((m) => {
+        modes.current.set(src, m);
+        setClassifyTick((t) => t + 1);
+      });
+    }
+  }, [images]);
 
   // Is image at index i eligible to show given the active mode?
   const eligible = useCallback((i: number, imgs: string[]) => {

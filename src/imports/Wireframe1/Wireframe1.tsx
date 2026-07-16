@@ -3,7 +3,9 @@ import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
+import { UploadButton } from "../../app/components/UploadButton";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
+import { useUploads } from "../../hooks/useUploads";
 
 // Each phrase can have typos: { after: string, wrong: string }
 // meaning: after typing `after`, type `wrong` chars then backspace before continuing
@@ -492,7 +494,8 @@ const MAIN_SLUG = "nothing-tykp-p8vhpo";
 export default function Wireframe() {
   // 'auto' until the user touches the toggle, then locked to 'dark' or 'light'
   const [mode, setMode] = useState<SlideMode>('auto');
-  const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode);
+  const { images: uploads, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
+  const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode, uploads);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   // In auto mode the UI follows the current image's tone; in manual mode it's fixed.
@@ -628,6 +631,16 @@ export default function Wireframe() {
         >Product Designer</p>
         <Typewriter darkMode={darkMode} />
         <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} darkMode={darkMode} />
+        {/* Visitor image upload — only shown once Supabase is configured */}
+        {uploadsOn && (
+          <UploadButton
+            darkMode={darkMode}
+            status={uploadStatus}
+            error={uploadError}
+            onFile={upload}
+            onLink={addByLink}
+          />
+        )}
       </div>
 
       {/* Mobile overlay — rendered at root level so fixed positioning works correctly */}

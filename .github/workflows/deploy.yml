@@ -38,6 +38,10 @@ jobs:
         run: pnpm run build
         env:
           VITE_ARENA_TOKEN: ${{ secrets.VITE_ARENA_TOKEN }}
+          # Supabase powers visitor image uploads. The anon key is meant to be public
+          # (it ships in the client bundle); access is gated by Storage RLS policies.
+          VITE_SUPABASE_URL: https://cqhotvhsuksjhjajbqlh.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxaG90dmhzdWtzamhqYWpicWxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMDUwOTQsImV4cCI6MjA5OTc4MTA5NH0.8JtKJLbPGInGZLax0-eDuAkWUwVJtXnnFl370nYdqxY
 
       - uses: actions/upload-pages-artifact@v3
         with:
