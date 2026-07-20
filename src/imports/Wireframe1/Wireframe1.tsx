@@ -652,11 +652,11 @@ export default function Wireframe() {
         {caption && (
           <div
             key={caption}
-            className="absolute max-sm:top-20 max-sm:left-4 sm:bottom-6 sm:left-6 max-w-[280px] max-sm:max-w-[62vw]"
+            className="absolute max-sm:top-9 max-sm:left-4 max-sm:max-w-[38vw] sm:bottom-6 sm:left-6 sm:max-w-[280px]"
             style={{ zIndex: 30, animation: "fadeIn 500ms ease" }}
           >
             <div
-              className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] leading-snug px-3 py-2 rounded-[10px]"
+              className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] max-sm:text-[11px] leading-snug px-3 py-2 max-sm:px-2.5 max-sm:py-1.5 rounded-[10px]"
               style={{
                 background: darkMode ? "rgba(26,26,26,0.78)" : "rgba(248,248,248,0.9)",
                 color: darkMode ? "#E0E0E0" : "#3a3a3a",

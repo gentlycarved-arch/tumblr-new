@@ -19,7 +19,7 @@ const BLUE_LIGHT = "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%,
 const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, #1f2e3e 70%, #151f2b 100%)";
 
 /**
- * "add your own image" flow. Opening it blanks the background; picking a file or link
+ * "add an image" flow. Opening it blanks the background; picking a file or link
  * shows it full-bleed so the visitor can see how it looks behind the site, add a note,
  * and submit. Sits bottom-center on mobile, top-right on desktop.
  */
@@ -165,7 +165,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
             transition: "color 160ms ease, background 300ms ease",
           }}
         >
-          add your own image
+          add an image
         </button>
       )}
 
@@ -176,7 +176,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
         >
           {step === "pick" && (
             <>
-              <div className="text-[15px]" style={{ color: heading }}>add your own image</div>
+              <div className="text-[15px]" style={{ color: heading }}>add an image</div>
 
               {/* Desktop: one file picker */}
               <button
