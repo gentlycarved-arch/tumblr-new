@@ -238,8 +238,6 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
           {step === "review" && (
             <>
-              <div className="text-[15px]" style={{ color: heading }}>how does it look? 👆</div>
-
               <div className="flex flex-col gap-1">
                 <textarea
                   value={comment}
