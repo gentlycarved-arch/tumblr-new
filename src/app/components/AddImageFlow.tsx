@@ -25,6 +25,7 @@ const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, 
  */
 export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAddingChange, onPreviewChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const objUrlRef = useRef<string | null>(null);
   const [step, setStep] = useState<Step>("idle");
   const [hover, setHover] = useState(false);
@@ -144,7 +145,9 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
+      {/* Library picker (no capture) and, on mobile, a direct-to-camera picker */}
       <input ref={inputRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={onFileChange} className="hidden" />
 
       {step === "idle" && (
         <button
@@ -175,14 +178,35 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
             <>
               <div className="text-[15px]" style={{ color: heading }}>add your own image</div>
 
+              {/* Desktop: one file picker */}
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="w-full rounded-[10px] py-2.5 text-[14px]"
+                className="hidden sm:block w-full rounded-[10px] py-2.5 text-[14px]"
                 style={secondaryBtn}
               >
                 choose from your device
               </button>
+
+              {/* Mobile: camera roll, or open the camera to take a photo */}
+              <div className="sm:hidden flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  className="w-full rounded-[10px] py-2.5 text-[14px]"
+                  style={secondaryBtn}
+                >
+                  🖼️ choose from camera roll
+                </button>
+                <button
+                  type="button"
+                  onClick={() => cameraRef.current?.click()}
+                  className="w-full rounded-[10px] py-2.5 text-[14px]"
+                  style={secondaryBtn}
+                >
+                  📷 take a photo
+                </button>
+              </div>
 
               <div className="flex items-center gap-2 text-[12px] opacity-60">
                 <div className="h-px flex-1" style={{ background: darkMode ? "#3a3a3a" : "#dcdde0" }} />
