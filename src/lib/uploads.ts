@@ -16,10 +16,10 @@ const BUCKET = "uploads";
 // Supabase free tier ≈ 1 GB storage + 5 GB egress/month. Keeping images small and
 // capping the count keeps stored bytes tiny; pasted links don't count at all.
 const MAX_IMAGES = 300;                 // hard cap on total shared additions
-const MAX_DIMENSION = 1600;             // downscale longest edge to this (px)
-const WEBP_QUALITY = 0.82;
-const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;   // reject source files over 12 MB pre-compression
-const MAX_STORED_BYTES = 2 * 1024 * 1024;    // after compression, never store over 2 MB
+const MAX_DIMENSION = 2048;             // downscale longest edge to this (px)
+const WEBP_QUALITY = 0.85;
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;   // reject source files over 25 MB pre-compression
+const MAX_STORED_BYTES = 5 * 1024 * 1024;    // after compression, never store over 5 MB
 const CACHE_SECONDS = 2_592_000;        // 30-day CDN/browser cache → fewer repeat downloads
 const LINK_PREFIX = "link-";            // pointer-file naming
 const MAX_LINK_LEN = 700;
@@ -202,7 +202,7 @@ async function assertRoom(): Promise<void> {
 export async function uploadImage(file: File, comment = ""): Promise<string> {
   if (!uploadsConfigured()) throw new Error("Uploads are not configured.");
   if (!ALLOWED.includes(file.type)) throw new Error("Please choose a JPEG, PNG, GIF, WebP, or AVIF image.");
-  if (file.size > MAX_UPLOAD_BYTES) throw new Error("That image is over 12 MB — please pick a smaller one.");
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error("That image is over 25 MB — please pick a smaller one.");
   await assertRoom();
 
   const { body, ext, type } = await compress(file);
