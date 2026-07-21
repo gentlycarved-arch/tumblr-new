@@ -161,12 +161,26 @@ function Group({ darkMode }: { darkMode: boolean }) {
 
 function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => void; darkMode: boolean }) {
   const [hover, setHover] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Desktop: click anywhere outside the button/card to dismiss it.
+  // (Mobile renders its own full-screen dismiss overlay at the root.)
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: PointerEvent) {
+      if (window.innerWidth < 640) return; // mobile handles its own dismissal
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) onToggle();
+    }
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [open, onToggle]);
 
   const ringed = hover || open;
 
   return (
     <div
       className="absolute right-[38.5%] top-[55%] -translate-y-1/2 max-sm:right-[11%] max-sm:top-[54.5%]"
+      ref={rootRef}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
