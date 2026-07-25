@@ -239,34 +239,21 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
 }
 
 function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
-  const [hover, setHover] = useState(false);
-  const [mobileToast, setMobileToast] = useState(false);
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const TRACK_W = 80;
   const TRACK_H = 42;
   const KNOB = 34;
   const PAD = (TRACK_H - KNOB) / 2;
   const knobX = darkMode ? TRACK_W - KNOB - PAD : PAD;
 
-  function handleToggle() {
-    onToggle();
-    setMobileToast(true);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setMobileToast(false), 3000);
-  }
-
   return (
     <div
       className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
       style={{ zIndex: 10 }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
     >
       {/* The toggle switch */}
       <button
         type="button"
-        onClick={handleToggle}
+        onClick={onToggle}
         aria-label="Cycle light / auto / dark mode"
         style={{
           width: TRACK_W, height: TRACK_H, position: "relative",
@@ -400,83 +387,6 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
         </svg>
       </button>
 
-      {/* Arrow + tooltip — desktop only, fixed to viewport center */}
-      {hover && (
-        <div
-          className="hidden sm:block pointer-events-none fixed"
-          style={{
-            top: 32 + TRACK_H - 4,
-            left: "50%",
-            transform: "translateX(-50%)",
-            opacity: 1,
-            zIndex: 100,
-            filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.18))",
-          }}
-        >
-          <div style={{
-            width: 12, height: 12,
-            background: darkMode ? "#1A1A1A" : "#F4F5F7",
-            transform: "rotate(45deg)",
-            margin: "0 auto",
-            marginBottom: -6,
-            borderRadius: 2,
-          }} />
-          <div
-            className="px-3 py-2 rounded-[10px] text-[12px] font-['Favorit_Tumblr:Medium',sans-serif] leading-snug text-center"
-            style={{
-              width: 210,
-              background: darkMode ? "#1A1A1A" : "linear-gradient(180deg, #F4F5F7 0%, #E8E9EC 100%)",
-              color: darkMode ? "#E0E0E0" : "#212529",
-            }}
-          >
-            {darkMode
-              ? "Dark mode changes to darker coloured images."
-              : "Light mode changes to lighter coloured images."}
-          </div>
-        </div>
-      )}
-
-      {/* Mobile toast — appears for 3s after toggling */}
-      <div
-        className="sm:hidden fixed pointer-events-none"
-        style={{
-          top: 32 + TRACK_H - 4,
-          left: "50%",
-          transform: "translateX(-50%)",
-          opacity: mobileToast ? 1 : 0,
-          visibility: mobileToast ? "visible" : "hidden",
-          transition: mobileToast
-            ? "opacity 400ms ease, visibility 0s"
-            : "opacity 400ms ease, visibility 0s 400ms",
-          zIndex: 100,
-          background: "transparent",
-          filter: mobileToast ? "drop-shadow(0 3px 10px rgba(0,0,0,0.18))" : "none",
-        }}
-      >
-        {/* Arrow */}
-        <div style={{
-          width: 14, height: 14,
-          background: darkMode ? "#1A1A1A" : "#F4F5F7",
-          transform: "rotate(45deg)",
-
-          margin: "0 auto",
-          marginBottom: -7,
-          borderRadius: 2,
-        }} />
-        {/* Card */}
-        <div
-          className="px-4 py-3 rounded-[12px] text-[15px] font-['Favorit_Tumblr:Medium',sans-serif] leading-snug text-center"
-          style={{
-            width: 240,
-            background: darkMode ? "#1A1A1A" : "linear-gradient(180deg, #F4F5F7 0%, #E8E9EC 100%)",
-            color: darkMode ? "#E0E0E0" : "#212529",
-          }}
-        >
-          {darkMode
-            ? "Dark mode changes to darker coloured images."
-            : "Light mode changes to lighter coloured images."}
-        </div>
-      </div>
     </div>
   );
 }
