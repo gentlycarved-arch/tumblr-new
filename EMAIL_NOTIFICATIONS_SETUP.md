@@ -42,9 +42,27 @@ Go to **tahreem.cv**, add an image (with a comment), submit. Within a few second
 should get an email showing the image + the comment. If not, check **Edge Functions →
 notify-upload → Logs** for the error.
 
+## 5. (Optional) Auto-moderation with OpenAI — screens every upload
+The function can screen each upload with **OpenAI's moderation API** (the `omni-moderation`
+model reads **images**, and the endpoint is **free**). Flagged uploads are removed
+automatically and you get a "⚠️ flagged" alert instead of a normal notification.
+
+1. Create a free OpenAI API key at https://platform.openai.com/api-keys
+2. **Edge Functions → Manage secrets**, add:
+   - `OPENAI_API_KEY` = that key
+   - *(optional)* `MODERATION_MODE` = `delete` (default — auto-removes flagged uploads) or
+     `flag` (keeps them live but emails you an alert to review)
+3. **Re-deploy** `notify-upload` with the latest code (it already contains the moderation
+   logic — just paste the current [`index.ts`](supabase/functions/notify-upload/index.ts) again).
+
+If `OPENAI_API_KEY` isn't set, moderation is simply skipped and everything works as before.
+
+> The moderation runs before the email, so a flagged image still shows in the alert; then
+> it's deleted. Switch to `MODERATION_MODE=flag` if you'd rather review before removal.
+
 ## Notes
 - The function ignores anything that isn't a new file in the `uploads` bucket, so it
   won't email on unrelated activity.
-- Every add triggers one email — including ones you add yourself. If it gets noisy once
-  the site is popular, we can batch them (e.g. a daily digest) instead.
+- Every clean add triggers one email — including ones you add yourself. If it gets noisy
+  once the site is popular, we can batch them (e.g. a daily digest) instead.
 - Deleting images from the bucket does **not** email you (only additions do).
