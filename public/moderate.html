@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Moderate · tahreem.cv</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: #141414; color: #e6e2e2;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      padding: 24px 20px 60px;
+    }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .sub { color: #8a8686; font-size: 13px; margin: 0 0 20px; }
+    .bar {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      margin: 0 0 22px; max-width: 520px;
+    }
+    input[type=password] {
+      flex: 1; min-width: 180px; background: #222; color: #eee; border: 1px solid #3a3a3a;
+      border-radius: 8px; padding: 9px 11px; font-size: 14px; outline: none;
+    }
+    .count { color: #8a8686; font-size: 13px; }
+    .grid {
+      display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    .card {
+      background: #1c1c1c; border: 1px solid #2a2a2a; border-radius: 12px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .thumb {
+      width: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: #262626; display: block;
+    }
+    .meta { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .comment { font-size: 13px; line-height: 1.35; }
+    .comment.empty { color: #6f6b6b; font-style: italic; }
+    .tags { font-size: 11px; color: #7a7676; }
+    .tag { background: #2a2a2a; border-radius: 5px; padding: 1px 6px; margin-right: 6px; }
+    button.remove {
+      margin-top: auto; background: #3a1f1f; color: #ff9d9d; border: 1px solid #5a2a2a;
+      border-radius: 8px; padding: 8px; font-size: 13px; cursor: pointer; transition: background .12s;
+    }
+    button.remove:hover { background: #4a2626; }
+    button.remove:disabled { opacity: .5; cursor: default; }
+    .status { margin: 0 0 16px; font-size: 13px; color: #8a8686; }
+    .status.err { color: #ff9d9d; }
+    a.link-open { color: #7fb0e6; font-size: 11px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Moderate uploads</h1>
+  <p class="sub">Everything currently live on tahreem.cv. Remove anything inappropriate — it drops out of the rotation immediately.</p>
+
+  <div class="bar">
+    <input id="secret" type="password" placeholder="moderation password" autocomplete="current-password" />
+    <span class="count" id="count"></span>
+  </div>
+
+  <p class="status" id="status">Loading…</p>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const SUPABASE_URL = "https://cqhotvhsuksjhjajbqlh.supabase.co";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxaG90dmhzdWtzamhqYWpicWxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyMDUwOTQsImV4cCI6MjA5OTc4MTA5NH0.8JtKJLbPGInGZLax0-eDuAkWUwVJtXnnFl370nYdqxY";
+    const BUCKET = "uploads";
+    const LINK_PREFIX = "link-", SEP = "@";
+
+    const $ = (id) => document.getElementById(id);
+    const secretInput = $("secret");
+    // Remember the password for this browser so you don't retype it each week.
+    secretInput.value = localStorage.getItem("moderateSecret") || "";
+    secretInput.addEventListener("input", () => localStorage.setItem("moderateSecret", secretInput.value));
+
+    function b64urlDecode(s) {
+      try { let b = s.replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "="; return decodeURIComponent(escape(atob(b))); }
+      catch { return null; }
+    }
+    function decode(name) {
+      const parseComment = (stem) => {
+        const i = stem.indexOf(SEP);
+        return i === -1 ? { head: stem, comment: "" } : { head: stem.slice(0, i), comment: b64urlDecode(stem.slice(i + 1)) || "" };
+      };
+      if (name.startsWith(LINK_PREFIX) && name.endsWith(".txt")) {
+        const { head, comment } = parseComment(name.slice(LINK_PREFIX.length, -4));
+        const url = b64urlDecode(head);
+        return url ? { name, url, comment, kind: "pasted link" } : null;
+      }
+      const dot = name.lastIndexOf(".");
+      const stem = dot === -1 ? name : name.slice(0, dot);
+      const { comment } = parseComment(stem);
+      return { name, url: SUPABASE_URL + "/storage/v1/object/public/" + BUCKET + "/" + encodeURIComponent(name), comment, kind: "device / camera" };
+    }
+    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    async function load() {
+      try {
+        const res = await fetch(SUPABASE_URL + "/storage/v1/object/list/" + BUCKET, {
+          method: "POST",
+          headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY, "Content-Type": "application/json" },
+          body: JSON.stringify({ prefix: "", limit: 1000, sortBy: { column: "created_at", order: "desc" } }),
+        });
+        if (!res.ok) throw new Error("list " + res.status);
+        const rows = (await res.json()).filter((r) => r.id !== null && r.name && !r.name.endsWith("/"));
+        const items = rows.map((r) => decode(r.name)).filter(Boolean);
+        render(items);
+      } catch (e) {
+        setStatus("Couldn't load uploads: " + e.message, true);
+      }
+    }
+
+    function setStatus(msg, err) {
+      const el = $("status");
+      el.textContent = msg;
+      el.className = "status" + (err ? " err" : "");
+    }
+
+    function render(items) {
+      $("count").textContent = items.length + " live";
+      setStatus(items.length ? "" : "Nothing uploaded right now — all clear. ✅");
+      $("grid").innerHTML = "";
+      for (const it of items) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML =
+          '<img class="thumb" loading="lazy" src="' + esc(it.url) + '" alt="" />' +
+          '<div class="meta">' +
+            '<div class="comment' + (it.comment ? '' : ' empty') + '">' + (it.comment ? '“' + esc(it.comment) + '”' : "no comment") + '</div>' +
+            '<div class="tags"><span class="tag">' + esc(it.kind) + '</span><a class="link-open" href="' + esc(it.url) + '" target="_blank" rel="noopener">open ↗</a></div>' +
+            '<button class="remove">Remove</button>' +
+          '</div>';
+        card.querySelector("button.remove").addEventListener("click", (ev) => remove(it, card, ev.target));
+        $("grid").appendChild(card);
+      }
+    }
+
+    async function remove(it, card, btn) {
+      const secret = secretInput.value.trim();
+      if (!secret) { secretInput.focus(); setStatus("Enter your moderation password first.", true); return; }
+      if (!confirm("Remove this image from the site?\n\n" + (it.comment ? '“' + it.comment + '”' : "(no comment)"))) return;
+      btn.disabled = true; btn.textContent = "Removing…";
+      try {
+        const res = await fetch(SUPABASE_URL + "/functions/v1/moderate-delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ secret, name: it.name }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || ("error " + res.status));
+        card.remove();
+        const n = document.querySelectorAll(".card").length;
+        $("count").textContent = n + " live";
+        if (!n) setStatus("Nothing uploaded right now — all clear. ✅");
+      } catch (e) {
+        btn.disabled = false; btn.textContent = "Remove";
+        setStatus("Couldn't remove: " + e.message, true);
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>
