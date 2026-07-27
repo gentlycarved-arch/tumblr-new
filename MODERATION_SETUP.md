@@ -43,3 +43,46 @@ built-in service key automatically).
 - The password is stored only in your own browser's local storage.
 
 > If you ever want to rotate the password, just change the `MODERATE_SECRET` secret value.
+
+## Weekly reminder email (Monday morning)
+
+This emails you every Monday with a link to the moderation page and how many images are
+live — reusing your existing Resend setup, so it lands right in your inbox. No new edge
+function needed. Run this once in the **SQL Editor** (replace `YOUR_RESEND_API_KEY` with the
+same key you used for the upload notifications):
+
+```sql
+create extension if not exists pg_cron;
+create extension if not exists pg_net;
+
+select cron.schedule(
+  'weekly-review-email',
+  '0 13 * * 1',   -- Mondays 13:00 UTC ≈ 9am Toronto (8am in winter)
+  $$
+  select net.http_post(
+    url := 'https://api.resend.com/emails',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer YOUR_RESEND_API_KEY',
+      'Content-Type', 'application/json'
+    ),
+    body := jsonb_build_object(
+      'from', 'tahreem.cv <onboarding@resend.dev>',
+      'to', 'gentlycarved@gmail.com',
+      'subject', 'Weekly review — tahreem.cv',
+      'html', '<p>Time for your weekly review of visitor uploads.</p>'
+        || '<p>There '
+        || (select case when count(*) = 1 then 'is <b>1 image</b>' else 'are <b>' || count(*) || ' images</b>' end
+            from storage.objects where bucket_id = 'uploads')
+        || ' currently live.</p>'
+        || '<p><a href="https://tahreem.cv/moderate.html">Open the moderation page →</a></p>'
+    ),
+    timeout_milliseconds := 5000
+  );
+  $$
+);
+```
+
+- To change the time, edit the cron (`0 13 * * 1` = minute hour day month weekday, UTC).
+- To stop the reminder later: `select cron.unschedule('weekly-review-email');`
+- To send yourself a test right now, run just the inner `select net.http_post(...)` part.
+
