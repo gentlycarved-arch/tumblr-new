@@ -373,6 +373,17 @@ function stageToSVGText(){
   const clone=stage.cloneNode(true);
   clone.setAttribute('width',STAGE_W);
   clone.setAttribute('height',STAGE_H);
+  // The live displacement map is referenced by a blob: URL, which only
+  // resolves for the current session and can already have been replaced by
+  // the time you export. Bake the current warp into a self-contained data
+  // URI instead, so the export always matches what's on screen and keeps
+  // working after the page (or the file) is reopened later.
+  const dispImgClone=clone.querySelector('#disp-img');
+  if(dispImgClone){
+    const dataUrl=dispCanvas.toDataURL();
+    dispImgClone.setAttribute('href',dataUrl);
+    dispImgClone.setAttributeNS(XLINK,'xlink:href',dataUrl);
+  }
   return '<?xml version="1.0"?>\n'+new XMLSerializer().serializeToString(clone);
 }
 function download(url,filename){
