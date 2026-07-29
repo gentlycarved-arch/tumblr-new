@@ -1,0 +1,434 @@
+<title>Blob Sculptor</title>
+<style>
+:root {
+  --bg:#f2f2f2;--surface:#fff;--canvas-bg:#e0e0e0;
+  --border:#d6d6d6;--text:#2a2a2a;--text-dim:#999;
+  --active:#333;--active-text:#fff;--slider-accent:#888;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#111;--surface:#1a1a1a;--canvas-bg:#1e1e1e;
+  --border:#2e2e2e;--text:#ddd;--text-dim:#666;
+  --active:#ccc;--active-text:#111;--slider-accent:#666;
+}}
+:root[data-theme="light"]{--bg:#f2f2f2;--surface:#fff;--canvas-bg:#e0e0e0;--border:#d6d6d6;--text:#2a2a2a;--text-dim:#999;--active:#333;--active-text:#fff;--slider-accent:#888;}
+:root[data-theme="dark"]{--bg:#111;--surface:#1a1a1a;--canvas-bg:#1e1e1e;--border:#2e2e2e;--text:#ddd;--text-dim:#666;--active:#ccc;--active-text:#111;--slider-accent:#666;}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none}
+
+.toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap;min-height:46px}
+.logo{font-size:14px;font-weight:700;letter-spacing:-.02em;margin-right:4px}
+.btn{font:500 12px/1 system-ui,sans-serif;padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s}
+.btn:hover{background:var(--bg)}
+.btn.accent{background:var(--active);color:var(--active-text);border-color:var(--active)}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+.tool-group{display:flex;border-radius:7px;overflow:hidden;border:1px solid var(--border)}
+.tool-btn{font:500 12px/1 system-ui,sans-serif;padding:6px 11px;border:none;cursor:pointer;background:var(--surface);color:var(--text);border-right:1px solid var(--border);transition:all .12s}
+.tool-btn:last-child{border-right:none}
+.tool-btn:hover{background:var(--bg)}
+.tool-btn.active{background:var(--active);color:var(--active-text)}
+.text-field{font:400 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);width:120px;outline:none}
+.text-field::placeholder{color:var(--text-dim)}
+.color-pick{width:28px;height:28px;border:1px solid var(--border);border-radius:6px;padding:1px;cursor:pointer;background:var(--surface)}
+.spacer{flex:1;min-width:4px}
+
+.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--canvas-bg)}
+.canvas-area.drag-over{outline:2px dashed var(--active);outline-offset:-6px}
+#stage{width:calc(100% - 32px);height:calc(100% - 24px);display:block;border-radius:6px;filter:drop-shadow(0 2px 12px rgba(0,0,0,0.07));cursor:grab}
+.hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none;transition:opacity .25s}
+.hint.hidden{opacity:0}
+.hint p{font-size:14px;color:var(--text-dim)}
+.hint small{font-size:11px;color:var(--text-dim);opacity:.55}
+
+.controls{display:flex;gap:14px;padding:10px 14px;border-top:1px solid var(--border);background:var(--surface);flex-wrap:wrap;align-items:center}
+.slider-row{display:flex;align-items:center;gap:6px;font-size:11px}
+.slider-row label{color:var(--text-dim);font-weight:500;min-width:42px}
+.slider-row input[type=range]{width:90px;accent-color:var(--slider-accent)}
+.slider-row .val{color:var(--text-dim);min-width:22px;text-align:right;font:500 11px/1 ui-monospace,'SF Mono',monospace}
+
+@media(max-width:540px){.toolbar{gap:5px;padding:6px 8px}.text-field{width:90px}.controls{gap:10px;padding:8px 10px}.slider-row input[type=range]{width:65px}}
+</style>
+
+<header class="toolbar">
+  <span class="logo">Blob Sculptor</span>
+  <label class="btn">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 14V3m0 0L6 7m4-4l4 4M3 17h14"/></svg>
+    SVG
+    <input type="file" accept=".svg,image/svg+xml" hidden id="file-input">
+  </label>
+  <input type="text" class="text-field" placeholder="Text + Enter" id="text-input">
+  <div class="tool-group">
+    <button class="tool-btn active" data-tool="warp">Warp</button>
+    <button class="tool-btn" data-tool="draw">Draw</button>
+  </div>
+  <input type="color" value="#ffffff" class="color-pick" id="color-pick" title="Fill color">
+  <div class="spacer"></div>
+  <button class="btn" id="clear-btn">Clear</button>
+  <button class="btn accent" id="export-btn">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 3v11m0 0l4-4m-4 4L6 10M3 17h14"/></svg>
+    Export
+  </button>
+</header>
+
+<main class="canvas-area" id="canvas-area">
+  <svg id="stage" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <filter id="goo" x="0" y="0" width="800" height="600" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feImage id="disp-img" x="0" y="0" width="800" height="600" preserveAspectRatio="none" result="dispMap"/>
+        <feDisplacementMap in="SourceGraphic" in2="dispMap" scale="300" xChannelSelector="R" yChannelSelector="G" result="warped"/>
+        <feGaussianBlur in="warped" stdDeviation="12" result="blur"/>
+        <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"/>
+      </filter>
+    </defs>
+    <g id="goo-group" filter="url(#goo)"></g>
+  </svg>
+  <div class="hint" id="hint">
+    <p>Drop SVG, enter text, then push &amp; pull it into shape</p>
+    <small>Drag anywhere on the shape to warp it &middot; Click and hold to inflate &middot; Draw adds new strokes &middot; Scroll to change brush size</small>
+  </div>
+</main>
+
+<footer class="controls">
+  <div class="slider-row">
+    <label>Gooey</label>
+    <input type="range" min="0" max="40" value="12" id="k-slider">
+    <span class="val" id="k-val">12</span>
+  </div>
+  <div class="slider-row">
+    <label>Size</label>
+    <input type="range" min="5" max="100" value="30" id="size-slider">
+    <span class="val" id="size-val">30</span>
+  </div>
+  <div class="slider-row">
+    <label>Inflate</label>
+    <input type="range" min="-10" max="10" value="0" id="inflate-slider">
+    <span class="val" id="inflate-val">0</span>
+  </div>
+</footer>
+
+<script>
+const NS='http://www.w3.org/2000/svg';
+const XLINK='http://www.w3.org/1999/xlink';
+const stage=document.getElementById('stage');
+const goo=document.getElementById('goo-group');
+const hintEl=document.getElementById('hint');
+const areaEl=document.getElementById('canvas-area');
+const dispImgEl=document.getElementById('disp-img');
+
+const STAGE_W=800,STAGE_H=600;
+const S={tool:'warp',size:30,gooey:12,inflate:0,color:'#ffffff'};
+let drawing=false,curPath=null,curPts=[];
+
+function s2svg(e){
+  const pt=stage.createSVGPoint();
+  pt.x=e.clientX;pt.y=e.clientY;
+  return pt.matrixTransform(stage.getScreenCTM().inverse());
+}
+
+function updateFilter(){
+  stage.querySelector('#goo feGaussianBlur').setAttribute('stdDeviation',S.gooey);
+  const thr=Math.max(1,8-S.inflate*0.5);
+  stage.querySelector('#goo feColorMatrix').setAttribute('values',
+    `1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -${thr.toFixed(1)}`);
+}
+
+function checkContent(){hintEl.classList.toggle('hidden',goo.children.length>0)}
+
+// ── Warp field: a low-res displacement map that physically pushes/pulls ────
+// whatever is rendered under it (the SVG, the text, everything) — this is
+// what makes dragging move the actual shape instead of adding new pieces.
+const FW=160,FH=120,MAX_DISP=150;
+const dispX=new Float32Array(FW*FH),dispY=new Float32Array(FW*FH);
+const dispCanvas=document.createElement('canvas');
+dispCanvas.width=FW;dispCanvas.height=FH;
+const dispCtx=dispCanvas.getContext('2d');
+
+function clampDisp(v){return Math.max(-MAX_DISP,Math.min(MAX_DISP,v));}
+
+function pushDispToImage(){
+  const imgData=dispCtx.createImageData(FW,FH);
+  const d=imgData.data;
+  for(let i=0;i<FW*FH;i++){
+    d[i*4]=Math.max(0,Math.min(255,128+dispX[i]/MAX_DISP*127));
+    d[i*4+1]=Math.max(0,Math.min(255,128+dispY[i]/MAX_DISP*127));
+    d[i*4+2]=255;d[i*4+3]=255;
+  }
+  dispCtx.putImageData(imgData,0,0);
+  const url=dispCanvas.toDataURL();
+  dispImgEl.setAttribute('href',url);
+  dispImgEl.setAttributeNS(XLINK,'xlink:href',url);
+}
+
+function resetWarp(){dispX.fill(0);dispY.fill(0);pushDispToImage();}
+
+let rafScheduled=false;
+function scheduleWarpUpdate(){
+  if(rafScheduled)return;
+  rafScheduled=true;
+  requestAnimationFrame(()=>{rafScheduled=false;pushDispToImage();});
+}
+
+function brushRadius(){return S.size*2.5;}
+
+// Drag stamp: pulls the content along with the drag direction (content
+// follows the cursor, like liquify/kneading dough).
+function stampWarp(x,y,dx,dy,radius){
+  const fx=x/STAGE_W*FW,fy=y/STAGE_H*FH;
+  const fr=Math.max(1,radius/STAGE_W*FW);
+  const x0=Math.max(0,Math.floor(fx-fr)),x1=Math.min(FW-1,Math.ceil(fx+fr));
+  const y0=Math.max(0,Math.floor(fy-fr)),y1=Math.min(FH-1,Math.ceil(fy+fr));
+  for(let yy=y0;yy<=y1;yy++){
+    for(let xx=x0;xx<=x1;xx++){
+      const ddx=xx-fx,ddy=yy-fy;
+      const dist=Math.sqrt(ddx*ddx+ddy*ddy);
+      if(dist>fr)continue;
+      const w=1-dist/fr,falloff=w*w*(3-2*w);
+      const idx=yy*FW+xx;
+      dispX[idx]=clampDisp(dispX[idx]-dx*falloff);
+      dispY[idx]=clampDisp(dispY[idx]-dy*falloff);
+    }
+  }
+}
+
+// Hold-in-place stamp: bulges the shape outward from that point.
+function stampInflate(x,y,radius,amount){
+  const fx=x/STAGE_W*FW,fy=y/STAGE_H*FH;
+  const fr=Math.max(1,radius/STAGE_W*FW);
+  const x0=Math.max(0,Math.floor(fx-fr)),x1=Math.min(FW-1,Math.ceil(fx+fr));
+  const y0=Math.max(0,Math.floor(fy-fr)),y1=Math.min(FH-1,Math.ceil(fy+fr));
+  for(let yy=y0;yy<=y1;yy++){
+    for(let xx=x0;xx<=x1;xx++){
+      const ddx=xx-fx,ddy=yy-fy;
+      const dist=Math.sqrt(ddx*ddx+ddy*ddy)||0.0001;
+      if(dist>fr)continue;
+      const w=1-dist/fr,falloff=w*w*(3-2*w);
+      const nx=ddx/dist,ny=ddy/dist;
+      const idx=yy*FW+xx;
+      dispX[idx]=clampDisp(dispX[idx]+nx*amount*falloff);
+      dispY[idx]=clampDisp(dispY[idx]+ny*amount*falloff);
+    }
+  }
+}
+
+function fitContent(el,vx,vy,vw,vh){
+  if(!vw||!vh)return;
+  const PAD_W=620,PAD_H=460;
+  const scale=Math.min(PAD_W/vw,PAD_H/vh);
+  const tx=(STAGE_W-vw*scale)/2-vx*scale;
+  const ty=(STAGE_H-vh*scale)/2-vy*scale;
+  el.setAttribute('transform',`translate(${tx},${ty}) scale(${scale})`);
+}
+
+function clearAll(){
+  while(goo.firstChild)goo.removeChild(goo.firstChild);
+  resetWarp();
+  checkContent();
+}
+
+// ── Load SVG (direct DOM import — no canvas, no tainting) ─────────────────
+function loadSVG(svgText){
+  const doc=new DOMParser().parseFromString(svgText,'image/svg+xml');
+  if(doc.querySelector('parsererror'))return;
+  const el=doc.documentElement;
+
+  let w=parseFloat(el.getAttribute('width'))||0;
+  let h=parseFloat(el.getAttribute('height'))||0;
+  const vb=el.getAttribute('viewBox');
+  let vx=0,vy=0,vw=w,vh=h;
+  if(vb){
+    const p=vb.trim().split(/[\s,]+/).map(Number);
+    if(p.length>=4){vx=p[0];vy=p[1];vw=w=w||p[2];vh=h=h||p[3];}
+  }
+  if(!w){w=vw=400;}if(!h){h=vh=400;}
+
+  clearAll();
+  const stageDefs=stage.querySelector('defs');
+  [...stageDefs.children].forEach(c=>{if(c.id!=='goo')c.remove();});
+
+  const svgDefs=el.querySelector('defs');
+  if(svgDefs)for(const c of[...svgDefs.childNodes])
+    stageDefs.appendChild(document.importNode(c,true));
+  for(const s of el.querySelectorAll(':scope > style'))
+    stageDefs.appendChild(document.importNode(s,true));
+
+  const base=document.createElementNS(NS,'g');
+  base.setAttribute('data-role','base');
+  base.style.pointerEvents='none';
+  for(const c of[...el.childNodes]){
+    if(c.nodeName==='defs'||c.nodeName==='style')continue;
+    base.appendChild(document.importNode(c,true));
+  }
+  fitContent(base,vx,vy,vw,vh);
+  goo.appendChild(base);
+  checkContent();
+}
+
+// ── Load text ─────────────────────────────────────────────────────────────
+function loadText(text){
+  clearAll();
+  const t=document.createElementNS(NS,'text');
+  t.setAttribute('font-size','120');t.setAttribute('font-weight','bold');
+  t.setAttribute('font-family','system-ui,-apple-system,sans-serif');
+  t.setAttribute('fill',S.color);
+  t.setAttribute('x','0');t.setAttribute('y','0');
+  t.textContent=text;
+  const base=document.createElementNS(NS,'g');
+  base.setAttribute('data-role','base');
+  base.style.pointerEvents='none';
+  base.appendChild(t);
+  goo.appendChild(base);
+  requestAnimationFrame(()=>{
+    try{
+      const b=t.getBBox();
+      fitContent(base,b.x,b.y,b.width,b.height);
+    }catch(e){}
+    checkContent();
+  });
+}
+
+// ── User-drawn strokes (Draw tool only) ─────────────────────────────────────
+function addCircle(cx,cy){
+  const c=document.createElementNS(NS,'circle');
+  c.setAttribute('cx',cx);c.setAttribute('cy',cy);
+  c.setAttribute('r',S.size);c.setAttribute('fill',S.color);
+  c.setAttribute('data-role','user');
+  goo.appendChild(c);checkContent();return c;
+}
+function startStroke(x,y){
+  curPts=[{x,y}];
+  curPath=document.createElementNS(NS,'path');
+  curPath.setAttribute('fill','none');curPath.setAttribute('stroke',S.color);
+  curPath.setAttribute('stroke-width',S.size*2);
+  curPath.setAttribute('stroke-linecap','round');curPath.setAttribute('stroke-linejoin','round');
+  curPath.setAttribute('data-role','user');curPath.setAttribute('d',`M${x},${y}`);
+  goo.appendChild(curPath);
+}
+function extendStroke(x,y){
+  if(!curPath)return;
+  const last=curPts[curPts.length-1];
+  if(Math.hypot(x-last.x,y-last.y)<5)return;
+  curPts.push({x,y});
+  curPath.setAttribute('d',curPts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' '));
+}
+function endStroke(){
+  if(curPath&&curPts.length<=1){curPath.remove();addCircle(curPts[0].x,curPts[0].y);}
+  curPath=null;curPts=[];checkContent();
+}
+
+// ── Hit test (manual in SVG coords, user-drawn strokes only) ───────────────
+function findCircleAt(x,y){
+  const els=goo.querySelectorAll('circle[data-role="user"]');
+  for(let i=els.length-1;i>=0;i--){
+    const c=els[i];
+    if(Math.hypot(x-parseFloat(c.getAttribute('cx')),y-parseFloat(c.getAttribute('cy')))
+       <=parseFloat(c.getAttribute('r'))+8)return c;
+  }return null;
+}
+function findStrokeAt(x,y){
+  const els=goo.querySelectorAll('path[data-role="user"]');
+  for(let i=els.length-1;i>=0;i--){
+    const p=els[i];
+    try{const len=p.getTotalLength();
+      for(let d=0;d<len;d+=8){
+        const pt=p.getPointAtLength(d);
+        if(Math.hypot(x-pt.x,y-pt.y)<parseFloat(p.getAttribute('stroke-width'))/2+8)return p;
+      }
+    }catch(e){}
+  }return null;
+}
+function findAnyUserAt(x,y){return findCircleAt(x,y)||findStrokeAt(x,y);}
+
+// ── Pointer events ────────────────────────────────────────────────────────
+stage.style.touchAction='none';
+let warping=false,lastP=null,downP=null,movedDist=0;
+
+stage.addEventListener('pointerdown',e=>{
+  const p=s2svg(e);
+  if(e.button===2||(e.button===0&&e.altKey)){
+    e.preventDefault();
+    const el=findAnyUserAt(p.x,p.y);
+    if(el){el.remove();checkContent();}
+    return;
+  }
+  stage.setPointerCapture(e.pointerId);
+  if(S.tool==='draw'){drawing=true;startStroke(p.x,p.y);return;}
+  // Warp tool: drag physically pushes/pulls whatever is under the cursor —
+  // the SVG, the text, previously drawn strokes, all of it, as one piece.
+  warping=true;lastP={x:p.x,y:p.y};downP={x:p.x,y:p.y};movedDist=0;
+});
+
+stage.addEventListener('pointermove',e=>{
+  const p=s2svg(e);
+  if(drawing){extendStroke(p.x,p.y);return;}
+  if(warping){
+    const dx=p.x-lastP.x,dy=p.y-lastP.y;
+    movedDist+=Math.hypot(dx,dy);
+    if(dx||dy)stampWarp(p.x,p.y,dx,dy,brushRadius());
+    lastP={x:p.x,y:p.y};
+    scheduleWarpUpdate();
+  }
+});
+
+stage.addEventListener('pointerup',()=>{
+  if(drawing){drawing=false;endStroke();}
+  if(warping){
+    if(movedDist<4&&downP&&S.inflate!==0)stampInflate(downP.x,downP.y,brushRadius(),S.inflate*4);
+    pushDispToImage();
+    warping=false;lastP=null;downP=null;
+  }
+});
+stage.addEventListener('pointercancel',()=>{
+  if(drawing){drawing=false;if(curPath){curPath.remove();curPath=null;}}
+  warping=false;lastP=null;downP=null;
+});
+stage.addEventListener('contextmenu',e=>e.preventDefault());
+stage.addEventListener('wheel',e=>{
+  e.preventDefault();
+  S.size=Math.max(5,Math.min(150,S.size+(e.deltaY>0?-4:4)));
+  const sl=document.getElementById('size-slider');
+  sl.value=S.size;document.getElementById('size-val').textContent=Math.round(S.size);
+},{passive:false});
+
+// ── File & drop ───────────────────────────────────────────────────────────
+document.getElementById('file-input').addEventListener('change',e=>{
+  const f=e.target.files[0];if(f)f.text().then(loadSVG);e.target.value='';
+});
+areaEl.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy';areaEl.classList.add('drag-over');});
+areaEl.addEventListener('dragleave',e=>{if(!areaEl.contains(e.relatedTarget))areaEl.classList.remove('drag-over');});
+areaEl.addEventListener('drop',e=>{
+  e.preventDefault();areaEl.classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];
+  if(f&&(f.type==='image/svg+xml'||f.name.endsWith('.svg')))f.text().then(loadSVG);
+});
+
+document.getElementById('text-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const t=e.target.value.trim();if(t)loadText(t);}
+});
+
+document.querySelectorAll('.tool-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    S.tool=b.dataset.tool;
+    document.querySelectorAll('.tool-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    stage.style.cursor=S.tool==='draw'?'crosshair':'grab';
+  });
+});
+document.getElementById('clear-btn').addEventListener('click',clearAll);
+document.getElementById('color-pick').addEventListener('input',e=>{S.color=e.target.value;});
+
+[['k-slider','k-val','gooey'],['size-slider','size-val','size'],['inflate-slider','inflate-val','inflate']].forEach(([sid,vid,prop])=>{
+  const sl=document.getElementById(sid),vl=document.getElementById(vid);
+  sl.addEventListener('input',()=>{S[prop]=+sl.value;vl.textContent=sl.value;updateFilter();});
+});
+
+document.getElementById('export-btn').addEventListener('click',()=>{
+  const clone=stage.cloneNode(true);
+  const svgText='<?xml version="1.0"?>\n'+new XMLSerializer().serializeToString(clone);
+  const b=new Blob([svgText],{type:'image/svg+xml'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');
+  a.href=u;a.download='blob-sculpture.svg';a.click();URL.revokeObjectURL(u);
+});
+
+resetWarp();
+checkContent();
+</script>
