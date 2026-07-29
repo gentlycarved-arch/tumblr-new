@@ -22,11 +22,6 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
 .btn:hover{background:var(--bg)}
 .btn.accent{background:var(--active);color:var(--active-text);border-color:var(--active)}
 .btn svg{width:13px;height:13px;flex-shrink:0}
-.tool-group{display:flex;border-radius:7px;overflow:hidden;border:1px solid var(--border)}
-.tool-btn{font:500 12px/1 system-ui,sans-serif;padding:6px 11px;border:none;cursor:pointer;background:var(--surface);color:var(--text);border-right:1px solid var(--border);transition:all .12s}
-.tool-btn:last-child{border-right:none}
-.tool-btn:hover{background:var(--bg)}
-.tool-btn.active{background:var(--active);color:var(--active-text)}
 .text-field{font:400 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);width:120px;outline:none}
 .text-field::placeholder{color:var(--text-dim)}
 .color-pick{width:28px;height:28px;border:1px solid var(--border);border-radius:6px;padding:1px;cursor:pointer;background:var(--surface)}
@@ -57,16 +52,16 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
     <input type="file" accept=".svg,image/svg+xml" hidden id="file-input">
   </label>
   <input type="text" class="text-field" placeholder="Text + Enter" id="text-input">
-  <div class="tool-group">
-    <button class="tool-btn active" data-tool="warp">Warp</button>
-    <button class="tool-btn" data-tool="draw">Draw</button>
-  </div>
   <input type="color" value="#ffffff" class="color-pick" id="color-pick" title="Fill color">
   <div class="spacer"></div>
   <button class="btn" id="clear-btn">Clear</button>
-  <button class="btn accent" id="export-btn">
+  <button class="btn" id="export-png-btn">
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 3v11m0 0l4-4m-4 4L6 10M3 17h14"/></svg>
-    Export
+    PNG
+  </button>
+  <button class="btn accent" id="export-svg-btn">
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 3v11m0 0l4-4m-4 4L6 10M3 17h14"/></svg>
+    SVG
   </button>
 </header>
 
@@ -84,7 +79,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:v
   </svg>
   <div class="hint" id="hint">
     <p>Drop SVG, enter text, then push &amp; pull it into shape</p>
-    <small>Drag anywhere on the shape to warp it &middot; Click and hold to inflate &middot; Draw adds new strokes &middot; Scroll to change brush size</small>
+    <small>Drag anywhere on the shape to warp it &middot; Click and hold to inflate &middot; Scroll to change brush size</small>
   </div>
 </main>
 
@@ -114,10 +109,12 @@ const goo=document.getElementById('goo-group');
 const hintEl=document.getElementById('hint');
 const areaEl=document.getElementById('canvas-area');
 const dispImgEl=document.getElementById('disp-img');
+const blurEl=stage.querySelector('#goo feGaussianBlur');
+const colorMatrixEl=stage.querySelector('#goo feColorMatrix');
 
 const STAGE_W=800,STAGE_H=600;
-const S={tool:'warp',size:30,gooey:12,inflate:0,color:'#ffffff'};
-let drawing=false,curPath=null,curPts=[];
+const S={size:30,gooey:12,inflate:0,color:'#ffffff'};
+let warping=false;
 
 function s2svg(e){
   const pt=stage.createSVGPoint();
@@ -126,9 +123,9 @@ function s2svg(e){
 }
 
 function updateFilter(){
-  stage.querySelector('#goo feGaussianBlur').setAttribute('stdDeviation',S.gooey);
+  if(!warping)blurEl.setAttribute('stdDeviation',S.gooey);
   const thr=Math.max(1,8-S.inflate*0.5);
-  stage.querySelector('#goo feColorMatrix').setAttribute('values',
+  colorMatrixEl.setAttribute('values',
     `1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -${thr.toFixed(1)}`);
 }
 
@@ -142,21 +139,36 @@ const dispX=new Float32Array(FW*FH),dispY=new Float32Array(FW*FH);
 const dispCanvas=document.createElement('canvas');
 dispCanvas.width=FW;dispCanvas.height=FH;
 const dispCtx=dispCanvas.getContext('2d');
+// Reused buffer avoids allocating + GC'ing a new ImageData every frame.
+const dispImageData=dispCtx.createImageData(FW,FH);
+const dispPixels=dispImageData.data;
 
 function clampDisp(v){return Math.max(-MAX_DISP,Math.min(MAX_DISP,v));}
 
+// toBlob is async, so encoding never blocks the main thread — this is what
+// keeps pointer input flowing smoothly instead of stalling mid-drag.
+let lastBlobUrl=null,encoding=false,encodePending=false;
 function pushDispToImage(){
-  const imgData=dispCtx.createImageData(FW,FH);
-  const d=imgData.data;
+  const d=dispPixels;
   for(let i=0;i<FW*FH;i++){
     d[i*4]=Math.max(0,Math.min(255,128+dispX[i]/MAX_DISP*127));
     d[i*4+1]=Math.max(0,Math.min(255,128+dispY[i]/MAX_DISP*127));
     d[i*4+2]=255;d[i*4+3]=255;
   }
-  dispCtx.putImageData(imgData,0,0);
-  const url=dispCanvas.toDataURL();
-  dispImgEl.setAttribute('href',url);
-  dispImgEl.setAttributeNS(XLINK,'xlink:href',url);
+  dispCtx.putImageData(dispImageData,0,0);
+  if(encoding){encodePending=true;return;}
+  encoding=true;
+  dispCanvas.toBlob(blob=>{
+    encoding=false;
+    if(blob){
+      const url=URL.createObjectURL(blob);
+      dispImgEl.setAttribute('href',url);
+      dispImgEl.setAttributeNS(XLINK,'xlink:href',url);
+      if(lastBlobUrl)URL.revokeObjectURL(lastBlobUrl);
+      lastBlobUrl=url;
+    }
+    if(encodePending){encodePending=false;pushDispToImage();}
+  });
 }
 
 function resetWarp(){dispX.fill(0);dispY.fill(0);pushDispToImage();}
@@ -286,80 +298,25 @@ function loadText(text){
   });
 }
 
-// ── User-drawn strokes (Draw tool only) ─────────────────────────────────────
-function addCircle(cx,cy){
-  const c=document.createElementNS(NS,'circle');
-  c.setAttribute('cx',cx);c.setAttribute('cy',cy);
-  c.setAttribute('r',S.size);c.setAttribute('fill',S.color);
-  c.setAttribute('data-role','user');
-  goo.appendChild(c);checkContent();return c;
-}
-function startStroke(x,y){
-  curPts=[{x,y}];
-  curPath=document.createElementNS(NS,'path');
-  curPath.setAttribute('fill','none');curPath.setAttribute('stroke',S.color);
-  curPath.setAttribute('stroke-width',S.size*2);
-  curPath.setAttribute('stroke-linecap','round');curPath.setAttribute('stroke-linejoin','round');
-  curPath.setAttribute('data-role','user');curPath.setAttribute('d',`M${x},${y}`);
-  goo.appendChild(curPath);
-}
-function extendStroke(x,y){
-  if(!curPath)return;
-  const last=curPts[curPts.length-1];
-  if(Math.hypot(x-last.x,y-last.y)<5)return;
-  curPts.push({x,y});
-  curPath.setAttribute('d',curPts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' '));
-}
-function endStroke(){
-  if(curPath&&curPts.length<=1){curPath.remove();addCircle(curPts[0].x,curPts[0].y);}
-  curPath=null;curPts=[];checkContent();
-}
-
-// ── Hit test (manual in SVG coords, user-drawn strokes only) ───────────────
-function findCircleAt(x,y){
-  const els=goo.querySelectorAll('circle[data-role="user"]');
-  for(let i=els.length-1;i>=0;i--){
-    const c=els[i];
-    if(Math.hypot(x-parseFloat(c.getAttribute('cx')),y-parseFloat(c.getAttribute('cy')))
-       <=parseFloat(c.getAttribute('r'))+8)return c;
-  }return null;
-}
-function findStrokeAt(x,y){
-  const els=goo.querySelectorAll('path[data-role="user"]');
-  for(let i=els.length-1;i>=0;i--){
-    const p=els[i];
-    try{const len=p.getTotalLength();
-      for(let d=0;d<len;d+=8){
-        const pt=p.getPointAtLength(d);
-        if(Math.hypot(x-pt.x,y-pt.y)<parseFloat(p.getAttribute('stroke-width'))/2+8)return p;
-      }
-    }catch(e){}
-  }return null;
-}
-function findAnyUserAt(x,y){return findCircleAt(x,y)||findStrokeAt(x,y);}
-
 // ── Pointer events ────────────────────────────────────────────────────────
 stage.style.touchAction='none';
-let warping=false,lastP=null,downP=null,movedDist=0;
+let lastP=null,downP=null,movedDist=0;
+// Blur is the most expensive part of the filter chain to recompute every
+// frame — drop it to a cheap preview while actively dragging, snap back to
+// full quality on release, so the drag itself stays fluid.
+const LIVE_BLUR=3;
 
 stage.addEventListener('pointerdown',e=>{
   const p=s2svg(e);
-  if(e.button===2||(e.button===0&&e.altKey)){
-    e.preventDefault();
-    const el=findAnyUserAt(p.x,p.y);
-    if(el){el.remove();checkContent();}
-    return;
-  }
   stage.setPointerCapture(e.pointerId);
-  if(S.tool==='draw'){drawing=true;startStroke(p.x,p.y);return;}
-  // Warp tool: drag physically pushes/pulls whatever is under the cursor —
-  // the SVG, the text, previously drawn strokes, all of it, as one piece.
+  // Drag physically pushes/pulls whatever is under the cursor — the SVG,
+  // the text, all of it, as one piece.
   warping=true;lastP={x:p.x,y:p.y};downP={x:p.x,y:p.y};movedDist=0;
+  blurEl.setAttribute('stdDeviation',Math.min(S.gooey,LIVE_BLUR));
 });
 
 stage.addEventListener('pointermove',e=>{
   const p=s2svg(e);
-  if(drawing){extendStroke(p.x,p.y);return;}
   if(warping){
     const dx=p.x-lastP.x,dy=p.y-lastP.y;
     movedDist+=Math.hypot(dx,dy);
@@ -370,18 +327,17 @@ stage.addEventListener('pointermove',e=>{
 });
 
 stage.addEventListener('pointerup',()=>{
-  if(drawing){drawing=false;endStroke();}
   if(warping){
     if(movedDist<4&&downP&&S.inflate!==0)stampInflate(downP.x,downP.y,brushRadius(),S.inflate*4);
     pushDispToImage();
     warping=false;lastP=null;downP=null;
+    blurEl.setAttribute('stdDeviation',S.gooey);
   }
 });
 stage.addEventListener('pointercancel',()=>{
-  if(drawing){drawing=false;if(curPath){curPath.remove();curPath=null;}}
   warping=false;lastP=null;downP=null;
+  blurEl.setAttribute('stdDeviation',S.gooey);
 });
-stage.addEventListener('contextmenu',e=>e.preventDefault());
 stage.addEventListener('wheel',e=>{
   e.preventDefault();
   S.size=Math.max(5,Math.min(150,S.size+(e.deltaY>0?-4:4)));
@@ -405,14 +361,6 @@ document.getElementById('text-input').addEventListener('keydown',e=>{
   if(e.key==='Enter'){const t=e.target.value.trim();if(t)loadText(t);}
 });
 
-document.querySelectorAll('.tool-btn').forEach(b=>{
-  b.addEventListener('click',()=>{
-    S.tool=b.dataset.tool;
-    document.querySelectorAll('.tool-btn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    stage.style.cursor=S.tool==='draw'?'crosshair':'grab';
-  });
-});
 document.getElementById('clear-btn').addEventListener('click',clearAll);
 document.getElementById('color-pick').addEventListener('input',e=>{S.color=e.target.value;});
 
@@ -421,12 +369,43 @@ document.getElementById('color-pick').addEventListener('input',e=>{S.color=e.tar
   sl.addEventListener('input',()=>{S[prop]=+sl.value;vl.textContent=sl.value;updateFilter();});
 });
 
-document.getElementById('export-btn').addEventListener('click',()=>{
+function stageToSVGText(){
   const clone=stage.cloneNode(true);
-  const svgText='<?xml version="1.0"?>\n'+new XMLSerializer().serializeToString(clone);
-  const b=new Blob([svgText],{type:'image/svg+xml'});
-  const u=URL.createObjectURL(b);const a=document.createElement('a');
-  a.href=u;a.download='blob-sculpture.svg';a.click();URL.revokeObjectURL(u);
+  clone.setAttribute('width',STAGE_W);
+  clone.setAttribute('height',STAGE_H);
+  return '<?xml version="1.0"?>\n'+new XMLSerializer().serializeToString(clone);
+}
+function download(url,filename){
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.click();
+}
+
+document.getElementById('export-svg-btn').addEventListener('click',()=>{
+  const b=new Blob([stageToSVGText()],{type:'image/svg+xml'});
+  const u=URL.createObjectURL(b);
+  download(u,'blob-sculpture.svg');
+  URL.revokeObjectURL(u);
+});
+
+document.getElementById('export-png-btn').addEventListener('click',()=>{
+  const svgBlob=new Blob([stageToSVGText()],{type:'image/svg+xml'});
+  const svgUrl=URL.createObjectURL(svgBlob);
+  const img=new Image();
+  img.onload=()=>{
+    const scale=2;
+    const c=document.createElement('canvas');
+    c.width=STAGE_W*scale;c.height=STAGE_H*scale;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(svgUrl);
+    c.toBlob(blob=>{
+      if(!blob)return;
+      const pngUrl=URL.createObjectURL(blob);
+      download(pngUrl,'blob-sculpture.png');
+      URL.revokeObjectURL(pngUrl);
+    },'image/png');
+  };
+  img.onerror=()=>URL.revokeObjectURL(svgUrl);
+  img.src=svgUrl;
 });
 
 resetWarp();
