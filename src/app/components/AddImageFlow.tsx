@@ -178,6 +178,9 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
           {step === "pick" && (
             <>
               <div className="text-[15px]" style={{ color: heading }}>add an image</div>
+              <div className="text-[12px] leading-snug -mt-1 opacity-70">
+                visible to everyone who visits — it'll join the rotating background.
+              </div>
 
               {/* Desktop: one file picker */}
               <button
