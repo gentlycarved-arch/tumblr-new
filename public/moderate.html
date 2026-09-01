@@ -79,11 +79,18 @@
       try { let b = s.replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "="; return decodeURIComponent(escape(atob(b))); }
       catch { return null; }
     }
+    const CONF_PREFIX = "conf-";
     function decode(name) {
       const parseComment = (stem) => {
         const i = stem.indexOf(SEP);
         return i === -1 ? { head: stem, comment: "" } : { head: stem.slice(0, i), comment: b64urlDecode(stem.slice(i + 1)) || "" };
       };
+      if (name.startsWith(CONF_PREFIX) && name.endsWith(".txt")) {
+        const stem = name.slice(CONF_PREFIX.length, -4);
+        const i = stem.indexOf(SEP);
+        const text = i === -1 ? null : b64urlDecode(stem.slice(i + 1));
+        return text ? { name, kind: "confession", text } : null;
+      }
       if (name.startsWith(LINK_PREFIX) && name.endsWith(".txt")) {
         const { head, comment } = parseComment(name.slice(LINK_PREFIX.length, -4));
         const url = b64urlDecode(head);
@@ -125,13 +132,22 @@
       for (const it of items) {
         const card = document.createElement("div");
         card.className = "card";
-        card.innerHTML =
-          '<img class="thumb" loading="lazy" src="' + esc(it.url) + '" alt="" />' +
-          '<div class="meta">' +
-            '<div class="comment' + (it.comment ? '' : ' empty') + '">' + (it.comment ? '“' + esc(it.comment) + '”' : "no comment") + '</div>' +
-            '<div class="tags"><span class="tag">' + esc(it.kind) + '</span><a class="link-open" href="' + esc(it.url) + '" target="_blank" rel="noopener">open ↗</a></div>' +
-            '<button class="remove">Remove</button>' +
-          '</div>';
+        if (it.kind === "confession") {
+          card.innerHTML =
+            '<div class="meta">' +
+              '<div class="tags"><span class="tag">confession</span></div>' +
+              '<div class="comment" style="flex:1">“' + esc(it.text) + '”</div>' +
+              '<button class="remove">Remove</button>' +
+            '</div>';
+        } else {
+          card.innerHTML =
+            '<img class="thumb" loading="lazy" src="' + esc(it.url) + '" alt="" />' +
+            '<div class="meta">' +
+              '<div class="comment' + (it.comment ? '' : ' empty') + '">' + (it.comment ? '“' + esc(it.comment) + '”' : "no comment") + '</div>' +
+              '<div class="tags"><span class="tag">' + esc(it.kind) + '</span><a class="link-open" href="' + esc(it.url) + '" target="_blank" rel="noopener">open ↗</a></div>' +
+              '<button class="remove">Remove</button>' +
+            '</div>';
+        }
         card.querySelector("button.remove").addEventListener("click", (ev) => remove(it, card, ev.target));
         $("grid").appendChild(card);
       }
@@ -140,7 +156,8 @@
     async function remove(it, card, btn) {
       const secret = secretInput.value.trim();
       if (!secret) { secretInput.focus(); setStatus("Enter your moderation password first.", true); return; }
-      if (!confirm("Remove this image from the site?\n\n" + (it.comment ? '“' + it.comment + '”' : "(no comment)"))) return;
+      const label = it.kind === "confession" ? '“' + it.text + '”' : (it.comment ? '“' + it.comment + '”' : "(no comment)");
+      if (!confirm("Remove this from the site?\n\n" + label)) return;
       btn.disabled = true; btn.textContent = "Removing…";
       try {
         const res = await fetch(SUPABASE_URL + "/functions/v1/moderate-delete", {

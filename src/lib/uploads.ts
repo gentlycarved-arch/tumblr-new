@@ -25,6 +25,8 @@ const LINK_PREFIX = "link-";            // pointer-file naming
 const MAX_LINK_LEN = 700;
 export const MAX_COMMENT_LEN = 140;     // visitor's "why do you like this image?" note
 const COMMENT_SEP = "@";                // delimiter in filenames: allowed by Supabase, never in base64url
+const CONF_PREFIX = "conf-";            // anonymous confessions ride in the same bucket
+export const MAX_CONFESSION_LEN = 280;
 
 const ALLOWED = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/avif"];
 
@@ -107,13 +109,52 @@ async function listRows(): Promise<StorageRow[]> {
   return rows.filter((r) => r.id !== null && r.name && !r.name.endsWith("/"));
 }
 
-/** Every visitor addition (image URL + comment), newest first. */
+/** Every visitor image (URL + comment), newest first. Confessions are excluded. */
 export async function listUploads(): Promise<Upload[]> {
   if (!uploadsConfigured()) return [];
   const rows = await listRows();
   return rows
+    .filter((r) => !r.name.startsWith(CONF_PREFIX))
     .map((r) => decodeRow(r.name))
     .filter((u): u is Upload => u !== null);
+}
+
+// ---- Confessions (anonymous text, same bucket, "conf-" prefix) ----------------
+
+export interface Confession { text: string }
+
+function encodeConfessionName(text: string): string {
+  const t = text.trim().slice(0, MAX_CONFESSION_LEN);
+  // A unique opaque tag before "@" keeps identical confessions from colliding.
+  const tag = `${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
+  return `${CONF_PREFIX}${tag}${COMMENT_SEP}${b64urlEncode(t)}.txt`;
+}
+
+function decodeConfession(name: string): Confession | null {
+  if (!name.startsWith(CONF_PREFIX) || !name.endsWith(".txt")) return null;
+  const stem = name.slice(CONF_PREFIX.length, -4);
+  const i = stem.indexOf(COMMENT_SEP);
+  if (i === -1) return null;
+  const text = b64urlDecode(stem.slice(i + 1));
+  return text ? { text } : null;
+}
+
+/** Every confession, newest first. */
+export async function listConfessions(): Promise<Confession[]> {
+  if (!uploadsConfigured()) return [];
+  const rows = await listRows();
+  return rows
+    .map((r) => decodeConfession(r.name))
+    .filter((c): c is Confession => c !== null);
+}
+
+/** Store one anonymous confession (moderated asynchronously by the notify-upload function). */
+export async function addConfession(text: string): Promise<void> {
+  if (!uploadsConfigured()) throw new Error("Confessions are not configured.");
+  const t = text.trim();
+  if (!t) throw new Error("Say something first.");
+  if (t.length > MAX_CONFESSION_LEN) throw new Error(`Keep it under ${MAX_CONFESSION_LEN} characters.`);
+  await putObject(encodeConfessionName(t), "", "text/plain");
 }
 
 async function currentCount(): Promise<number> {

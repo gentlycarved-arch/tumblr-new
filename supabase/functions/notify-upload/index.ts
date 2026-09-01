@@ -19,6 +19,7 @@
 
 const BUCKET = "uploads";
 const LINK_PREFIX = "link-";
+const CONF_PREFIX = "conf-";
 const COMMENT_SEP = "@";
 
 function b64urlDecode(s: string): string | null {
@@ -87,6 +88,58 @@ async function moderate(imageUrl: string, comment: string): Promise<{ ran: boole
   }
 }
 
+// Text-only moderation (for confessions).
+async function moderateText(text: string): Promise<{ ran: boolean; flagged: boolean; categories: string[] }> {
+  const key = Deno.env.get("OPENAI_API_KEY");
+  if (!key || !text) return { ran: false, flagged: false, categories: [] };
+  try {
+    const res = await fetch("https://api.openai.com/v1/moderations", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "omni-moderation-latest", input: text }),
+    });
+    if (!res.ok) {
+      console.error("moderation error", res.status, await res.text().catch(() => ""));
+      return { ran: false, flagged: false, categories: [] };
+    }
+    const data = await res.json();
+    const r = data?.results?.[0];
+    const flagged = !!r?.flagged;
+    return { ran: true, flagged, categories: flagged ? Object.entries(r.categories ?? {}).filter(([, v]) => v).map(([k]) => k) : [] };
+  } catch (e) {
+    console.error("moderation call failed", e);
+    return { ran: false, flagged: false, categories: [] };
+  }
+}
+
+function decodeConfession(name: string): string | null {
+  const stem = name.slice(CONF_PREFIX.length, -4); // strip "conf-" and ".txt"
+  const i = stem.indexOf(COMMENT_SEP);
+  return i === -1 ? null : b64urlDecode(stem.slice(i + 1));
+}
+
+async function handleConfession(name: string, supabaseUrl: string): Promise<Response> {
+  const text = decodeConfession(name);
+  if (!text) return new Response(JSON.stringify({ skipped: "undecodable confession" }), { headers: { "Content-Type": "application/json" } });
+  const mod = await moderateText(text);
+  const quote = `<blockquote style="font-size:16px;font-style:italic;border-left:3px solid #ccc;margin:0 0 12px;padding:2px 0 2px 12px">“${esc(text)}”</blockquote>`;
+  if (mod.flagged) {
+    const cats = mod.categories.map(esc).join(", ") || "flagged";
+    const html = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:520px">
+      <p style="font-size:15px;margin:0 0 6px">⚠️ A flagged <b>confession</b> on <b>tahreem.cv</b></p>
+      <p style="font-size:13px;color:#b23;margin:0 0 12px">Moderation flagged: <b>${cats}</b>. It was <b>automatically removed</b>.</p>
+      ${quote}</div>`;
+    const emailRes = await sendEmail("⚠️ Auto-removed a flagged confession — tahreem.cv", html);
+    await deleteObject(name, supabaseUrl);
+    return emailRes;
+  }
+  const html = `<div style="font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:520px">
+    <p style="font-size:15px;margin:0 0 12px">New <b>confession</b> on <b>tahreem.cv</b>:</p>
+    ${quote}
+    ${mod.ran ? '<p style="font-size:12px;color:#999;margin:0">moderation: clean</p>' : ""}</div>`;
+  return await sendEmail(`New confession — “${text.slice(0, 60)}”`, html);
+}
+
 async function deleteObject(name: string, supabaseUrl: string): Promise<void> {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   await fetch(`${supabaseUrl}/storage/v1/object/${BUCKET}`, {
@@ -133,6 +186,12 @@ Deno.serve(async (req) => {
   }
 
   const supabaseUrl = (Deno.env.get("SUPABASE_URL") ?? "").replace(/\/$/, "");
+
+  // Confessions (anonymous text) get text-only moderation.
+  if (rec.name.startsWith(CONF_PREFIX)) {
+    return await handleConfession(rec.name, supabaseUrl);
+  }
+
   const decoded = decode(rec.name, supabaseUrl);
   if (!decoded) {
     return new Response(JSON.stringify({ skipped: "undecodable" }), { headers: { "Content-Type": "application/json" } });
