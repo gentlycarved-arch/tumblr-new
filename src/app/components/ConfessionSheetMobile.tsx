@@ -10,7 +10,7 @@ interface Props {
   onSubmit: (text: string) => void;
 }
 
-const COLLAPSED_PX = 108; // visible height when collapsed: handle + trigger row
+const COLLAPSED_PX = 128; // visible height when collapsed: handle + trigger row (+ safe-area room)
 const EXPANDED_VH = 86;   // sheet height when swiped open, almost takes over the screen
 
 /**
@@ -24,8 +24,10 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startY: number; startTop: number } | null>(null);
 
-  const topClosed = `calc(100vh - ${COLLAPSED_PX}px)`;
-  const topOpen = `${100 - EXPANDED_VH}vh`;
+  // dvh (not vh) tracks the real visible area — vh in mobile Safari counts the space
+  // behind its own toolbar, which pushes bottom-anchored content out of view.
+  const topClosed = `calc(100dvh - ${COLLAPSED_PX}px)`;
+  const topOpen = `${100 - EXPANDED_VH}dvh`;
 
   useEffect(() => {
     const el = sheetRef.current;
@@ -35,9 +37,16 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  function viewportHeight() {
+    // visualViewport reflects the actual visible area (excludes the browser's own
+    // toolbar/keyboard); window.innerHeight can overreport it, same issue as vh vs dvh.
+    return window.visualViewport?.height ?? window.innerHeight;
+  }
+
   function bounds() {
-    const minTop = window.innerHeight * (1 - EXPANDED_VH / 100); // fully open
-    const maxTop = window.innerHeight - COLLAPSED_PX;            // fully closed
+    const vh = viewportHeight();
+    const minTop = vh * (1 - EXPANDED_VH / 100); // fully open
+    const maxTop = vh - COLLAPSED_PX;            // fully closed
     return { minTop, maxTop };
   }
 
@@ -101,7 +110,7 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
         className="fixed left-0 right-0 flex flex-col overflow-hidden"
         style={{
           top: topClosed,
-          height: `${EXPANDED_VH}vh`,
+          height: `${EXPANDED_VH}dvh`,
           borderRadius: "20px 20px 0 0",
           background: panelBg,
           boxShadow: darkMode ? "0 -4px 24px rgba(0,0,0,0.45)" : "0 -4px 24px rgba(0,0,0,0.18)",
@@ -117,8 +126,8 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
         </div>
 
         <div
-          className="flex items-center justify-between px-5 pb-3 shrink-0"
-          style={{ touchAction: "none" }}
+          className="flex items-center justify-between px-5 shrink-0"
+          style={{ touchAction: "none", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
           {...dragHandlers}
         >
           <button
@@ -134,7 +143,7 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 pb-8">
+        <div className="flex-1 overflow-y-auto px-5" style={{ paddingBottom: "max(32px, env(safe-area-inset-bottom))" }}>
           {composeOpen ? (
             <ConfessionComposeCard
               darkMode={darkMode}
