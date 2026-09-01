@@ -81,9 +81,16 @@
     }
     const CONF_PREFIX = "conf-";
     function decode(name) {
-      const parseComment = (stem) => {
+      const parseMeta = (stem) => {
         const i = stem.indexOf(SEP);
-        return i === -1 ? { head: stem, comment: "" } : { head: stem.slice(0, i), comment: b64urlDecode(stem.slice(i + 1)) || "" };
+        if (i === -1) return { head: stem, comment: "", song: "" };
+        const head = stem.slice(0, i);
+        const raw = b64urlDecode(stem.slice(i + 1)) || "";
+        if (raw.startsWith("json:")) {
+          try { const o = JSON.parse(raw.slice(5)); return { head, comment: o.c || "", song: o.s || "" }; }
+          catch { return { head, comment: "", song: "" }; }
+        }
+        return { head, comment: raw, song: "" };
       };
       if (name.startsWith(CONF_PREFIX) && name.endsWith(".txt")) {
         const stem = name.slice(CONF_PREFIX.length, -4);
@@ -92,14 +99,14 @@
         return text ? { name, kind: "confession", text } : null;
       }
       if (name.startsWith(LINK_PREFIX) && name.endsWith(".txt")) {
-        const { head, comment } = parseComment(name.slice(LINK_PREFIX.length, -4));
+        const { head, comment, song } = parseMeta(name.slice(LINK_PREFIX.length, -4));
         const url = b64urlDecode(head);
-        return url ? { name, url, comment, kind: "pasted link" } : null;
+        return url ? { name, url, comment, song, kind: "pasted link" } : null;
       }
       const dot = name.lastIndexOf(".");
       const stem = dot === -1 ? name : name.slice(0, dot);
-      const { comment } = parseComment(stem);
-      return { name, url: SUPABASE_URL + "/storage/v1/object/public/" + BUCKET + "/" + encodeURIComponent(name), comment, kind: "device / camera" };
+      const { comment, song } = parseMeta(stem);
+      return { name, url: SUPABASE_URL + "/storage/v1/object/public/" + BUCKET + "/" + encodeURIComponent(name), comment, song, kind: "device / camera" };
     }
     const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -140,10 +147,14 @@
               '<button class="remove">Remove</button>' +
             '</div>';
         } else {
+          const songLine = it.song
+            ? '<div class="tags">🎵 <a class="link-open" href="' + esc(it.song) + '" target="_blank" rel="noopener">' + esc(it.song) + '</a></div>'
+            : '';
           card.innerHTML =
             '<img class="thumb" loading="lazy" src="' + esc(it.url) + '" alt="" />' +
             '<div class="meta">' +
               '<div class="comment' + (it.comment ? '' : ' empty') + '">' + (it.comment ? '“' + esc(it.comment) + '”' : "no comment") + '</div>' +
+              songLine +
               '<div class="tags"><span class="tag">' + esc(it.kind) + '</span><a class="link-open" href="' + esc(it.url) + '" target="_blank" rel="noopener">open ↗</a></div>' +
               '<button class="remove">Remove</button>' +
             '</div>';

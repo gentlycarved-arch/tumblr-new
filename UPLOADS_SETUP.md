@@ -88,6 +88,13 @@ to keep you comfortably under it:
 > (a Supabase Edge Function) — ask and it can be added. You can also watch usage any time
 > under **Supabase → Reports**.
 
+## Attaching a song to an image
+When adding an image, visitors can optionally paste a **YouTube, Apple Music, or Spotify**
+link (the only three with free, keyless `iframe` embeds — no paid API involved). While that
+image is the current background, a small **"🎵 play this image's song"** pill appears near
+the top; clicking it reveals the platform's embedded player. Browsers block autoplay with
+sound, so it's always click-to-play, never automatic.
+
 ## Guardrails already in place
 - Only image files (JPEG/PNG/GIF/WebP/AVIF); source files over **12 MB** are rejected.
 - Each upload gets a random unique filename (no overwrites/collisions).

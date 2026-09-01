@@ -34,25 +34,34 @@ function b64urlDecode(s: string): string | null {
   }
 }
 
-// Mirror of the site's decodeRow(): object name -> { url, comment, kind }
-function decode(name: string, supabaseUrl: string): { url: string; comment: string; kind: "link" | "upload" } | null {
-  const parseComment = (stem: string) => {
+// Mirror of the site's decodeRow(): object name -> { url, comment, song, kind }
+function decode(name: string, supabaseUrl: string): { url: string; comment: string; song: string; kind: "link" | "upload" } | null {
+  const parseMeta = (stem: string) => {
     const i = stem.indexOf(COMMENT_SEP);
-    return i === -1
-      ? { head: stem, comment: "" }
-      : { head: stem.slice(0, i), comment: b64urlDecode(stem.slice(i + 1)) ?? "" };
+    if (i === -1) return { head: stem, comment: "", song: "" };
+    const head = stem.slice(0, i);
+    const raw = b64urlDecode(stem.slice(i + 1)) ?? "";
+    if (raw.startsWith("json:")) {
+      try {
+        const o = JSON.parse(raw.slice(5));
+        return { head, comment: o.c ?? "", song: o.s ?? "" };
+      } catch {
+        return { head, comment: "", song: "" };
+      }
+    }
+    return { head, comment: raw, song: "" };
   };
 
   if (name.startsWith(LINK_PREFIX) && name.endsWith(".txt")) {
-    const { head, comment } = parseComment(name.slice(LINK_PREFIX.length, -4));
+    const { head, comment, song } = parseMeta(name.slice(LINK_PREFIX.length, -4));
     const url = b64urlDecode(head);
-    return url ? { url, comment, kind: "link" } : null;
+    return url ? { url, comment, song, kind: "link" } : null;
   }
   const dot = name.lastIndexOf(".");
   const stem = dot === -1 ? name : name.slice(0, dot);
-  const { comment } = parseComment(stem);
+  const { comment, song } = parseMeta(stem);
   const url = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(name)}`;
-  return { url, comment, kind: "upload" };
+  return { url, comment, song, kind: "upload" };
 }
 
 function esc(s: string): string {
@@ -202,6 +211,9 @@ Deno.serve(async (req) => {
     : `<p style="font-size:14px;color:#888;margin:0 0 12px">(no comment)</p>`;
   const imgBlock = `<a href="${esc(decoded.url)}"><img src="${esc(decoded.url)}" alt="upload"
       style="max-width:100%;border-radius:10px;display:block;margin:0 0 12px" /></a>`;
+  const songLine = decoded.song
+    ? `<p style="font-size:13px;margin:0 0 12px">🎵 <a href="${esc(decoded.song)}" style="color:#5688be">${esc(decoded.song)}</a></p>`
+    : "";
 
   // --- Moderation ---
   const mod = await moderate(decoded.url, decoded.comment);
@@ -218,6 +230,7 @@ Deno.serve(async (req) => {
           ${removed ? "It was <b>automatically removed</b>." : "It's <b>still live</b> — review it."}
         </p>
         ${commentLine}
+        ${songLine}
         ${imgBlock}
         <p style="font-size:12px;color:#999;margin:0">
           <a href="https://tahreem.cv/moderate.html" style="color:#5688be">open the moderation page</a>
@@ -233,6 +246,7 @@ Deno.serve(async (req) => {
     <div style="font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:520px">
       <p style="font-size:15px;margin:0 0 12px">Someone just added an image to <b>tahreem.cv</b>:</p>
       ${commentLine}
+      ${songLine}
       ${imgBlock}
       <p style="font-size:12px;color:#999;margin:0">
         source: ${decoded.kind === "link" ? "pasted link" : "device / camera"} ·

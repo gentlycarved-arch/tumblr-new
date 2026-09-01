@@ -4,6 +4,7 @@ import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { AddImageFlow } from "../../app/components/AddImageFlow";
+import { SongBanner } from "../../app/components/SongBanner";
 import { ConfessionFlow } from "../../app/components/ConfessionFlow";
 import { ConfessionTicker } from "../../app/components/ConfessionTicker";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
@@ -421,7 +422,7 @@ const MAIN_SLUG = "nothing-tykp-p8vhpo";
 export default function Wireframe() {
   // 'auto' until the user touches the toggle, then locked to 'dark' or 'light'
   const [mode, setMode] = useState<SlideMode>('auto');
-  const { images: uploads, commentByUrl, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
+  const { images: uploads, commentByUrl, songByUrl, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
   const { confessions, configured: confOn, status: confStatus, error: confError, submit: submitConfession } = useConfessions();
   const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode, uploads);
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -437,6 +438,7 @@ export default function Wireframe() {
 
   // If the current background is a visitor upload with a note, caption it.
   const caption = !addingImage ? (commentByUrl[currentSrc] || "") : "";
+  const currentSong = !addingImage ? (songByUrl[currentSrc] || "") : "";
 
   function handleAddingChange(adding: boolean) {
     frozenDark.current = adding ? liveDark : null;
@@ -586,6 +588,9 @@ export default function Wireframe() {
           />
         )}
         {!addingImage && <ConfessionTicker confessions={confessions} darkMode={darkMode} />}
+
+        {/* Top banner: the current background image's attached song, if it has one */}
+        {currentSong && <SongBanner song={currentSong} darkMode={darkMode} />}
 
         {/* Caption for the current background, when it's a visitor upload with a note */}
         {caption && (

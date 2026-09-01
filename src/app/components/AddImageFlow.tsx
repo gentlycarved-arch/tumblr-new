@@ -6,8 +6,8 @@ interface Props {
   darkMode: boolean;
   status: UploadStatus;
   error: string | null;
-  onFile: (file: File, comment: string) => void;
-  onLink: (url: string, comment: string) => void;
+  onFile: (file: File, comment: string, song: string) => void;
+  onLink: (url: string, comment: string, song: string) => void;
   onAddingChange: (adding: boolean) => void;   // blanks the background while true
   onPreviewChange: (url: string | null) => void; // shows a preview image on the background
 }
@@ -35,6 +35,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const [linkErr, setLinkErr] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
   const [comment, setComment] = useState("");
+  const [song, setSong] = useState("");
 
   const busy = status === "uploading";
 
@@ -45,7 +46,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const reset = useCallback(() => {
     clearObjUrl();
     setStep("idle"); setPendingFile(null); setPendingLink(null);
-    setLinkInput(""); setLinkErr(null); setChecking(false); setComment("");
+    setLinkInput(""); setLinkErr(null); setChecking(false); setComment(""); setSong("");
     onAddingChange(false); onPreviewChange(null);
   }, [clearObjUrl, onAddingChange, onPreviewChange]);
 
@@ -113,8 +114,8 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   function submit() {
     if (busy) return;
-    if (pendingFile) onFile(pendingFile, comment);
-    else if (pendingLink) onLink(pendingLink, comment);
+    if (pendingFile) onFile(pendingFile, comment, song);
+    else if (pendingLink) onLink(pendingLink, comment, song);
   }
 
   // ---- shared styling ----
@@ -139,7 +140,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   return (
     <div
       className={`absolute flex flex-col max-sm:items-center sm:items-end
-        max-sm:bottom-6 max-sm:left-1/2 max-sm:-translate-x-1/2
+        max-sm:bottom-20 max-sm:left-1/2 max-sm:-translate-x-1/2
         sm:top-6 sm:right-6`}
       style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
@@ -250,6 +251,15 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                 />
                 <div className="text-[11px] opacity-45 text-right pr-0.5">{comment.length}/{MAX_COMMENT_LEN}</div>
               </div>
+
+              <input
+                value={song}
+                onChange={(e) => setSong(e.target.value)}
+                placeholder="🎵 attach a song (optional) — youtube, apple music, spotify"
+                disabled={busy}
+                className="w-full rounded-[10px] px-3 py-2.5 text-[13px] outline-none"
+                style={fieldStyle}
+              />
 
               {status === "error" && error && (
                 <div className="text-[12px] px-0.5" style={{ color: "#d05a5a" }}>{error}</div>
