@@ -93,8 +93,8 @@ export function ConfessionFlow({ darkMode, status, error, onSubmit }: Props) {
             <>
               <div className="text-[15px]" style={{ color: heading }}>a free space</div>
               <div className="text-[12px] leading-snug -mt-1 opacity-80">
-                anonymous — a thought on tech, life, an idea you can't shake, or the thing you're
-                afraid to say out loud.
+                anonymous. your unfiltered thoughts on the future, tech, your career, AI, life —
+                anything. nothing personal, hateful, or inappropriate, please; it'll be flagged.
               </div>
 
               <div className="flex flex-col gap-1">
