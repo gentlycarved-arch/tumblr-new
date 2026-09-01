@@ -53,7 +53,7 @@
 </head>
 <body>
   <h1>Moderate uploads</h1>
-  <p class="sub">Everything currently live on tahreem.cv. Remove anything inappropriate — it drops out of the rotation immediately.</p>
+  <p class="sub">Everything currently live on tahreem.cv. Remove anything inappropriate and it drops out of the rotation immediately.</p>
 
   <div class="bar">
     <input id="secret" type="password" placeholder="moderation password" autocomplete="current-password" />
@@ -134,7 +134,7 @@
 
     function render(items) {
       $("count").textContent = items.length + " live";
-      setStatus(items.length ? "" : "Nothing uploaded right now — all clear. ✅");
+      setStatus(items.length ? "" : "Nothing uploaded right now, all clear. ✅");
       $("grid").innerHTML = "";
       for (const it of items) {
         const card = document.createElement("div");
@@ -181,7 +181,7 @@
         card.remove();
         const n = document.querySelectorAll(".card").length;
         $("count").textContent = n + " live";
-        if (!n) setStatus("Nothing uploaded right now — all clear. ✅");
+        if (!n) setStatus("Nothing uploaded right now, all clear. ✅");
       } catch (e) {
         btn.disabled = false; btn.textContent = "Remove";
         setStatus("Couldn't remove: " + e.message, true);

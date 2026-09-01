@@ -267,7 +267,7 @@ async function putObject(name: string, body: Blob | string, contentType: string)
       body,
     });
   } catch {
-    throw new Error("Couldn't reach the server — check your connection and try again.");
+    throw new Error("Couldn't reach the server. Check your connection and try again.");
   }
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -293,13 +293,13 @@ function validateSong(song: string): void {
 export async function uploadImage(file: File, comment = "", song = ""): Promise<string> {
   if (!uploadsConfigured()) throw new Error("Uploads are not configured.");
   if (!ALLOWED.includes(file.type)) throw new Error("Please choose a JPEG, PNG, GIF, WebP, or AVIF image.");
-  if (file.size > MAX_UPLOAD_BYTES) throw new Error("That image is over 25 MB — please pick a smaller one.");
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error("That image is over 25 MB. Please pick a smaller one.");
   validateSong(song);
   await assertRoom();
 
   const { body, ext, type } = await compress(file);
   if (body.size > MAX_STORED_BYTES) {
-    throw new Error("That image is too large even after compression — please pick a smaller one.");
+    throw new Error("That image is too large even after compression. Please pick a smaller one.");
   }
   const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${metaSuffix(comment, song)}.${ext}`;
   await putObject(name, body, type);

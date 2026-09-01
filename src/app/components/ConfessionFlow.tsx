@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import type { ConfessionStatus } from "../../hooks/useConfessions";
 import { MAX_CONFESSION_LEN } from "../../lib/uploads";
+import { ConfessionFeed } from "./ConfessionFeed";
 
 interface Props {
   darkMode: boolean;
   status: ConfessionStatus;
   error: string | null;
+  confessions: string[];
   onSubmit: (text: string) => void;
 }
 
@@ -16,7 +18,7 @@ const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, 
  * "a free space" — anonymous confessions box, styled like the add-image flow.
  * Button sits in the left corner: top-left on desktop, bottom-left on mobile.
  */
-export function ConfessionFlow({ darkMode, status, error, onSubmit }: Props) {
+export function ConfessionFlow({ darkMode, status, error, confessions, onSubmit }: Props) {
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
   const [text, setText] = useState("");
@@ -80,6 +82,8 @@ export function ConfessionFlow({ darkMode, status, error, onSubmit }: Props) {
         </button>
       )}
 
+      {!open && <ConfessionFeed confessions={confessions} darkMode={darkMode} />}
+
       {open && (
         <div
           className={`${font} rounded-[14px] p-4 w-[320px] max-w-[88vw] flex flex-col gap-3`}
@@ -93,7 +97,7 @@ export function ConfessionFlow({ darkMode, status, error, onSubmit }: Props) {
             <>
               <div className="text-[15px]" style={{ color: heading }}>a free space</div>
               <div className="text-[12px] leading-snug -mt-1 opacity-80">
-                anonymous. your unfiltered thoughts on the future, tech, your career, AI, life —
+                anonymous. your unfiltered thoughts on the future, tech, your career, AI, life,
                 anything. nothing personal, hateful, or inappropriate, please; it'll be flagged.
               </div>
 

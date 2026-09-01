@@ -6,7 +6,6 @@ import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { AddImageFlow } from "../../app/components/AddImageFlow";
 import { SongBanner } from "../../app/components/SongBanner";
 import { ConfessionFlow } from "../../app/components/ConfessionFlow";
-import { ConfessionTicker } from "../../app/components/ConfessionTicker";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
 import { useUploads } from "../../hooks/useUploads";
 import { useConfessions } from "../../hooks/useConfessions";
@@ -578,16 +577,16 @@ export default function Wireframe() {
           />
         )}
 
-        {/* Anonymous confessions — submit box (left corner) + cycling display */}
+        {/* Anonymous confessions — submit box + feed pop out underneath it */}
         {confOn && (
           <ConfessionFlow
             darkMode={darkMode}
             status={confStatus}
             error={confError}
+            confessions={confessions}
             onSubmit={submitConfession}
           />
         )}
-        {!addingImage && <ConfessionTicker confessions={confessions} darkMode={darkMode} />}
 
         {/* Top banner: the current background image's attached song, if it has one */}
         {currentSong && <SongBanner song={currentSong} darkMode={darkMode} />}

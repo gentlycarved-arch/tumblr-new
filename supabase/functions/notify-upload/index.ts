@@ -138,7 +138,7 @@ async function handleConfession(name: string, supabaseUrl: string): Promise<Resp
       <p style="font-size:15px;margin:0 0 6px">⚠️ A flagged <b>confession</b> on <b>tahreem.cv</b></p>
       <p style="font-size:13px;color:#b23;margin:0 0 12px">Moderation flagged: <b>${cats}</b>. It was <b>automatically removed</b>.</p>
       ${quote}</div>`;
-    const emailRes = await sendEmail("⚠️ Auto-removed a flagged confession — tahreem.cv", html);
+    const emailRes = await sendEmail("⚠️ Auto-removed a flagged confession on tahreem.cv", html);
     await deleteObject(name, supabaseUrl);
     return emailRes;
   }
@@ -146,7 +146,7 @@ async function handleConfession(name: string, supabaseUrl: string): Promise<Resp
     <p style="font-size:15px;margin:0 0 12px">New <b>confession</b> on <b>tahreem.cv</b>:</p>
     ${quote}
     ${mod.ran ? '<p style="font-size:12px;color:#999;margin:0">moderation: clean</p>' : ""}</div>`;
-  return await sendEmail(`New confession — “${text.slice(0, 60)}”`, html);
+  return await sendEmail(`New confession: “${text.slice(0, 60)}”`, html);
 }
 
 async function deleteObject(name: string, supabaseUrl: string): Promise<void> {
@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
         <p style="font-size:15px;margin:0 0 6px">⚠️ A flagged upload on <b>tahreem.cv</b></p>
         <p style="font-size:13px;color:#b23;margin:0 0 12px">
           Moderation flagged: <b>${cats}</b>.
-          ${removed ? "It was <b>automatically removed</b>." : "It's <b>still live</b> — review it."}
+          ${removed ? "It was <b>automatically removed</b>." : "It's <b>still live</b>, please review it."}
         </p>
         ${commentLine}
         ${songLine}
@@ -236,7 +236,7 @@ Deno.serve(async (req) => {
           <a href="https://tahreem.cv/moderate.html" style="color:#5688be">open the moderation page</a>
         </p>
       </div>`;
-    const emailRes = await sendEmail(removed ? "⚠️ Auto-removed a flagged upload — tahreem.cv" : "⚠️ Flagged upload — tahreem.cv", html);
+    const emailRes = await sendEmail(removed ? "⚠️ Auto-removed a flagged upload on tahreem.cv" : "⚠️ Flagged upload on tahreem.cv", html);
     if (removed) await deleteObject(rec.name, supabaseUrl);
     return emailRes;
   }
@@ -255,7 +255,7 @@ Deno.serve(async (req) => {
       </p>
     </div>`;
   const subject = decoded.comment
-    ? `New image on tahreem.cv — “${decoded.comment.slice(0, 60)}”`
+    ? `New image on tahreem.cv: “${decoded.comment.slice(0, 60)}”`
     : "New image on tahreem.cv";
   return await sendEmail(subject, html);
 });

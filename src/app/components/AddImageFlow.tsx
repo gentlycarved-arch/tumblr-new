@@ -91,7 +91,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
     img.onerror = () => {
       previewingRef.current = false;
       setChecking(false);
-      setLinkErr("Couldn't load that link — try right-click → Copy image address.");
+      setLinkErr("Couldn't load that link. Try right-click, then Copy image address.");
     };
     img.src = v;
   }
@@ -139,9 +139,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   return (
     <div
-      className={`absolute flex flex-col max-sm:items-center sm:items-end
-        max-sm:bottom-20 max-sm:left-1/2 max-sm:-translate-x-1/2
-        sm:top-6 sm:right-6`}
+      className="absolute flex flex-col items-end top-6 right-6"
       style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -179,7 +177,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
             <>
               <div className="text-[15px]" style={{ color: heading }}>add an image</div>
               <div className="text-[12px] leading-snug -mt-1 opacity-70">
-                visible to everyone who visits — it'll join the rotating background.
+                visible to everyone who visits. it'll join the rotating background.
               </div>
 
               {/* Desktop: one file picker */}
@@ -223,7 +221,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                   value={linkInput}
                   onChange={(e) => { setLinkInput(e.target.value); setLinkErr(null); }}
                   onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); previewLink(linkInput.trim()); } }}
-                  placeholder="paste a link — cosmos, are.na, anywhere"
+                  placeholder="paste a link: cosmos, are.na, anywhere"
                   className="w-full rounded-[10px] px-3 py-2.5 text-[13px] outline-none"
                   style={fieldStyle}
                 />
@@ -231,7 +229,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                   ? <div className="text-[12px] px-0.5 opacity-70">loading…</div>
                   : linkErr
                     ? <div className="text-[12px] px-0.5" style={{ color: "#d05a5a" }}>{linkErr}</div>
-                    : <div className="text-[12px] px-0.5 opacity-50">paste a link — it previews automatically</div>}
+                    : <div className="text-[12px] px-0.5 opacity-50">paste a link and it previews automatically</div>}
               </div>
 
               <button type="button" onClick={reset} className="rounded-[10px] py-2.5 text-[14px]" style={secondaryBtn}>
@@ -258,7 +256,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
               <input
                 value={song}
                 onChange={(e) => setSong(e.target.value)}
-                placeholder="🎵 attach a song (optional) — youtube, apple music, spotify"
+                placeholder="🎵 attach a song (optional): youtube, apple music, spotify"
                 disabled={busy}
                 className="w-full rounded-[10px] px-3 py-2.5 text-[13px] outline-none"
                 style={fieldStyle}
