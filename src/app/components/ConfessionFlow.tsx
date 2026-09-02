@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { ConfessionStatus } from "../../hooks/useConfessions";
 import { ConfessionFeed } from "./ConfessionFeed";
 import { ConfessionComposeCard } from "./ConfessionComposeCard";
-import { SONG_BAR_HEIGHT } from "./SongBanner";
 
 interface Props {
   darkMode: boolean;
@@ -10,7 +9,6 @@ interface Props {
   error: string | null;
   confessions: string[];
   onSubmit: (text: string) => void;
-  pushDown?: boolean; // true when the top song bar is showing, so this clears it
 }
 
 /**
@@ -18,7 +16,7 @@ interface Props {
  * confessions feed preview popping out underneath it when idle. Mobile uses the
  * swipe-up ConfessionSheetMobile instead (see Wireframe1).
  */
-export function ConfessionFlow({ darkMode, status, error, confessions, onSubmit, pushDown }: Props) {
+export function ConfessionFlow({ darkMode, status, error, confessions, onSubmit }: Props) {
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
 
@@ -31,8 +29,8 @@ export function ConfessionFlow({ darkMode, status, error, confessions, onSubmit,
 
   return (
     <div
-      className="hidden sm:flex absolute flex-col items-start left-6"
-      style={{ zIndex: 40, top: pushDown ? SONG_BAR_HEIGHT + 12 : 24, transition: "top 250ms ease" }}
+      className="hidden sm:flex absolute flex-col items-start top-6 left-6"
+      style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >

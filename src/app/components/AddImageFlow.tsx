@@ -1,17 +1,15 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import type { UploadStatus } from "../../hooks/useUploads";
 import { MAX_COMMENT_LEN } from "../../lib/uploads";
-import { SONG_BAR_HEIGHT } from "./SongBanner";
 
 interface Props {
   darkMode: boolean;
   status: UploadStatus;
   error: string | null;
-  onFile: (file: File, comment: string, song: string) => void;
-  onLink: (url: string, comment: string, song: string) => void;
+  onFile: (file: File, comment: string) => void;
+  onLink: (url: string, comment: string) => void;
   onAddingChange: (adding: boolean) => void;   // blanks the background while true
   onPreviewChange: (url: string | null) => void; // shows a preview image on the background
-  pushDown?: boolean; // true when the top song bar is showing, so this clears it
 }
 
 type Step = "idle" | "pick" | "review";
@@ -25,7 +23,7 @@ const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, 
  * shows it full-bleed so the visitor can see how it looks behind the site, add a note,
  * and submit. Sits bottom-center on mobile, top-right on desktop.
  */
-export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAddingChange, onPreviewChange, pushDown }: Props) {
+export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAddingChange, onPreviewChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
   const objUrlRef = useRef<string | null>(null);
@@ -37,7 +35,6 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const [linkErr, setLinkErr] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
   const [comment, setComment] = useState("");
-  const [song, setSong] = useState("");
 
   const busy = status === "uploading";
 
@@ -48,7 +45,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const reset = useCallback(() => {
     clearObjUrl();
     setStep("idle"); setPendingFile(null); setPendingLink(null);
-    setLinkInput(""); setLinkErr(null); setChecking(false); setComment(""); setSong("");
+    setLinkInput(""); setLinkErr(null); setChecking(false); setComment("");
     onAddingChange(false); onPreviewChange(null);
   }, [clearObjUrl, onAddingChange, onPreviewChange]);
 
@@ -116,8 +113,8 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   function submit() {
     if (busy) return;
-    if (pendingFile) onFile(pendingFile, comment, song);
-    else if (pendingLink) onLink(pendingLink, comment, song);
+    if (pendingFile) onFile(pendingFile, comment);
+    else if (pendingLink) onLink(pendingLink, comment);
   }
 
   // ---- shared styling ----
@@ -141,8 +138,8 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   return (
     <div
-      className="absolute flex flex-col items-end right-6"
-      style={{ zIndex: 40, top: pushDown ? SONG_BAR_HEIGHT + 12 : 24, transition: "top 250ms ease" }}
+      className="absolute flex flex-col items-end top-6 right-6"
+      style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -254,15 +251,6 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                 />
                 <div className="text-[11px] opacity-45 text-right pr-0.5">{comment.length}/{MAX_COMMENT_LEN}</div>
               </div>
-
-              <input
-                value={song}
-                onChange={(e) => setSong(e.target.value)}
-                placeholder="🎵 attach a song (optional): youtube, apple music, spotify"
-                disabled={busy}
-                className="w-full rounded-[10px] px-3 py-2.5 text-[13px] outline-none"
-                style={fieldStyle}
-              />
 
               {status === "error" && error && (
                 <div className="text-[12px] px-0.5" style={{ color: "#d05a5a" }}>{error}</div>

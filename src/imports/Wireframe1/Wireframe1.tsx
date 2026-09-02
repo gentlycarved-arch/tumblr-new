@@ -4,7 +4,6 @@ import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { AddImageFlow } from "../../app/components/AddImageFlow";
-import { SongBanner, SONG_BAR_HEIGHT } from "../../app/components/SongBanner";
 import { ConfessionFlow } from "../../app/components/ConfessionFlow";
 import { ConfessionSheetMobile } from "../../app/components/ConfessionSheetMobile";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
@@ -242,7 +241,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
   );
 }
 
-function ModeToggle({ darkMode, onToggle, pushDown }: { darkMode: boolean; onToggle: () => void; pushDown?: boolean }) {
+function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
   const TRACK_W = 80;
   const TRACK_H = 42;
   const KNOB = 34;
@@ -251,8 +250,8 @@ function ModeToggle({ darkMode, onToggle, pushDown }: { darkMode: boolean; onTog
 
   return (
     <div
-      className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
-      style={{ zIndex: 10, top: pushDown ? SONG_BAR_HEIGHT + 12 : 32, transition: "top 250ms ease" }}
+      className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
+      style={{ zIndex: 10 }}
     >
       {/* The toggle switch */}
       <button
@@ -422,7 +421,7 @@ const MAIN_SLUG = "nothing-tykp-p8vhpo";
 export default function Wireframe() {
   // 'auto' until the user touches the toggle, then locked to 'dark' or 'light'
   const [mode, setMode] = useState<SlideMode>('auto');
-  const { images: uploads, commentByUrl, songByUrl, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
+  const { images: uploads, commentByUrl, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
   const { confessions, configured: confOn, status: confStatus, error: confError, submit: submitConfession } = useConfessions();
   const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode, uploads);
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -438,7 +437,6 @@ export default function Wireframe() {
 
   // If the current background is a visitor upload with a note, caption it.
   const caption = !addingImage ? (commentByUrl[currentSrc] || "") : "";
-  const currentSong = !addingImage ? (songByUrl[currentSrc] || "") : "";
 
   function handleAddingChange(adding: boolean) {
     frozenDark.current = adding ? liveDark : null;
@@ -490,7 +488,7 @@ export default function Wireframe() {
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
-        <ModeToggle darkMode={darkMode} onToggle={handleToggle} pushDown={!!currentSong} />
+        <ModeToggle darkMode={darkMode} onToggle={handleToggle} />
         <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
@@ -575,7 +573,6 @@ export default function Wireframe() {
             onLink={addByLink}
             onAddingChange={handleAddingChange}
             onPreviewChange={setPreviewUrl}
-            pushDown={!!currentSong}
           />
         )}
 
@@ -587,7 +584,6 @@ export default function Wireframe() {
             error={confError}
             confessions={confessions}
             onSubmit={submitConfession}
-            pushDown={!!currentSong}
           />
         )}
         {/* Anonymous confessions — mobile: swipe-up bottom sheet */}
@@ -601,14 +597,11 @@ export default function Wireframe() {
           />
         )}
 
-        {/* Top banner: the current background image's attached song, if it has one */}
-        {currentSong && <SongBanner song={currentSong} darkMode={darkMode} />}
-
         {/* Caption for the current background, when it's a visitor upload with a note */}
         {caption && (
           <div
             key={caption}
-            className={`absolute ${currentSong ? "max-sm:top-12" : "max-sm:top-9"} max-sm:left-4 max-sm:max-w-[38vw] sm:bottom-6 sm:left-6 sm:max-w-[280px]`}
+            className="absolute max-sm:top-9 max-sm:left-4 max-sm:max-w-[38vw] sm:bottom-6 sm:left-6 sm:max-w-[280px]"
             style={{ zIndex: 30, animation: "fadeIn 500ms ease" }}
           >
             <div

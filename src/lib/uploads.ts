@@ -34,11 +34,10 @@ export function uploadsConfigured(): boolean {
   return Boolean(SUPABASE_URL && ANON_KEY);
 }
 
-/** A visitor addition: the image URL plus the optional note + attached song. */
+/** A visitor addition: the image URL plus the optional note about it. */
 export interface Upload {
   url: string;
   comment: string;
-  song: string;   // a YouTube / Apple Music / Spotify link, or ""
 }
 
 function authHeaders(): Record<string, string> {
@@ -64,75 +63,46 @@ function b64urlDecode(s: string): string | null {
   }
 }
 
-// A trailing "@<base64url payload>" segment carries the note (+ optional song).
-// Legacy entries stored the raw comment; entries with a song store JSON as "json:{...}".
-function metaSuffix(comment: string, song: string): string {
+// A trailing "@<base64url payload>" segment carries the note. Some older entries may
+// still have a "json:{c,s}" payload from when songs could be attached — the "s" (song)
+// field is simply dropped on read, since that feature no longer exists.
+function commentSuffix(comment: string): string {
   const c = (comment || "").trim().slice(0, MAX_COMMENT_LEN);
-  const s = (song || "").trim();
-  if (!c && !s) return "";
-  const payload = s ? `json:${JSON.stringify({ c, s })}` : c;
-  return `${COMMENT_SEP}${b64urlEncode(payload)}`;
+  return c ? `${COMMENT_SEP}${b64urlEncode(c)}` : "";
 }
-function parseMeta(stem: string): { head: string; comment: string; song: string } {
+function parseMeta(stem: string): { head: string; comment: string } {
   const i = stem.indexOf(COMMENT_SEP);
-  if (i === -1) return { head: stem, comment: "", song: "" };
+  if (i === -1) return { head: stem, comment: "" };
   const head = stem.slice(0, i);
   const raw = b64urlDecode(stem.slice(i + 1)) ?? "";
   if (raw.startsWith("json:")) {
     try {
       const o = JSON.parse(raw.slice(5));
-      return { head, comment: o.c || "", song: o.s || "" };
+      return { head, comment: o.c || "" };
     } catch {
-      return { head, comment: "", song: "" };
+      return { head, comment: "" };
     }
   }
-  return { head, comment: raw, song: "" };
+  return { head, comment: raw };
 }
 
-function encodeLinkName(url: string, comment: string, song: string): string {
-  return `${LINK_PREFIX}${b64urlEncode(url)}${metaSuffix(comment, song)}.txt`;
+function encodeLinkName(url: string, comment: string): string {
+  return `${LINK_PREFIX}${b64urlEncode(url)}${commentSuffix(comment)}.txt`;
 }
 
-/** Decodes a stored object name back into its image URL + comment + song. */
+/** Decodes a stored object name back into its image URL + comment. */
 function decodeRow(name: string): Upload | null {
   if (name.startsWith(LINK_PREFIX) && name.endsWith(".txt")) {
     const stem = name.slice(LINK_PREFIX.length, -4);
-    const { head, comment, song } = parseMeta(stem);
+    const { head, comment } = parseMeta(stem);
     const url = b64urlDecode(head);
-    return url ? { url, comment, song } : null;
+    return url ? { url, comment } : null;
   }
-  // A device upload: the object itself is the image; comment + song are encoded.
+  // A device upload: the object itself is the image; the comment is encoded.
   const dot = name.lastIndexOf(".");
   const stem = dot === -1 ? name : name.slice(0, dot);
-  const { comment, song } = parseMeta(stem);
-  return { url: publicUrl(name), comment, song };
-}
-
-// ---- Song embeds (YouTube / Apple Music / Spotify — all free iframe embeds) ----
-
-export interface SongEmbed { platform: "youtube" | "spotify" | "apple"; embed: string; height: number }
-
-/** Turn a pasted song link into an embeddable player URL, or null if unsupported. */
-export function songEmbed(url: string): SongEmbed | null {
-  let u: URL;
-  try { u = new URL(url.trim()); } catch { return null; }
-  const host = u.hostname.replace(/^www\./, "");
-  if (host === "open.spotify.com") {
-    const m = u.pathname.match(/\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/);
-    if (m) return { platform: "spotify", embed: `https://open.spotify.com/embed/${m[1]}/${m[2]}`, height: 152 };
-  }
-  if (host === "youtube.com" || host === "music.youtube.com") {
-    const v = u.searchParams.get("v");
-    if (v) return { platform: "youtube", embed: `https://www.youtube.com/embed/${v}`, height: 160 };
-  }
-  if (host === "youtu.be") {
-    const id = u.pathname.slice(1).split("/")[0];
-    if (id) return { platform: "youtube", embed: `https://www.youtube.com/embed/${id}`, height: 160 };
-  }
-  if (host === "music.apple.com") {
-    return { platform: "apple", embed: `https://embed.music.apple.com${u.pathname}${u.search}`, height: 175 };
-  }
-  return null;
+  const { comment } = parseMeta(stem);
+  return { url: publicUrl(name), comment };
 }
 
 // ---- Reading -----------------------------------------------------------------
@@ -281,27 +251,18 @@ async function assertRoom(): Promise<void> {
   }
 }
 
-/** Rejects a non-empty song link that isn't YouTube / Apple Music / Spotify. */
-function validateSong(song: string): void {
-  const s = (song || "").trim();
-  if (s && !songEmbed(s)) {
-    throw new Error("For the song, paste a YouTube, Apple Music, or Spotify link.");
-  }
-}
-
-/** Compress + upload one device/camera-roll image with an optional note + song. Returns its public URL. */
-export async function uploadImage(file: File, comment = "", song = ""): Promise<string> {
+/** Compress + upload one device/camera-roll image with an optional note. Returns its public URL. */
+export async function uploadImage(file: File, comment = ""): Promise<string> {
   if (!uploadsConfigured()) throw new Error("Uploads are not configured.");
   if (!ALLOWED.includes(file.type)) throw new Error("Please choose a JPEG, PNG, GIF, WebP, or AVIF image.");
   if (file.size > MAX_UPLOAD_BYTES) throw new Error("That image is over 25 MB. Please pick a smaller one.");
-  validateSong(song);
   await assertRoom();
 
   const { body, ext, type } = await compress(file);
   if (body.size > MAX_STORED_BYTES) {
     throw new Error("That image is too large even after compression. Please pick a smaller one.");
   }
-  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${metaSuffix(comment, song)}.${ext}`;
+  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${commentSuffix(comment)}.${ext}`;
   await putObject(name, body, type);
   return publicUrl(name);
 }
@@ -310,11 +271,10 @@ export async function uploadImage(file: File, comment = "", song = ""): Promise<
  * Add an image by URL (Cosmos / Are.na / any direct image link). Are.na block links
  * are auto-resolved. Stores only a tiny pointer — no image bytes. Returns the image URL.
  */
-export async function addLink(rawUrl: string, comment = "", song = ""): Promise<string> {
+export async function addLink(rawUrl: string, comment = ""): Promise<string> {
   if (!uploadsConfigured()) throw new Error("Uploads are not configured.");
   const input = rawUrl.trim();
   if (!input) throw new Error("Please paste an image link.");
-  validateSong(song);
 
   const resolved = (await resolveArena(input)) ?? input;
   if (!/^https?:\/\//i.test(resolved)) throw new Error("That doesn't look like a valid link.");
@@ -328,7 +288,7 @@ export async function addLink(rawUrl: string, comment = "", song = ""): Promise<
   }
 
   await assertRoom();
-  await putObject(encodeLinkName(resolved, comment, song), "", "text/plain");
+  await putObject(encodeLinkName(resolved, comment), "", "text/plain");
   return resolved;
 }
 
