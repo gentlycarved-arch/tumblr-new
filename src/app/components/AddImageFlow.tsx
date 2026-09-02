@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import type { UploadStatus } from "../../hooks/useUploads";
 import { MAX_COMMENT_LEN } from "../../lib/uploads";
+import { SONG_BAR_HEIGHT } from "./SongBanner";
 
 interface Props {
   darkMode: boolean;
@@ -10,6 +11,7 @@ interface Props {
   onLink: (url: string, comment: string, song: string) => void;
   onAddingChange: (adding: boolean) => void;   // blanks the background while true
   onPreviewChange: (url: string | null) => void; // shows a preview image on the background
+  pushDown?: boolean; // true when the top song bar is showing, so this clears it
 }
 
 type Step = "idle" | "pick" | "review";
@@ -23,7 +25,7 @@ const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, 
  * shows it full-bleed so the visitor can see how it looks behind the site, add a note,
  * and submit. Sits bottom-center on mobile, top-right on desktop.
  */
-export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAddingChange, onPreviewChange }: Props) {
+export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAddingChange, onPreviewChange, pushDown }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
   const objUrlRef = useRef<string | null>(null);
@@ -139,8 +141,8 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   return (
     <div
-      className="absolute flex flex-col items-end top-6 right-6"
-      style={{ zIndex: 40 }}
+      className="absolute flex flex-col items-end right-6"
+      style={{ zIndex: 40, top: pushDown ? SONG_BAR_HEIGHT + 12 : 24, transition: "top 250ms ease" }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >

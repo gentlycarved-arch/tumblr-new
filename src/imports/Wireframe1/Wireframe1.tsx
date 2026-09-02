@@ -4,7 +4,7 @@ import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { AddImageFlow } from "../../app/components/AddImageFlow";
-import { SongBanner } from "../../app/components/SongBanner";
+import { SongBanner, SONG_BAR_HEIGHT } from "../../app/components/SongBanner";
 import { ConfessionFlow } from "../../app/components/ConfessionFlow";
 import { ConfessionSheetMobile } from "../../app/components/ConfessionSheetMobile";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
@@ -242,7 +242,7 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
   );
 }
 
-function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
+function ModeToggle({ darkMode, onToggle, pushDown }: { darkMode: boolean; onToggle: () => void; pushDown?: boolean }) {
   const TRACK_W = 80;
   const TRACK_H = 42;
   const KNOB = 34;
@@ -251,8 +251,8 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
 
   return (
     <div
-      className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
-      style={{ zIndex: 10 }}
+      className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
+      style={{ zIndex: 10, top: pushDown ? SONG_BAR_HEIGHT + 12 : 32, transition: "top 250ms ease" }}
     >
       {/* The toggle switch */}
       <button
@@ -490,7 +490,7 @@ export default function Wireframe() {
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
-        <ModeToggle darkMode={darkMode} onToggle={handleToggle} />
+        <ModeToggle darkMode={darkMode} onToggle={handleToggle} pushDown={!!currentSong} />
         <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
@@ -575,6 +575,7 @@ export default function Wireframe() {
             onLink={addByLink}
             onAddingChange={handleAddingChange}
             onPreviewChange={setPreviewUrl}
+            pushDown={!!currentSong}
           />
         )}
 
@@ -586,6 +587,7 @@ export default function Wireframe() {
             error={confError}
             confessions={confessions}
             onSubmit={submitConfession}
+            pushDown={!!currentSong}
           />
         )}
         {/* Anonymous confessions — mobile: swipe-up bottom sheet */}
@@ -606,7 +608,7 @@ export default function Wireframe() {
         {caption && (
           <div
             key={caption}
-            className="absolute max-sm:top-9 max-sm:left-4 max-sm:max-w-[38vw] sm:bottom-6 sm:left-6 sm:max-w-[280px]"
+            className={`absolute ${currentSong ? "max-sm:top-12" : "max-sm:top-9"} max-sm:left-4 max-sm:max-w-[38vw] sm:bottom-6 sm:left-6 sm:max-w-[280px]`}
             style={{ zIndex: 30, animation: "fadeIn 500ms ease" }}
           >
             <div

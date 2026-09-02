@@ -6,6 +6,8 @@ interface Props {
   darkMode: boolean;
 }
 
+export const SONG_BAR_HEIGHT = 34; // px — other top-anchored UI shifts down by this when a song is present
+
 const PLATFORM_COLOR: Record<string, string> = {
   youtube: "#ff3b30",
   spotify: "#1db954",
@@ -16,12 +18,11 @@ function Disc({ color, spinning }: { color: string; spinning: boolean }) {
   return (
     <div
       style={{
-        width: 24,
-        height: 24,
+        width: 16,
+        height: 16,
         borderRadius: "50%",
         flexShrink: 0,
-        background: `radial-gradient(circle at 50% 50%, #0e0e0e 0 3px, ${color} 3px 4.2px, #262626 4.2px 8.5px, #333 8.5px 10.5px, #0e0e0e 10.5px 12px)`,
-        boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
+        background: `radial-gradient(circle at 50% 50%, #0e0e0e 0 2px, ${color} 2px 2.8px, #262626 2.8px 5.6px, #333 5.6px 7px, #0e0e0e 7px 8px)`,
         animation: spinning ? "songDiscSpin 2.4s linear infinite" : "none",
       }}
     />
@@ -29,10 +30,10 @@ function Disc({ color, spinning }: { color: string; spinning: boolean }) {
 }
 
 /**
- * Top banner for the current background image's attached song: a small pill with a
- * spinning-disc icon. YouTube autoplays muted (the only platform browsers allow silent
- * autoplay for) and taps toggle sound; Spotify/Apple Music need one tap to start, since
- * their embeds don't support autoplay at all.
+ * A very simple "now playing" strip pinned across the very top of the page: a slim,
+ * full-width bar (not a floating pill) for the current background image's attached song.
+ * YouTube autoplays muted (the only platform browsers allow silent autoplay for) and
+ * tapping toggles sound; Spotify/Apple Music need one tap to start.
  */
 export function SongBanner({ song, darkMode }: Props) {
   const embed = useMemo(() => songEmbed(song), [song]);
@@ -47,50 +48,49 @@ export function SongBanner({ song, darkMode }: Props) {
   const spinning = isYouTube || expanded;
   const color = PLATFORM_COLOR[embed.platform] ?? "#888";
 
-  const pillBg = darkMode ? "rgba(26,26,26,0.85)" : "rgba(248,248,248,0.92)";
+  const barBg = darkMode ? "rgba(20,20,20,0.9)" : "rgba(250,250,250,0.94)";
   const text = darkMode ? "#E5E1E1" : "#2a2a2a";
-  const pillShadow = darkMode
-    ? "0 0 0 1px rgba(255,255,255,0.18), 0 2px 10px rgba(0,0,0,0.3)"
-    : "0 0 0 1px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.14)";
   const font = "font-['Favorit_Tumblr:Medium',sans-serif]";
 
-  function handlePillClick() {
+  function handleClick() {
     if (isYouTube) { setMuted((m) => !m); return; }
     setExpanded((e) => !e);
   }
 
   const label = isYouTube
-    ? (muted ? "playing, tap for sound" : "tap to mute")
+    ? (muted ? "now playing, tap for sound" : "tap to mute")
     : (expanded ? "now playing" : "tap to play");
 
   return (
-    <div className="absolute top-20 left-1/2 -translate-x-1/2 flex flex-col items-center" style={{ zIndex: 45 }}>
+    <>
       <style>{`@keyframes songDiscSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       <button
         type="button"
-        onClick={handlePillClick}
-        className={`${font} flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full text-[13px] leading-none whitespace-nowrap`}
+        onClick={handleClick}
+        className={`${font} absolute top-0 left-0 right-0 flex items-center justify-center gap-2 text-[12px] leading-none`}
         style={{
-          background: pillBg,
+          height: SONG_BAR_HEIGHT,
+          background: barBg,
           color: text,
-          boxShadow: pillShadow,
           backdropFilter: "blur(6px)",
           WebkitBackdropFilter: "blur(6px)",
+          borderBottom: darkMode ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.06)",
+          zIndex: 60,
         }}
       >
         <Disc color={color} spinning={spinning} />
         {label}
       </button>
 
-      {/* YouTube: hidden iframe drives the sound; the pill above is what's visible. */}
+      {/* YouTube: hidden iframe drives the sound; the bar above is what's visible. */}
       {isYouTube && (
         <iframe
           title="song"
           src={`${embed.embed}?autoplay=1&mute=${muted ? 1 : 0}&playsinline=1&controls=0`}
           width="1"
           height="1"
-          style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+          style={{ position: "absolute", top: 0, opacity: 0, pointerEvents: "none" }}
           allow="autoplay; encrypted-media"
         />
       )}
@@ -98,8 +98,15 @@ export function SongBanner({ song, darkMode }: Props) {
       {/* Spotify / Apple Music: reveal their real player once tapped (no autoplay support). */}
       {!isYouTube && expanded && (
         <div
-          className="mt-2 rounded-[14px] overflow-hidden"
-          style={{ width: 320, maxWidth: "88vw", background: darkMode ? "#1A1A1A" : "#FAFAFA", boxShadow: pillShadow }}
+          className="absolute left-1/2 -translate-x-1/2 rounded-b-[14px] overflow-hidden"
+          style={{
+            top: SONG_BAR_HEIGHT,
+            width: 320,
+            maxWidth: "88vw",
+            background: darkMode ? "#1A1A1A" : "#FAFAFA",
+            boxShadow: darkMode ? "0 6px 20px rgba(0,0,0,0.4)" : "0 6px 20px rgba(0,0,0,0.16)",
+            zIndex: 59,
+          }}
         >
           <iframe
             title="song"
@@ -112,6 +119,6 @@ export function SongBanner({ song, darkMode }: Props) {
           />
         </div>
       )}
-    </div>
+    </>
   );
 }
