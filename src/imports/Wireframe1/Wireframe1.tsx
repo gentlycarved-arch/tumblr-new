@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
 import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
@@ -428,6 +429,7 @@ export default function Wireframe() {
   // While a visitor is adding an image, blank the slideshow and show their pick as a preview.
   const [addingImage, setAddingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const navigate = useNavigate();
   // Theme frozen at the moment the add flow opens, so the hidden slideshow can't flip it mid-add.
   const frozenDark = useRef<boolean | null>(null);
 
@@ -500,8 +502,9 @@ export default function Wireframe() {
             to   { opacity: 1; }
           }
         `}</style>
-        <a
-          href="mailto:gentlycarved@gmail.com"
+        <button
+          type="button"
+          onClick={() => navigate("/portfolio")}
           className="btn-glow absolute active:translate-y-px inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
         >
           {/* Light gradient layer */}
@@ -520,9 +523,9 @@ export default function Wireframe() {
             style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)", position: "relative", zIndex: 3 }}
             className="font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] not-italic text-[22px] max-sm:text-[18px] text-center text-white tracking-[-0.52px]"
           >
-            Portfolio Request
+            Log In
           </span>
-        </a>
+        </button>
 
         {/* Input field box */}
         <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"

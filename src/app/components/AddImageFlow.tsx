@@ -18,6 +18,25 @@ type Step = "idle" | "pick" | "review";
 const BLUE_LIGHT = "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)";
 const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, #1f2e3e 70%, #151f2b 100%)";
 
+// Curated moodboard visitors can pick from instead of uploading their own image.
+const PALETTE_SLUG = "color-palette-qtw3s8lypli";
+
+async function fetchPaletteImages(): Promise<string[]> {
+  const urls: string[] = [];
+  for (const page of [1, 2]) {
+    const res = await fetch(`https://api.are.na/v2/channels/${PALETTE_SLUG}?per=100&page=${page}`);
+    if (!res.ok) break;
+    const data = await res.json();
+    const contents = data.contents ?? [];
+    for (const c of contents) {
+      const url = c.image?.display?.url || c.image?.original?.url;
+      if (url) urls.push(url);
+    }
+    if (contents.length < 100) break;
+  }
+  return urls;
+}
+
 /**
  * "add an image" flow. Opening it blanks the background; picking a file or link
  * shows it full-bleed so the visitor can see how it looks behind the site, add a note,
@@ -35,8 +54,20 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const [linkErr, setLinkErr] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
   const [comment, setComment] = useState("");
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteImages, setPaletteImages] = useState<string[] | null>(null);
+  const [paletteError, setPaletteError] = useState(false);
 
   const busy = status === "uploading";
+
+  function togglePalette() {
+    setPaletteOpen((v) => !v);
+    if (!paletteImages && !paletteError) {
+      fetchPaletteImages()
+        .then((urls) => setPaletteImages(urls))
+        .catch(() => setPaletteError(true));
+    }
+  }
 
   const clearObjUrl = useCallback(() => {
     if (objUrlRef.current) { URL.revokeObjectURL(objUrlRef.current); objUrlRef.current = null; }
@@ -45,7 +76,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
   const reset = useCallback(() => {
     clearObjUrl();
     setStep("idle"); setPendingFile(null); setPendingLink(null);
-    setLinkInput(""); setLinkErr(null); setChecking(false); setComment("");
+    setLinkInput(""); setLinkErr(null); setChecking(false); setComment(""); setPaletteOpen(false);
     onAddingChange(false); onPreviewChange(null);
   }, [clearObjUrl, onAddingChange, onPreviewChange]);
 
@@ -208,6 +239,47 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
                   📷 take a photo
                 </button>
               </div>
+
+              <div className="flex items-center gap-2 text-[12px] opacity-60">
+                <div className="h-px flex-1" style={{ background: darkMode ? "#3a3a3a" : "#dcdde0" }} />
+                or
+                <div className="h-px flex-1" style={{ background: darkMode ? "#3a3a3a" : "#dcdde0" }} />
+              </div>
+
+              <button
+                type="button"
+                onClick={togglePalette}
+                className="w-full rounded-[10px] py-2.5 text-[14px]"
+                style={secondaryBtn}
+              >
+                {paletteOpen ? "hide my palette" : "choose from my palette"}
+              </button>
+
+              {paletteOpen && (
+                <div className="max-h-[220px] overflow-y-auto -mx-1 px-1">
+                  {paletteError && (
+                    <div className="text-[12px] px-0.5 opacity-70">couldn't load the palette right now.</div>
+                  )}
+                  {!paletteError && !paletteImages && (
+                    <div className="text-[12px] px-0.5 opacity-70">loading…</div>
+                  )}
+                  {paletteImages && (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {paletteImages.map((url, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => previewLink(url)}
+                          className="aspect-square rounded-[6px] overflow-hidden"
+                          style={{ background: darkMode ? "#2a2a2a" : "#eee" }}
+                        >
+                          <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex items-center gap-2 text-[12px] opacity-60">
                 <div className="h-px flex-1" style={{ background: darkMode ? "#3a3a3a" : "#dcdde0" }} />
