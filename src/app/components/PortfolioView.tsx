@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router";
 import { X, ArrowUpRight } from "lucide-react";
 import work02 from "../../assets/portfolio/work-02.mp4";
 import work03 from "../../assets/portfolio/work-03.mp4";
@@ -165,6 +166,18 @@ function ToolsCard() {
       <p className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-3" style={{ color: "#212529" }}>
         my design toolbox
       </p>
+      <Link
+        to="/iris"
+        className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-[6px] transition-colors mb-1"
+        style={{ background: "transparent" }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "#f4f4f4")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      >
+        <span className="font-['Favorit_Tumblr:Regular',sans-serif] text-[14px]" style={{ color: "#212529" }}>
+          Iris — my color tool
+        </span>
+        <ArrowUpRight size={14} style={{ color: "#888", flexShrink: 0 }} />
+      </Link>
       {error && (
         <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px]" style={{ color: "#888" }}>
           couldn't load the are.na channel right now.
