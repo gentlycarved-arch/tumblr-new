@@ -452,10 +452,18 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
             <div className="font-['Favorit_Tumblr:Medium',sans-serif] text-[15px]" style={{ color: "#2a2a2a" }}>
               Tahreem Rehman
             </div>
-            <div className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug" style={{ color: "#5a5757" }}>
-              Founding Product Designer at GeologicAI, building AI tools for geologists to uncover what's hidden in rock.
-              <br />
-              Drawn to niche problems and complex systems that need to feel simple.
+            <div className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug">
+              <span style={{ color: "#2a2a2a" }}>Product designer who's always daydreaming on the internet.</span>{" "}
+              <span style={{ color: "#5a5757" }}>
+                Previously: small businesses at{" "}
+                <a href="https://www.freshbooks.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>FreshBooks</a>
+                {" "}in partnership with{" "}
+                <a href="https://gusto.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>Gusto</a>
+                , credit cards at{" "}
+                <a href="https://www.rbc.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>RBC</a>
+                . Currently: complex ideas for geologists @{" "}
+                <a href="https://geologic.ai" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>GeologicAI</a>.
+              </span>
             </div>
             <div className="flex items-center justify-center gap-4 mt-1">
               <NavPill onClick={() => setInfoOpen(true)}>info</NavPill>

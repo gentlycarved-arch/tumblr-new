@@ -16,6 +16,11 @@ import { useConfessions } from "../../hooks/useConfessions";
 type Typo = { after: string; wrong: string };
 type PhraseConfig = { text: string; typos?: Typo[] };
 
+// Once fully typed, "are.na" in this phrase becomes a real link — reverts to plain
+// text the instant backspacing starts removing characters from it.
+const ARENA_PHRASE = "& always on are.na";
+const ARENA_URL = "https://www.are.na/tahreem-rehman/channels";
+
 const PHRASE_CONFIGS: PhraseConfig[] = [
   // "Daydreaner" → fixes to "Daydreamer"
   { text: "& Daydreamer", typos: [{ after: "& Daydrea", wrong: "ner" }] },
@@ -33,6 +38,12 @@ const PHRASE_CONFIGS: PhraseConfig[] = [
   { text: "& Still on Tumblr", typos: [{ after: "& Still", wrong: "o" }] },
   // "Obsesed" → backtracks → "Obsessed with Images"
   { text: "& Obsessed with Images", typos: [{ after: "& Obses", wrong: "ed" }] },
+  { text: "& Graphic Artist" },
+  { text: "& Collecting the Internet" },
+  { text: "& Chronically Online" },
+  { text: "& Only Shoots Film" },
+  { text: "& Building for Geologists" },
+  { text: ARENA_PHRASE },
 ];
 
 // Build the full sequence of displayed strings for typing a phrase from `startFrom`
@@ -398,12 +409,31 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
 function Typewriter({ darkMode }: { darkMode: boolean }) {
   const { displayed, pausing } = useTypewriter();
   const color = darkMode ? "#c0bcbc" : "#888484";
+  // Only a fully-typed phrase renders "are.na" as a real link — the moment backspacing
+  // removes a character, `displayed` no longer matches and it's plain text again.
+  const isArenaComplete = displayed === ARENA_PHRASE;
   return (
     <p
       className="absolute font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] left-[38.5%] right-[41%] max-sm:left-[11%] max-sm:right-[16%] not-italic text-[22px] max-sm:text-[18px] top-[53.9%] max-sm:top-[53%] tracking-[-0.44px] overflow-hidden whitespace-nowrap"
       style={{ color, transition: "color 600ms ease" }}
     >
-      {displayed}
+      {isArenaComplete ? (
+        <>
+          & always on{" "}
+          <a
+            href={ARENA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+            style={{ color: "inherit" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            are.na
+          </a>
+        </>
+      ) : (
+        displayed
+      )}
       <span
         className="inline-block w-[2px] h-[22px] max-sm:h-[18px] ml-[2px] align-[-4px]"
         style={{
