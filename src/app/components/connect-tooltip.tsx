@@ -32,10 +32,25 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
 I'm Tahreem Rehman,
         </p>
         <p
-          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.65] mb-3 whitespace-pre-line"
+          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.65] mb-3"
           style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
         >
-          {"I design made-to-measure experiences for experts in their craft and daydreamers on the internet.\n\nI'm the Founding Designer at GeologicAI, where I design tools that help geologists use AI to uncover what's hidden in rock, from minerals to patterns in scan data.\n\nThis is a placeholder while I build my portfolio, inspired by Tumblr, where I first started making things for the internet."}
+          Product designer who's always daydreaming on the internet.
+          <br /><br />
+          Previously: small businesses at{" "}
+          <a href="https://www.freshbooks.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>FreshBooks</a>
+          {" "}in partnership with{" "}
+          <a href="https://gusto.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>Gusto</a>
+          , credit cards at{" "}
+          <a href="https://www.rbc.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>RBC</a>
+          . Currently: complex ideas for geologists @{" "}
+          <a href="https://geologic.ai" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>GeologicAI</a>.
+        </p>
+        <p
+          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.65] mb-3"
+          style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
+        >
+          This is a placeholder while I build my portfolio, inspired by Tumblr, where I first started making things for the internet.
         </p>
 
         <button

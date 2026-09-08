@@ -56,7 +56,7 @@ export function PortfolioGate({ darkMode, onClose, onUnlock }: Props) {
       >
         <div className="text-[16px]" style={{ color: heading }}>portfolio access</div>
         <div className="text-[12px] leading-snug -mt-1 opacity-80">
-          my work is mostly NDA so it's private, ask for my password to take a peak. you can also{" "}
+          my work is mostly NDA so it's private, you can also{" "}
           <a
             href="mailto:gentlycarved@gmail.com?subject=can%20i%20see%20your%20portfolio%3F&body=hey%2C%20can%20i%20see%20your%20portfolio%3F"
             className="underline"
@@ -64,7 +64,7 @@ export function PortfolioGate({ darkMode, onClose, onUnlock }: Props) {
           >
             email me
           </a>{" "}
-          for it.
+          for my password.
         </div>
 
         <input

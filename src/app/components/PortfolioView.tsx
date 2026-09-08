@@ -466,7 +466,8 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
               Tahreem Rehman
             </div>
             <div className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug">
-              <span style={{ color: "#2a2a2a" }}>Product designer who's always daydreaming on the internet.</span>{" "}
+              <span style={{ color: "#2a2a2a" }}>Product designer who's always daydreaming on the internet.</span>
+              <br /><br />
               <span style={{ color: "#5a5757" }}>
                 Previously: small businesses at{" "}
                 <a href="https://www.freshbooks.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>FreshBooks</a>
