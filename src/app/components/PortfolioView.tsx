@@ -184,7 +184,7 @@ function ToolsTile({ onOpen }: { onOpen: () => void }) {
       className="w-full text-left rounded-[13px] p-5 transition-transform"
       style={{
         background: "#FAFAFA",
-        boxShadow: "inset 0 0 6px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)",
+        boxShadow: "inset 0 0 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
       }}
     >
       <p className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1" style={{ color: "#212529" }}>
@@ -241,7 +241,7 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
         className="rounded-[13px] p-5 w-[460px] max-w-full max-h-[80vh] overflow-y-auto"
         style={{
           background: "#FAFAFA",
-          boxShadow: "inset 0 0 6px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)",
+          boxShadow: "inset 0 0 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
