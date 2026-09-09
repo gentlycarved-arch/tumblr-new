@@ -458,23 +458,23 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
           />
         </div>
 
-        <div className="grid grid-cols-[1fr_auto_1fr] items-start mb-16 px-1 gap-2">
-          <div />
-          <div className="flex flex-col items-center text-center gap-2 max-w-[420px]">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-start mb-16 px-1 gap-2 max-sm:grid-cols-1 max-sm:px-0">
+          <div className="max-sm:hidden" />
+          <div className="flex flex-col items-center text-center gap-2 max-w-[420px] min-w-0 max-sm:max-w-full mx-auto">
             <div className="font-['Favorit_Tumblr:Medium',sans-serif] text-[15px]" style={{ color: "#2a2a2a" }}>
               Tahreem Rehman
             </div>
-            <div className="font-['Ronzino',sans-serif] text-[13px] leading-snug">
+            <div className="font-['Ronzino',sans-serif] text-[13px] leading-snug px-4">
               <span style={{ color: "#2a2a2a" }}>product designer who's always daydreaming on the internet.</span>
             </div>
-            <div className="flex items-center justify-center gap-4 mt-1">
+            <div className="flex items-center justify-center gap-4 max-sm:gap-x-3 max-sm:gap-y-1 flex-wrap mt-1 px-4">
               <NavPill onClick={() => setInfoOpen(true)}>info</NavPill>
               {NAV_LINKS.map((link) => (
                 <NavPill key={link.label} href={link.href}>{link.label}</NavPill>
               ))}
             </div>
           </div>
-          <div />
+          <div className="max-sm:hidden" />
         </div>
 
         {infoOpen && <InfoPopover onClose={() => setInfoOpen(false)} />}
@@ -493,7 +493,7 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
           ))}
         </div>
 
-        <div className="flex items-center justify-center gap-4 mt-10 mb-2">
+        <div className="flex items-center justify-center gap-4 max-sm:gap-x-3 max-sm:gap-y-1 flex-wrap mt-10 mb-2 px-4">
           <NavPill onClick={() => setInfoOpen(true)}>info</NavPill>
           {NAV_LINKS.map((link) => (
             <NavPill key={link.label} href={link.href}>{link.label}</NavPill>

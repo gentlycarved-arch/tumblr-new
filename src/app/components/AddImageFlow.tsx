@@ -138,7 +138,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   return (
     <div
-      className="absolute flex flex-col items-end top-6 right-6"
+      className="absolute flex flex-col items-end top-6 right-6 max-sm:top-9"
       style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
