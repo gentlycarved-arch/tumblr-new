@@ -26,7 +26,7 @@ export function ConnectTooltip({ darkMode = false, onClose }: { darkMode?: boole
       {/* Card content */}
       <div className="p-5 max-sm:p-4">
         <p
-          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] max-sm:text-[16px] mb-2 leading-[1.3]"
+          className="font-['Favorit_Tumblr:Medium',sans-serif] text-[15px] max-sm:text-[14px] mb-2 leading-[1.3]"
           style={{ color: darkMode ? "#E0E0E0" : "#212529", transition: "color 600ms ease" }}
         >
 I'm Tahreem Rehman,
@@ -47,7 +47,7 @@ I'm Tahreem Rehman,
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1 text-[16px] max-sm:text-[15px] transition-colors"
+          className="flex items-center gap-1 text-[15px] max-sm:text-[14px] transition-colors"
           style={{ color: darkMode ? "#7ab2f0" : "#3a7fd4" }}
         >
           <span>{open ? "Close" : "My digital footprint"}</span>
@@ -73,7 +73,7 @@ I'm Tahreem Rehman,
                     onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                   >
                     <span
-                      className="text-[16px] max-sm:text-[15px]"
+                      className="text-[15px] max-sm:text-[14px]"
                       style={{ color: darkMode ? "#E0E0E0" : "#212529" }}
                     >{link.name}</span>
                     <ArrowUpRight className="w-3.5 h-3.5" style={{ color: darkMode ? "#888" : "#888" }} />

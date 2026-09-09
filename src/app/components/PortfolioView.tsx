@@ -90,22 +90,25 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="font-['Favorit_Tumblr:Regular',sans-serif] rounded-[14px] p-5 w-[380px] max-w-full text-[14px] leading-[1.65]"
+        className="font-['Favorit_Tumblr:Regular',sans-serif] rounded-[14px] p-5 w-[380px] max-w-full text-[14px] leading-[1.65] max-h-[80vh] overflow-y-auto"
         style={{ background: "#FAFAFA", color: "#3A3A3A", boxShadow: "0 10px 30px rgba(0,0,0,0.25)" }}
         onClick={(e) => e.stopPropagation()}
       >
+        <p className="mb-3">I'm a designer.</p>
         <p className="mb-3">
-          Currently designing complex tools for geologists at{" "}
-          <a href="https://geologic.ai/" target="_blank" rel="noopener noreferrer" className="underline">GeologicAI</a>
-          . I like wandering into unfamiliar worlds, learning how they work, and making sense of them alongside small, close-knit teams.
+          I have a strong point of view about how I'd like to see the world, and I scratch that itch by creating ideas on the internet.
+        </p>
+        <p className="mb-3">
+          I have a lot of niche interests, and I find ways to realize them into digital experiences, turning whatever I'm curious about that week into something people can actually use or look at.
+        </p>
+        <p className="mb-3">
+          I've taken on roles like design researcher, product designer, book designer, web designer. At the end of the day, I make things. No matter the context, no matter the medium.
+        </p>
+        <p className="mb-3">
+          I've designed specialized tools for geologists and scientific instruments. I've designed playbills for philosophical lectures. I've designed t-shirts. I've designed album covers for indie artists. The through-line isn't the industry, it's that someone had an idea worth shaping, and I showed up to shape it.
         </p>
         <p>
-          Previously worked on small-business payroll at{" "}
-          <a href="https://www.freshbooks.com/" target="_blank" rel="noopener noreferrer" className="underline">FreshBooks</a>
-          {" "}in partnership with{" "}
-          <a href="https://gusto.com/" target="_blank" rel="noopener noreferrer" className="underline">Gusto</a>
-          , and credit card experiences at{" "}
-          <a href="https://www.rbc.com/" target="_blank" rel="noopener noreferrer" className="underline">RBC</a>.
+          I like working with people and developing a vision for them, something they'll enjoy using, enjoy seeing, or enjoy holding. Good design should feel like it was made by someone who cared.
         </p>
       </div>
     </div>
@@ -487,6 +490,13 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
                 <ProjectTile cell={cell} cellBg={cellBg} onOpen={() => setLightbox(cell)} />
               )}
             </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-center gap-4 mt-10 mb-2">
+          <NavPill onClick={() => setInfoOpen(true)}>info</NavPill>
+          {NAV_LINKS.map((link) => (
+            <NavPill key={link.label} href={link.href}>{link.label}</NavPill>
           ))}
         </div>
       </div>
