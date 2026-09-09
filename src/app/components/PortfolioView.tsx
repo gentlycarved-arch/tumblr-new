@@ -129,9 +129,28 @@ interface ArenaTool {
   thumb?: string;
 }
 
-/** Card matching the site's popup design language (see ConnectTooltip), listing
- * Link blocks pulled live from the "🧰" are.na channel. */
-function ToolsCard() {
+const ARENA_EMBED_SNIPPET = `<div id="arena-links"></div>
+<script>
+  fetch('https://api.are.na/v2/channels/YOUR-CHANNEL-SLUG?per=100')
+    .then((res) => res.json())
+    .then((data) => {
+      const container = document.getElementById('arena-links');
+      data.contents
+        .filter((c) => c.class === 'Link' && c.source?.url)
+        .forEach((c) => {
+          const a = document.createElement('a');
+          a.href = c.source.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = c.title || c.source.url;
+          a.style.display = 'block';
+          container.appendChild(a);
+        });
+    });
+</script>`;
+
+/** Fetches the design-toolbox links from the "🧰" are.na channel. */
+function useArenaTools() {
   const [tools, setTools] = useState<ArenaTool[] | null>(null);
   const [error, setError] = useState(false);
 
@@ -150,29 +169,100 @@ function ToolsCard() {
     return () => { cancelled = true; };
   }, []);
 
+  return { tools, error };
+}
+
+/** Small clickable teaser shown in the grid: title, description, and a peek at a few
+ * tools from the list — opens the full toolbox as a centered modal. */
+function ToolsTile({ onOpen }: { onOpen: () => void }) {
+  const { tools } = useArenaTools();
+
   return (
-    <div
-      className="rounded-[13px] p-5"
+    <button
+      type="button"
+      onClick={onOpen}
+      className="w-full text-left rounded-[13px] p-5 transition-transform"
       style={{
         background: "#FAFAFA",
         boxShadow: "inset 0 0 6px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)",
       }}
     >
-      <p className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-3" style={{ color: "#212529" }}>
+      <p className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1" style={{ color: "#212529" }}>
         my design toolbox
       </p>
-      <Link
-        to="/iris"
-        className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-[6px] transition-colors mb-1"
-        style={{ background: "transparent" }}
-        onMouseEnter={(e) => (e.currentTarget.style.background = "#f4f4f4")}
-        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug mb-3" style={{ color: "#888" }}>
+        a collection of tools that I use as a designer, gathered on Are.na.
+      </p>
+      {tools && (
+        <ul className="flex flex-col gap-1 mb-2">
+          {tools.slice(0, 4).map((tool, i) => (
+            <li key={i} className="flex items-center gap-2 min-w-0">
+              {tool.thumb && (
+                <img src={tool.thumb} alt="" className="w-5 h-5 rounded-[4px] object-cover flex-shrink-0" style={{ background: "#eee" }} />
+              )}
+              <span className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] truncate" style={{ color: "#5a5757" }}>
+                {tool.title}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[12px]" style={{ color: "#a8a4a4" }}>
+        <span className="max-sm:hidden">click to view the rest</span>
+        <span className="sm:hidden">tap to see the rest</span>
+      </p>
+    </button>
+  );
+}
+
+/** Card matching the site's popup design language (see ConnectTooltip), listing
+ * Link blocks pulled live from the "🧰" are.na channel. Shown centered, as a modal,
+ * once the ToolsTile teaser in the grid is clicked. */
+function ToolsModal({ onClose }: { onClose: () => void }) {
+  const { tools, error } = useArenaTools();
+  const [showCode, setShowCode] = useState(false);
+
+  return (
+    <div
+      className="fixed inset-0 flex items-center justify-center px-6"
+      style={{ background: "rgba(0,0,0,0.45)", zIndex: 100 }}
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="fixed flex items-center justify-center rounded-full"
+        style={{ top: 20, right: 20, width: 36, height: 36, background: "rgba(255,255,255,0.12)", color: "#fff" }}
       >
-        <span className="font-['Favorit_Tumblr:Regular',sans-serif] text-[14px]" style={{ color: "#212529" }}>
-          Iris — my color tool
-        </span>
-        <ArrowUpRight size={14} style={{ color: "#888", flexShrink: 0 }} />
-      </Link>
+        <X size={17} strokeWidth={2} />
+      </button>
+      <div
+        className="rounded-[13px] p-5 w-[460px] max-w-full max-h-[80vh] overflow-y-auto"
+        style={{
+          background: "#FAFAFA",
+          boxShadow: "inset 0 0 6px rgba(0,0,0,0.18), 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.16)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1" style={{ color: "#212529" }}>
+          my design toolbox
+        </p>
+        <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug mb-3" style={{ color: "#888" }}>
+          a collection of tools that I use as a designer, gathered on Are.na.
+        </p>
+        <Link
+          to="/iris"
+          className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-[6px] transition-colors mb-1"
+          style={{ background: "transparent" }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#f4f4f4")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+        >
+          <span className="font-['Favorit_Tumblr:Regular',sans-serif] text-[14px]" style={{ color: "#212529" }}>
+            Iris — my color tool
+          </span>
+          <ArrowUpRight size={14} style={{ color: "#888", flexShrink: 0 }} />
+        </Link>
       {error && (
         <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px]" style={{ color: "#888" }}>
           couldn't load the are.na channel right now.
@@ -210,6 +300,46 @@ function ToolsCard() {
           ))}
         </ul>
       )}
+
+        <div className="mt-3 pt-3" style={{ borderTop: "1px solid #e5e5e5" }}>
+          <button
+            type="button"
+            onClick={() => setShowCode((v) => !v)}
+            className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] underline underline-offset-2 transition-colors"
+            style={{ color: "#3a7fd4" }}
+          >
+            {showCode ? "hide the code ↑" : "want this on your site? here's the code →"}
+          </button>
+
+          {showCode && (
+            <div className="mt-2">
+              <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[12px] leading-snug mb-2" style={{ color: "#888" }}>
+                drop this into any page — swap in your own Are.na channel slug — and it'll render a live list of links from that channel.
+              </p>
+              <pre
+                className="text-[11px] leading-snug p-3 rounded-[8px] overflow-x-auto"
+                style={{ background: "#1e1e1e", color: "#d4d4d4" }}
+              >
+{ARENA_EMBED_SNIPPET}
+              </pre>
+              <button
+                type="button"
+                onClick={(e) => {
+                  navigator.clipboard.writeText(ARENA_EMBED_SNIPPET);
+                  const btn = e.currentTarget;
+                  const original = btn.textContent;
+                  btn.textContent = "copied!";
+                  setTimeout(() => { btn.textContent = original; }, 1500);
+                }}
+                className="mt-2 font-['Favorit_Tumblr:Medium',sans-serif] text-[12px] px-3 py-1.5 rounded-full transition-colors"
+                style={{ background: "#e9eaed", color: "#5a5757" }}
+              >
+                copy code
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -402,6 +532,7 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
   const cellBg = "#fff";
   const [lightbox, setLightbox] = useState<Extract<Cell, { type: "image" | "video" }> | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
 
   return (
     <div className="fixed inset-0 overflow-y-auto" style={{ background: bg, zIndex: 80 }}>
@@ -485,7 +616,7 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
               {cell.type === "writing" ? (
                 <WritingCell text={cell.text} href={cell.href} />
               ) : cell.type === "tools" ? (
-                <ToolsCard />
+                <ToolsTile onOpen={() => setToolsOpen(true)} />
               ) : (
                 <ProjectTile cell={cell} cellBg={cellBg} onOpen={() => setLightbox(cell)} />
               )}
@@ -502,6 +633,7 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
       </div>
 
       {lightbox && <Lightbox cell={lightbox} onClose={() => setLightbox(null)} />}
+      {toolsOpen && <ToolsModal onClose={() => setToolsOpen(false)} />}
     </div>
   );
 }
