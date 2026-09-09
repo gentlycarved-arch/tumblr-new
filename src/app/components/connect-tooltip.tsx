@@ -36,12 +36,6 @@ I'm Tahreem Rehman,
           style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
         >
           Product designer that likes to daydream on the internet.
-          <br /><br />
-          Currently designing complex tools for geologists at GeologicAI{" "}
-          <a href="https://geologic.ai" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>
-            (→ geologic.ai)
-          </a>
-          . I like wandering into unfamiliar worlds, learning how they work, and making sense of them alongside small, close-knit teams.
         </p>
         <p
           className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.65] mb-3"
