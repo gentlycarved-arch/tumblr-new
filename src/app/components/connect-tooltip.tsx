@@ -35,7 +35,7 @@ I'm Tahreem Rehman,
           className="font-['Favorit_Tumblr:Regular',sans-serif] text-[16px] max-sm:text-[15px] leading-[1.65] mb-3"
           style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
         >
-          Product designer who's always daydreaming on the internet.
+          product designer who's always daydreaming on the internet.
           <br /><br />
           Previously: small businesses at{" "}
           <a href="https://www.freshbooks.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>FreshBooks</a>

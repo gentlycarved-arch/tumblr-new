@@ -96,24 +96,17 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <p className="mb-3">
-          Currently the Founding Product Designer at{" "}
-          <a href="https://geologic.ai" target="_blank" rel="noopener noreferrer" className="underline">GeologicAI</a>
-          , where I design AI tools for geologists working to uncover what's hidden inside rock. I'm drawn to niche
-          problems, complicated systems, and the challenge of making them feel remarkably simple.
-        </p>
-        <p className="mb-3">
-          Previously, I worked on payroll at{" "}
-          <a href="https://www.freshbooks.com" target="_blank" rel="noopener noreferrer" className="underline">FreshBooks</a>
-          , design research at{" "}
-          <a href="https://www.rbc.com" target="_blank" rel="noopener noreferrer" className="underline">RBC</a>
-          , and a range of product and service design projects across finance, technology, and beyond.
+          Currently designing complex tools for geologists at{" "}
+          <a href="https://geologic.ai/" target="_blank" rel="noopener noreferrer" className="underline">GeologicAI</a>
+          . I like wandering into unfamiliar worlds, learning how they work, and making sense of them alongside small, close-knit teams.
         </p>
         <p>
-          I'm also interested in film photography, fashion, industrial design, old books, and{" "}
-          <a href="https://www.are.na/tahreem-rehman/channels" target="_blank" rel="noopener noreferrer" className="underline">
-            collecting things from the internet
-          </a>
-          .
+          Previously worked on small-business payroll at{" "}
+          <a href="https://www.freshbooks.com/" target="_blank" rel="noopener noreferrer" className="underline">FreshBooks</a>
+          {" "}in partnership with{" "}
+          <a href="https://gusto.com/" target="_blank" rel="noopener noreferrer" className="underline">Gusto</a>
+          , and credit card experiences at{" "}
+          <a href="https://www.rbc.com/" target="_blank" rel="noopener noreferrer" className="underline">RBC</a>.
         </p>
       </div>
     </div>
@@ -301,7 +294,7 @@ function WritingCell({ text, href }: { text: string; href?: string }) {
   const color = "#5a5757";
   const content = (
     <div
-      className="font-['Favorit_Tumblr:Medium',sans-serif] text-[19px] max-sm:text-[16px] leading-snug"
+      className="font-['Ronzino',sans-serif] text-[19px] max-sm:text-[16px] leading-snug"
       style={{ color }}
     >
       {text}
@@ -465,19 +458,8 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
             <div className="font-['Favorit_Tumblr:Medium',sans-serif] text-[15px]" style={{ color: "#2a2a2a" }}>
               Tahreem Rehman
             </div>
-            <div className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug">
-              <span style={{ color: "#2a2a2a" }}>Product designer who's always daydreaming on the internet.</span>
-              <br /><br />
-              <span style={{ color: "#5a5757" }}>
-                Previously: small businesses at{" "}
-                <a href="https://www.freshbooks.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>FreshBooks</a>
-                {" "}in partnership with{" "}
-                <a href="https://gusto.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>Gusto</a>
-                , credit cards at{" "}
-                <a href="https://www.rbc.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>RBC</a>
-                . Currently: complex ideas for geologists @{" "}
-                <a href="https://geologic.ai" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "inherit" }}>GeologicAI</a>.
-              </span>
+            <div className="font-['Ronzino',sans-serif] text-[13px] leading-snug">
+              <span style={{ color: "#2a2a2a" }}>product designer who's always daydreaming on the internet.</span>
             </div>
             <div className="flex items-center justify-center gap-4 mt-1">
               <NavPill onClick={() => setInfoOpen(true)}>info</NavPill>
