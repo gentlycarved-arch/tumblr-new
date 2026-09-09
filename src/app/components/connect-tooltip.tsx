@@ -35,7 +35,7 @@ I'm Tahreem Rehman,
           className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.65] mb-3"
           style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
         >
-          Product designer that likes to daydream on the internet.
+          I am a product designer who likes to daydream on the internet.
         </p>
         <p
           className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.65] mb-3"
