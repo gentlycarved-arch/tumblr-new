@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { X, ArrowUpRight } from "lucide-react";
-import work02 from "../../assets/portfolio/work-02.mp4";
 import work03 from "../../assets/portfolio/work-03.mp4";
 import work04 from "../../assets/portfolio/work-04.mp4";
 import workSoap from "../../assets/portfolio/work-soap.jpg";
@@ -219,83 +218,87 @@ const CELLS: Cell[] = [
   { type: "tools" },
   { type: "writing", text: "most people overthink taste, its just an instinct", href: "https://x.com/gentlycarved/status/2019074356308050205" },
   { type: "image", src: workPosterSherry },
+
   { type: "writing", text: "you will simply not improve as a designer if you don't do 100 iterations of an idea.", href: "https://x.com/gentlycarved/status/2095690790747934922" },
   { type: "image", src: workSoap },
+  { type: "image", src: filmWater },
   { type: "image", src: workTshirt },
-
   { type: "image", src: workNative },
-  { type: "video", src: work02 },
+
   { type: "writing", text: "the interface you design becomes truly scalable when users can dream inside of it. It should be easy for them to imagine new realities inside of it.", href: "https://x.com/gentlycarved/status/1981473473978368370" },
+  { type: "image", src: filmCafe },
   { type: "image", src: workGallery },
 
-  { type: "image", src: workGeoai },
-  { type: "image", src: filmWater },
   { type: "writing", text: "I will always need a design canvas before working in code", href: "https://x.com/gentlycarved/status/2038664880505376825" },
+  { type: "image", src: filmBoat },
+  { type: "image", src: workGeoai },
   { type: "image", src: workHalftone },
 
+  { type: "writing", text: "The Iris color tool was inspired by an 18th-century cyanometer — a device for measuring the blueness of the sky.", href: "https://x.com/gentlycarved/status/2028332716291150208" },
+  { type: "image", src: filmRoad },
   { type: "video", src: work03 },
   { type: "image", src: workIris },
-  { type: "writing", text: "The Iris color tool was inspired by an 18th-century cyanometer — a device for measuring the blueness of the sky.", href: "https://x.com/gentlycarved/status/2028332716291150208" },
-  { type: "image", src: workCyanometerHistorical },
-  { type: "image", src: workTrailer },
-
-  { type: "image", src: filmCafe },
-  { type: "image", src: filmBoat },
+  { type: "image", src: filmStreet },
 
   { type: "writing", text: "\"when you design interfaces you are —literally— designing the sensory organs people use to perceive information\"", href: "https://x.com/gentlycarved/status/2023526271381368924" },
-  { type: "image", src: filmRoad },
+  { type: "image", src: workCyanometerHistorical },
+
   { type: "writing", text: "\"What we call 'interface' in the context of computer technology already exists within us: a network that mediates our subjectivity, that synthesizes what we perceive and the world that is perceived.\" — Seiko Mikami (Molecular Informatics, 2004)" },
+  { type: "image", src: workTrailer },
+  { type: "image", src: filmFresco },
   { type: "image", src: workPosterBoard },
-  { type: "image", src: filmStreet },
-  { type: "image", src: workCyanometer },
 
   { type: "writing", text: "something so millennial-coded about seeing photorealistic & device mockups on a design portfolio (sorry)", href: "https://x.com/gentlycarved/status/2049563662898131135" },
+  { type: "image", src: workCyanometer },
+  { type: "image", src: filmInterior },
   { type: "image", src: workPosters },
-  { type: "video", src: work04 },
-  { type: "image", src: workBelieve },
 
   { type: "writing", text: "These flowers are Tulipa sprengeri — their survival connects to what Douthat's talk was about: what we choose to preserve.", href: "https://x.com/gentlycarved/status/2095245562584928618" },
-  { type: "image", src: filmFresco },
-  { type: "video", src: work05 },
-  { type: "writing", text: "AI is only as effective as your judgement, imagination and articulation.", href: "https://x.com/gentlycarved/status/1955336976531411447" },
-
-  { type: "image", src: workTahreemBg },
-  { type: "writing", text: "we're still making chat interfaces because AI is unreliable.", href: "https://x.com/gentlycarved/status/2084455071849624051" },
-  { type: "image", src: workDesk },
-  { type: "writing", text: "sometimes I'm like, yeah well your website is beautiful because the images are beautiful", href: "https://x.com/gentlycarved/status/1937236176882061778" },
-
-  { type: "image", src: filmInterior },
-  { type: "writing", text: "6.5 billion for a design agency. I have so many thoughts, but I'm mostly optimistic simply because this allows designers to lead these crazy times", href: "https://x.com/gentlycarved/status/1925247370591105232" },
+  { type: "video", src: work04 },
   { type: "image", src: filmCrowdHill },
-  { type: "writing", text: "if you like my work, ask me to go through a work trial and then meet me after for a chat, I feel like this would make design hiring a bit easier.", href: "https://x.com/gentlycarved/status/2058990882976645145" },
-  { type: "image", src: filmPoolside },
-  { type: "writing", text: "Sincerely, but with a lightness of touch." },
-  { type: "image", src: workMemeticMap },
-  { type: "writing", text: "Designing for Geologists →", href: "https://x.com/gentlycarved/status/2026095227929235775" },
-  { type: "image", src: filmMiswak },
-  { type: "writing", text: "Designing for Geologists — Field Notes #2 →", href: "https://x.com/gentlycarved/status/2047497932421693589" },
 
+  { type: "writing", text: "AI is only as effective as your judgement, imagination and articulation.", href: "https://x.com/gentlycarved/status/1955336976531411447" },
+  { type: "image", src: workBelieve },
+
+  { type: "writing", text: "we're still making chat interfaces because AI is unreliable.", href: "https://x.com/gentlycarved/status/2084455071849624051" },
+  { type: "video", src: work05 },
+
+  { type: "writing", text: "sometimes I'm like, yeah well your website is beautiful because the images are beautiful", href: "https://x.com/gentlycarved/status/1937236176882061778" },
+  { type: "image", src: filmPoolside },
+
+  { type: "writing", text: "6.5 billion for a design agency. I have so many thoughts, but I'm mostly optimistic simply because this allows designers to lead these crazy times", href: "https://x.com/gentlycarved/status/1925247370591105232" },
+  { type: "image", src: workTahreemBg },
+
+  { type: "writing", text: "if you like my work, ask me to go through a work trial and then meet me after for a chat, I feel like this would make design hiring a bit easier.", href: "https://x.com/gentlycarved/status/2058990882976645145" },
+  { type: "image", src: workDesk },
+
+  { type: "writing", text: "Sincerely, but with a lightness of touch." },
+  { type: "image", src: filmMiswak },
+
+  { type: "writing", text: "Designing for Geologists →", href: "https://x.com/gentlycarved/status/2026095227929235775" },
+  { type: "image", src: workMemeticMap },
+
+  { type: "writing", text: "Designing for Geologists — Field Notes #2 →", href: "https://x.com/gentlycarved/status/2047497932421693589" },
   { type: "image", src: workCoretable2 },
+  { type: "image", src: filmCeiling },
   { type: "image", src: workCoretable3 },
   { type: "video", src: work06 },
-
   { type: "image", src: workPosterLuke },
-  { type: "image", src: workCrossword },
-
-  { type: "video", src: work07 },
-  { type: "image", src: filmCeiling },
   { type: "image", src: filmStreetMecca },
-
-  { type: "image", src: filmLakeTerrace },
+  { type: "image", src: workCrossword },
+  { type: "video", src: work07 },
   { type: "image", src: workTumblrLandingpage },
+  { type: "image", src: filmLakeTerrace },
 ];
 
 function WritingCell({ text, href }: { text: string; href?: string }) {
   const color = "#5a5757";
+  // Linked quotes are pulled from Twitter; those get Aujournuit italic to set them
+  // apart from the plain (non-linked) writing tiles, which keep Ronzino.
   const content = (
     <div
-      className="font-['Ronzino',sans-serif] text-[19px] max-sm:text-[16px] leading-snug"
-      style={{ color }}
+      className={href ? "text-[19px] max-sm:text-[16px] leading-snug italic" : "font-['Ronzino',sans-serif] text-[19px] max-sm:text-[16px] leading-snug"}
+      style={{ color, fontFamily: href ? "'Aujournuit', sans-serif" : undefined }}
     >
       {text}
     </div>

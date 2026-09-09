@@ -262,7 +262,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
 
   return (
     <div
-      className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
+      className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center max-sm:hidden"
       style={{ zIndex: 10 }}
     >
       {/* The toggle switch */}
