@@ -697,8 +697,8 @@ export function ColorWheel({
           return (
             <g key={`icon-${hl.label}`}>
               <text
-                fill={isActive ? '#222' : '#444'}
-                opacity={isActive ? 0.9 : 0.5}
+                fill={isActive ? '#111' : '#333'}
+                opacity={isActive ? 1 : 0.85}
                 style={{
                   fontFamily: "'ETBembo', serif",
                   fontSize: isActive ? '13px' : '12px',
@@ -721,8 +721,8 @@ export function ColorWheel({
                   cx={d.x}
                   cy={d.y}
                   r={dotR}
-                  fill={isActive ? '#222' : '#444'}
-                  opacity={isActive ? 0.9 : 0.45}
+                  fill={isActive ? '#111' : '#333'}
+                  opacity={isActive ? 1 : 0.85}
                   style={{ transition: 'opacity 0.2s ease' }}
                 />
               ))}
