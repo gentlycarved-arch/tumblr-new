@@ -252,7 +252,7 @@ export function ColorPicker() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-8 pb-56 relative"
-      style={{ background: '#F4F4E8' }}
+      style={{ background: '#ffffff' }}
     >
       {/* Gallery button - top left */}
       <button
@@ -263,9 +263,9 @@ export function ColorPicker() {
           fontSize: '11px',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          color: '#666',
+          color: '#444',
           borderColor: '#ccc',
-          background: 'rgba(244,244,232,0.9)',
+          background: 'rgba(255,255,255,0.9)',
           backdropFilter: 'blur(8px)',
         }}
       >
@@ -288,7 +288,7 @@ export function ColorPicker() {
         <h1
           className="tracking-[0.08em]"
           style={{
-            color: '#736A6A',
+            color: '#5c5050',
             fontFamily: "'ETBembo', serif",
           }}
         >
@@ -296,7 +296,7 @@ export function ColorPicker() {
         </h1>
         <p
           className="text-xs tracking-[0.12em] mt-1.5"
-          style={{ color: '#666', fontFamily: "'ETBembo', serif" }}
+          style={{ color: '#444', fontFamily: "'ETBembo', serif" }}
         >
           {hasColors
             ? <>Click segments or the image to pick colors</>
@@ -304,7 +304,7 @@ export function ColorPicker() {
         </p>
         <p
           className="text-[9.5px] tracking-[0.08em] mt-1.5"
-          style={{ color: '#777', fontFamily: "'ETBembo', serif" }}
+          style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
         >
           created by{' '}
           <a
@@ -345,7 +345,7 @@ export function ColorPicker() {
             >
               <span
                 className="text-[10px] tracking-[0.15em] uppercase whitespace-nowrap"
-                style={{ color: '#5c5252', fontFamily: "'ETBembo', serif" }}
+                style={{ color: '#453c3c', fontFamily: "'ETBembo', serif" }}
               >
                 Try an example
               </span>
@@ -370,7 +370,7 @@ export function ColorPicker() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="text-[10px] tracking-[0.1em] uppercase underline underline-offset-2 whitespace-nowrap mt-1"
-                style={{ color: '#5c5252', fontFamily: "'ETBembo', serif" }}
+                style={{ color: '#453c3c', fontFamily: "'ETBembo', serif" }}
               >
                 or upload your own
               </button>
@@ -404,7 +404,7 @@ export function ColorPicker() {
                 />
                 <span
                   className="text-sm tracking-[0.15em] uppercase mt-4"
-                  style={{ color: '#777', fontFamily: "'ETBembo', serif" }}
+                  style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
                 >
                   Analyzing...
                 </span>
@@ -450,9 +450,9 @@ export function ColorPicker() {
                     fontSize: '11px',
                     letterSpacing: '0.15em',
                     textTransform: 'uppercase' as const,
-                    color: saved ? '#16a34a' : '#888',
+                    color: saved ? '#16a34a' : '#666',
                     borderColor: saved ? '#86efac' : '#ccc',
-                    background: saved ? '#f0fdf4' : '#F4F4E8',
+                    background: saved ? '#f0fdf4' : '#ffffff',
                   }}
                 >
                   {saved ? (

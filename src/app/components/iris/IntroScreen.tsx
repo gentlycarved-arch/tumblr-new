@@ -59,7 +59,7 @@ export function IntroScreen({ onEnter }: IntroScreenProps) {
       {!exiting && (
         <motion.div
           className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
-          style={{ background: '#F4F4E8' }}
+          style={{ background: '#ffffff' }}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: 'easeInOut' }}
@@ -149,7 +149,7 @@ export function IntroScreen({ onEnter }: IntroScreenProps) {
               style={{
                 fontFamily: "'ETBembo', serif",
                 fontSize: '14px',
-                color: '#777',
+                color: '#555',
               }}
             >
               Upload an image, extract its palette, and take your colors anywhere.
@@ -159,7 +159,7 @@ export function IntroScreen({ onEnter }: IntroScreenProps) {
               style={{
                 fontFamily: "'ETBembo', serif",
                 fontSize: '12px',
-                color: '#999',
+                color: '#777',
               }}
             >
               Created by{' '}
@@ -168,9 +168,9 @@ export function IntroScreen({ onEnter }: IntroScreenProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline transition-colors"
-                style={{ color: '#777' }}
+                style={{ color: '#555' }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#333')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#999')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#777')}
               >
                 Tahreem Rehman
               </a>
@@ -188,8 +188,8 @@ export function IntroScreen({ onEnter }: IntroScreenProps) {
               textTransform: 'uppercase',
               background: 'transparent',
             }}
-            initial={{ opacity: 0, color: '#666', borderColor: '#ddd' }}
-            animate={{ opacity: 1, color: '#666', borderColor: '#ddd' }}
+            initial={{ opacity: 0, color: '#444', borderColor: '#ddd' }}
+            animate={{ opacity: 1, color: '#444', borderColor: '#ddd' }}
             transition={{ duration: 0.6, delay: 1.2 }}
             whileHover={{
               borderColor: '#333',

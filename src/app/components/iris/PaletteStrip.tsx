@@ -172,7 +172,7 @@ export function PaletteStrip({ entries, onRemove, onClear, onAddAll, onToggleLoc
           maxHeight: '720px',
           border: '1px solid #d5d5d5',
           borderRadius: '4px',
-          background: '#F4F4E8',
+          background: '#ffffff',
           overflowY: 'auto',
         }}
       >
@@ -180,7 +180,7 @@ export function PaletteStrip({ entries, onRemove, onClear, onAddAll, onToggleLoc
         <div className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: '1px solid #d5d5d5' }}>
           <span
             className="text-[9px] tracking-[0.15em] uppercase"
-            style={{ color: '#777', fontFamily: "'ETBembo', serif" }}
+            style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
           >
             Palette {!isEmpty && <>&middot; {entries.length}</>}
           </span>
@@ -194,8 +194,8 @@ export function PaletteStrip({ entries, onRemove, onClear, onAddAll, onToggleLoc
               disabled={addAllCount === 0}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 transition-all cursor-pointer hover:bg-black/[0.05] disabled:opacity-40 disabled:cursor-default disabled:hover:bg-transparent"
               style={{
-                color: '#666',
-                background: '#F4F4E8',
+                color: '#444',
+                background: '#ffffff',
               }}
               title="Add all visible wheel colors to palette"
             >
@@ -216,9 +216,9 @@ export function PaletteStrip({ entries, onRemove, onClear, onAddAll, onToggleLoc
             disabled={isEmpty}
             className="flex-1 flex items-center justify-center gap-1.5 py-2.5 transition-all cursor-pointer hover:bg-black/[0.05] disabled:opacity-40 disabled:cursor-default disabled:hover:bg-transparent"
             style={{
-              color: feedback === 'saved' ? '#16a34a' : '#888',
+              color: feedback === 'saved' ? '#16a34a' : '#666',
               borderRight: '1px solid #d5d5d5',
-              background: feedback === 'saved' ? '#f0fdf4' : '#F4F4E8',
+              background: feedback === 'saved' ? '#f0fdf4' : '#ffffff',
             }}
             title="Download palette as PNG"
           >
@@ -235,7 +235,7 @@ export function PaletteStrip({ entries, onRemove, onClear, onAddAll, onToggleLoc
             onClick={onClear}
             disabled={isEmpty}
             className="flex-1 flex items-center justify-center gap-1.5 py-2.5 transition-colors cursor-pointer hover:bg-black/[0.05] disabled:opacity-40 disabled:cursor-default disabled:hover:bg-transparent"
-            style={{ color: '#999', background: '#F4F4E8' }}
+            style={{ color: '#777', background: '#ffffff' }}
             title="Clear all"
           >
             <Trash2 className="w-3 h-3" />
@@ -253,7 +253,7 @@ export function PaletteStrip({ entries, onRemove, onClear, onAddAll, onToggleLoc
           >
             <span
               className="text-[10px] tracking-[0.12em] uppercase text-center leading-relaxed"
-              style={{ color: '#999', fontFamily: "'ETBembo', serif" }}
+              style={{ color: '#777', fontFamily: "'ETBembo', serif" }}
             >
               Click segments to<br />build your palette
             </span>

@@ -105,13 +105,13 @@ function GalleryCard({ entry, index }: { entry: GalleryEntry; index: number }) {
         <div className="flex items-center gap-3">
           <span
             className="text-[11px] tracking-[0.08em]"
-            style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
+            style={{ color: '#333', fontFamily: "'ETBembo', serif" }}
           >
             {entry.author || 'Anonymous'}
           </span>
           <span
             className="text-[10px]"
-            style={{ color: '#ccc', fontFamily: "'ETBembo', serif" }}
+            style={{ color: '#999', fontFamily: "'ETBembo', serif" }}
           >
             {formatDate(entry.createdAt)}
           </span>
@@ -124,9 +124,9 @@ function GalleryCard({ entry, index }: { entry: GalleryEntry; index: number }) {
             fontSize: '10px',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            color: saved ? '#16a34a' : '#888',
+            color: saved ? '#16a34a' : '#666',
             borderColor: saved ? '#86efac' : '#ccc',
-            background: saved ? '#f0fdf4' : '#F4F4E8',
+            background: saved ? '#f0fdf4' : '#ffffff',
           }}
         >
           {saved ? <Check className="w-3 h-3" /> : <Download className="w-3 h-3" />}
@@ -206,7 +206,7 @@ export function GalleryPage() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: '#F4F4E8' }}
+      style={{ background: '#ffffff' }}
     >
       {/* Header */}
       <header
@@ -221,7 +221,7 @@ export function GalleryPage() {
             fontSize: '11px',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: '#666',
+            color: '#444',
             borderColor: '#ccc',
           }}
         >
@@ -245,7 +245,7 @@ export function GalleryPage() {
             style={{
               fontFamily: "'ETBembo', serif",
               fontSize: '12px',
-              color: '#888',
+              color: '#666',
               letterSpacing: '0.08em',
             }}
           >
@@ -263,7 +263,7 @@ export function GalleryPage() {
             <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#ccc' }} />
             <span
               className="text-xs tracking-[0.12em] uppercase"
-              style={{ color: '#888', fontFamily: "'ETBembo', serif" }}
+              style={{ color: '#666', fontFamily: "'ETBembo', serif" }}
             >
               Loading...
             </span>
@@ -279,7 +279,7 @@ export function GalleryPage() {
             <button
               onClick={loadEntries}
               className="text-xs underline cursor-pointer hover:text-[#555] transition-colors"
-              style={{ color: '#666', fontFamily: "'ETBembo', serif" }}
+              style={{ color: '#444', fontFamily: "'ETBembo', serif" }}
             >
               Retry
             </button>
@@ -288,13 +288,13 @@ export function GalleryPage() {
           <div className="flex flex-col items-center justify-center gap-3 py-24">
             <span
               className="text-sm tracking-[0.1em]"
-              style={{ color: '#999', fontFamily: "'ETBembo', serif" }}
+              style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
             >
               No palettes saved yet
             </span>
             <span
               className="text-xs"
-              style={{ color: '#ddd', fontFamily: "'ETBembo', serif" }}
+              style={{ color: '#999', fontFamily: "'ETBembo', serif" }}
             >
               Be the first to share your palette
             </span>
