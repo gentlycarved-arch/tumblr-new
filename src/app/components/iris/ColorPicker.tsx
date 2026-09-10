@@ -1,6 +1,3 @@
-import { SaveDialog } from './SaveDialog';
-import { Grid3x3, Save, Check } from 'lucide-react';
-
 import exampleImage1 from 'figma:asset/9002480c806d2c7adc3c655220e291bf769b506a.png';
 import exampleImage2 from 'figma:asset/96f02ba5b4911e9e58deea502147c8ff134be5ae.png';
 import exampleImage3 from 'figma:asset/4a4b8a14fce613d111829123ce5ede1268a82da7.png';
@@ -10,31 +7,11 @@ import exampleImage6 from 'figma:asset/6aaef60ac79bb84ea88431df4240350246042a68.
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router';
 import { extractColors, Color } from './ColorExtractor';
 import { ColorWheel } from './ColorWheel';
 import { PaletteStrip, PaletteEntry } from './PaletteStrip';
-import { saveToGallery } from './Gallery';
-
-// Resize image to a thumbnail for gallery storage
-function resizeImageForGallery(dataUrl: string, maxSize: number = 400): Promise<string> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d')!;
-      ctx.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
-    };
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
-}
+import { CreatedByLink } from './CreatedByLink';
+import { AddOwnMenu } from './AddOwnMenu';
 
 let nextId = 1;
 
@@ -42,15 +19,11 @@ const ARENA_PALETTE_SLUG = 'color-palette-qtw3s8lypli';
 const FALLBACK_EXAMPLES = [exampleImage1, exampleImage2, exampleImage3, exampleImage4, exampleImage5, exampleImage6];
 
 export function ColorPicker() {
-  const navigate = useNavigate();
   const [exampleImages, setExampleImages] = useState<string[]>(FALLBACK_EXAMPLES);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [colors, setColors] = useState<Color[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paletteEntries, setPaletteEntries] = useState<PaletteEntry[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [selectedSegmentIndex, setSelectedSegmentIndex] = useState<number | null>(null);
   const [visibleColorIndices, setVisibleColorIndices] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -213,25 +186,6 @@ export function ColorPicker() {
     ]);
   }, []);
 
-  const handleSaveToGallery = async (authorName: string) => {
-    if (colors.length === 0 || saving || !imageSrc) return;
-    setSaving(true);
-    const thumbnail = await resizeImageForGallery(imageSrc);
-    const ok = await saveToGallery({
-      colors,
-      palette: paletteEntries.map((e) => e.color),
-      title: `Palette · ${colors.length} colors`,
-      author: authorName,
-      imageSrc: thumbnail,
-    });
-    setSaving(false);
-    if (ok) {
-      setSaveDialogOpen(false);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    }
-  };
-
   const handleVisibleColorsChange = useCallback((indices: number[]) => {
     setVisibleColorIndices(indices);
   }, []);
@@ -246,33 +200,12 @@ export function ColorPicker() {
   })();
 
   const hasColors = colors.length > 0;
-  const [examplesHover, setExamplesHover] = useState(false);
-  const showExamples = !hasColors || examplesHover;
 
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-8 pb-56 relative"
       style={{ background: '#ffffff' }}
     >
-      {/* Gallery button - top left */}
-      <button
-        onClick={() => navigate('/iris/gallery')}
-        className="fixed top-6 left-6 z-40 flex items-center gap-2 px-4 py-2 rounded-full border cursor-pointer transition-all hover:border-[#777] hover:text-[#333] hover:bg-black/[0.03] hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
-        style={{
-          fontFamily: "'ETBembo', serif",
-          fontSize: '11px',
-          letterSpacing: '0.15em',
-          textTransform: 'uppercase',
-          color: '#444',
-          borderColor: '#ccc',
-          background: 'rgba(255,255,255,0.9)',
-          backdropFilter: 'blur(8px)',
-        }}
-      >
-        <Grid3x3 className="w-3.5 h-3.5" />
-        Gallery
-      </button>
-
       <input
         ref={fileInputRef}
         type="file"
@@ -281,102 +214,41 @@ export function ColorPicker() {
         className="hidden"
       />
 
-      {/* Header - always centered */}
-      <motion.div
-        className="text-center mb-16"
-      >
-        <h1
-          className="tracking-[0.08em]"
-          style={{
-            color: '#5c5050',
-            fontFamily: "'ETBembo', serif",
-          }}
-        >
-          Iris
-        </h1>
-        <p
-          className="text-xs tracking-[0.12em] mt-1.5"
-          style={{ color: '#444', fontFamily: "'ETBembo', serif" }}
-        >
-          {hasColors
-            ? <>Click segments or the image to pick colors</>
-            : <>Upload or paste an image to extract its palette</>}
-        </p>
-        <p
-          className="text-[9.5px] tracking-[0.08em] mt-1.5"
-          style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
-        >
-          created by{' '}
-          <a
-            href="https://x.com/gentlycarved"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline decoration-[#ccc] underline-offset-2 hover:decoration-[#999] transition-colors"
-          >
-            Tahreem Rehman
-          </a>
-        </p>
-      </motion.div>
-
       {/* Wheel + palette area */}
       <div className="relative">
-        {/* Hover trigger: while exploring a picked image, nudge the mouse to the far left to bring the examples back. */}
-        {hasColors && (
-          <div
-            className="fixed left-0 top-0 h-full z-30"
-            style={{ width: '140px' }}
-            onMouseEnter={() => setExamplesHover(true)}
-            onMouseLeave={() => setExamplesHover(false)}
-          />
-        )}
-
-        {/* Reference images - positioned below gallery button, top-left */}
-        <AnimatePresence>
-          {showExamples && (
-            <motion.div
-              className="fixed z-40 flex flex-col items-center gap-3"
-              style={{ left: '24px', top: '50%', y: '-55%' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 170, damping: 26 }}
-              onMouseEnter={() => setExamplesHover(true)}
-              onMouseLeave={() => setExamplesHover(false)}
+        {/* Reference images - stay visible even after an image is picked, so it's easy to try another */}
+        <motion.div
+          className="fixed z-40 flex flex-col items-center gap-3"
+          style={{ left: '24px', top: '50%', y: '-55%' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 170, damping: 26 }}
+        >
+          <span
+            className="text-[10px] tracking-[0.15em] uppercase whitespace-nowrap"
+            style={{ color: '#332b2b', fontFamily: "'ETBembo', serif" }}
+          >
+            Try an example
+          </span>
+          {exampleImages.map((src, i) => (
+            <motion.button
+              key={i}
+              onClick={() => handleExampleClick(src)}
+              className="group cursor-pointer rounded-[10px] overflow-hidden border border-transparent hover:border-[#ccc] transition-all"
+              style={{ width: '88px', height: '88px' }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * i, type: 'spring', stiffness: 170, damping: 26 }}
             >
-              <span
-                className="text-[10px] tracking-[0.15em] uppercase whitespace-nowrap"
-                style={{ color: '#453c3c', fontFamily: "'ETBembo', serif" }}
-              >
-                Try an example
-              </span>
-              {exampleImages.map((src, i) => (
-                <motion.button
-                  key={i}
-                  onClick={() => handleExampleClick(src)}
-                  className="group cursor-pointer rounded-[10px] overflow-hidden border border-transparent hover:border-[#ccc] transition-all"
-                  style={{ width: '88px', height: '88px' }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 * i, type: 'spring', stiffness: 170, damping: 26 }}
-                >
-                  <img
-                    src={src}
-                    alt={`Example ${i + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </motion.button>
-              ))}
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="text-[10px] tracking-[0.1em] uppercase underline underline-offset-2 whitespace-nowrap mt-1"
-                style={{ color: '#453c3c', fontFamily: "'ETBembo', serif" }}
-              >
-                or upload your own
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <img
+                src={src}
+                alt={`Example ${i + 1}`}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </motion.button>
+          ))}
+          <AddOwnMenu onImageUrl={handleExampleClick} fileInputRef={fileInputRef} />
+        </motion.div>
 
         {/* Wheel column - shifts left smoothly */}
         <motion.div
@@ -404,7 +276,7 @@ export function ColorPicker() {
                 />
                 <span
                   className="text-sm tracking-[0.15em] uppercase mt-4"
-                  style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
+                  style={{ color: '#3a3a3a', fontFamily: "'ETBembo', serif" }}
                 >
                   Analyzing...
                 </span>
@@ -439,35 +311,6 @@ export function ColorPicker() {
                   ))}
                 </div>
               </div>
-              {/* Save to Gallery button - above palette */}
-              <div className="flex justify-center mb-2.5">
-                <button
-                  onClick={() => setSaveDialogOpen(true)}
-                  disabled={saving}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-full border cursor-pointer transition-all hover:border-[#777] hover:text-[#333] hover:bg-black/[0.03] hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] disabled:opacity-50"
-                  style={{
-                    fontFamily: "'ETBembo', serif",
-                    fontSize: '11px',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase' as const,
-                    color: saved ? '#16a34a' : '#666',
-                    borderColor: saved ? '#86efac' : '#ccc',
-                    background: saved ? '#f0fdf4' : '#ffffff',
-                  }}
-                >
-                  {saved ? (
-                    <>
-                      <Check className="w-3.5 h-3.5" />
-                      Saved
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-3.5 h-3.5" />
-                      Save to Gallery
-                    </>
-                  )}
-                </button>
-              </div>
               <PaletteStrip
                 entries={paletteEntries}
                 onRemove={handleRemove}
@@ -481,13 +324,7 @@ export function ColorPicker() {
         </AnimatePresence>
       </div>
 
-      {/* Save Dialog overlay */}
-      <SaveDialog
-        isOpen={saveDialogOpen}
-        onClose={() => setSaveDialogOpen(false)}
-        onConfirm={handleSaveToGallery}
-        saving={saving}
-      />
+      <CreatedByLink />
     </div>
   );
 }

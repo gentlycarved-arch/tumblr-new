@@ -807,17 +807,17 @@ export function ColorWheel({
       >
         {!imageSrc ? (
           <div className="w-full h-full rounded-full flex flex-col items-center justify-center gap-3 hover:bg-black/[0.03] transition-colors duration-300">
-            <Upload className="w-6 h-6" style={{ color: '#666' }} />
+            <Upload className="w-6 h-6" style={{ color: '#444' }} />
             <div className="flex flex-col items-center gap-1">
               <span
                 className="text-xs tracking-[0.15em] uppercase"
-                style={{ color: '#444', fontFamily: "'ETBembo', serif" }}
+                style={{ color: '#333', fontFamily: "'ETBembo', serif" }}
               >
                 Upload Image
               </span>
               <span
                 className="text-[10px] tracking-[0.1em]"
-                style={{ color: '#777', fontFamily: "'ETBembo', serif" }}
+                style={{ color: '#555', fontFamily: "'ETBembo', serif" }}
               >
                 or paste from clipboard
               </span>
