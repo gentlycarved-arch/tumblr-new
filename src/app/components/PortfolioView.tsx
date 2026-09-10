@@ -426,12 +426,10 @@ const CELLS: Cell[] = [
 
 function WritingCell({ text, href }: { text: string; href?: string }) {
   const color = "#5a5757";
-  // Linked quotes are pulled from Twitter; those get Aujournuit italic to set them
-  // apart from the plain (non-linked) writing tiles, which keep Ronzino.
   const content = (
     <div
-      className={href ? "text-[19px] max-sm:text-[16px] leading-snug italic" : "font-['Ronzino',sans-serif] text-[19px] max-sm:text-[16px] leading-snug"}
-      style={{ color, fontFamily: href ? "'Aujournuit', sans-serif" : undefined }}
+      className="text-[19px] max-sm:text-[16px] leading-snug italic"
+      style={{ color, fontFamily: "'Aujournuit', sans-serif" }}
     >
       {text}
     </div>
