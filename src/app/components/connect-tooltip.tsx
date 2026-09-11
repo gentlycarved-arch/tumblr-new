@@ -47,7 +47,14 @@ I'm Tahreem Rehman,
           className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.65] mb-3"
           style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
         >
-          click the "Log In" button to see my work.
+          click the "Log In" button to see my work, or{" "}
+          <a
+            href="mailto:gentlycarved@gmail.com?subject=can%20i%20see%20your%20portfolio%3F&body=hey%2C%20can%20i%20see%20your%20portfolio%3F"
+            className="underline"
+          >
+            email me
+          </a>{" "}
+          if you want my password.
         </p>
 
         <button
