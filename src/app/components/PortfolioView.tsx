@@ -42,6 +42,8 @@ import tumblrIcon from "../../assets/portfolio/tumblr-icon.png";
 import filmLakeTerrace from "../../assets/portfolio/film-lake-terrace.jpg";
 import filmPoolside from "../../assets/portfolio/film-poolside.jpg";
 import filmMiswak from "../../assets/portfolio/film-miswak.jpg";
+import workAlbumSingles from "../../assets/portfolio/work-album-singles.png";
+import workWaxSeal from "../../assets/portfolio/work-wax-seal.jpg";
 
 interface Props {
   darkMode: boolean;
@@ -419,7 +421,9 @@ const CELLS: Cell[] = [
   { type: "image", src: filmStreetMecca },
   { type: "image", src: workCrossword },
   { type: "video", src: work07 },
+  { type: "image", src: workAlbumSingles },
   { type: "image", src: filmLakeTerrace },
+  { type: "image", src: workWaxSeal },
 ];
 
 function WritingCell({ text, href }: { text: string; href?: string }) {
