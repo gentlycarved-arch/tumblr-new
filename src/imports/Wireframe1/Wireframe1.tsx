@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { useNavigate } from "react-router";
 import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
@@ -426,15 +426,15 @@ function useTypeOnce(text: string, active: boolean) {
 
 /** Once "Log In" is clicked, the fake username/typewriter fields become a real
  * username display + password input, so a visitor can actually log in right here. */
-function LoginPassword({
-  darkMode,
-  onCorrect,
-  onLiveMatch,
-}: {
+export interface LoginPasswordHandle {
+  submit: () => void;
+}
+
+const LoginPassword = forwardRef<LoginPasswordHandle, {
   darkMode: boolean;
   onCorrect: () => void;
   onLiveMatch: (matches: boolean) => void;
-}) {
+}>(function LoginPassword({ darkMode, onCorrect, onLiveMatch }, ref) {
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -455,6 +455,8 @@ function LoginPassword({
       setValue("");
     }
   }
+
+  useImperativeHandle(ref, () => ({ submit }));
 
   return (
     <div
@@ -481,7 +483,7 @@ function LoginPassword({
       )}
     </div>
   );
-}
+});
 
 function Typewriter({ darkMode }: { darkMode: boolean }) {
   const { displayed, pausing } = useTypewriter();
@@ -538,6 +540,8 @@ export default function Wireframe() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loginMode, setLoginMode] = useState(false);
   const [passwordMatches, setPasswordMatches] = useState(false);
+  const [loginBtnHover, setLoginBtnHover] = useState(false);
+  const loginPasswordRef = useRef<LoginPasswordHandle>(null);
   const { displayed: usernameDisplayed, done: usernameDone } = useTypeOnce(FAKE_USERNAME, loginMode);
   const navigate = useNavigate();
   // Theme frozen at the moment the add flow opens, so the hidden slideshow can't flip it mid-add.
@@ -621,30 +625,56 @@ export default function Wireframe() {
             to   { opacity: 1; }
           }
         `}</style>
-        <button
-          type="button"
-          onClick={() => setLoginMode(true)}
-          className={`btn-glow absolute active:translate-y-px inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center${passwordMatches ? " btn-glow-match" : ""}`}
+        <div
+          className="absolute inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%]"
+          onMouseEnter={() => setLoginBtnHover(true)}
+          onMouseLeave={() => setLoginBtnHover(false)}
         >
-          {/* Light gradient layer */}
-          <div className="absolute inset-0 rounded-[inherit]" style={{
-            backgroundImage: "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
-            opacity: darkMode ? 0 : 1,
-            transition: "opacity 600ms ease",
-          }} />
-          {/* Dark gradient layer */}
-          <div className="absolute inset-0 rounded-[inherit]" style={{
-            backgroundImage: "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, #1f2e3e 70%, #151f2b 100%)",
-            opacity: darkMode ? 1 : 0,
-            transition: "opacity 600ms ease",
-          }} />
-          <span
-            style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)", position: "relative", zIndex: 3 }}
-            className="font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] not-italic text-[22px] max-sm:text-[18px] text-center text-white tracking-[-0.52px]"
+          {/* Hover tooltip — desktop only */}
+          {loginBtnHover && !loginMode && (
+            <div
+              className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-3 whitespace-nowrap rounded-[8px] px-3 py-1.5 pointer-events-none"
+              style={{
+                zIndex: 20,
+                background: darkMode ? "rgba(26,26,26,0.92)" : "rgba(248,248,248,0.95)",
+                color: darkMode ? "#E0E0E0" : "#3a3a3a",
+                boxShadow: darkMode
+                  ? "0 0 0 1px rgba(255,255,255,0.14), 0 2px 10px rgba(0,0,0,0.3)"
+                  : "0 0 0 1px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.14)",
+                backdropFilter: "blur(6px)",
+                animation: "fadeIn 150ms ease",
+              }}
+            >
+              <span className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px]">
+                click this button to see my work
+              </span>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => (loginMode ? loginPasswordRef.current?.submit() : setLoginMode(true))}
+            className={`btn-glow absolute inset-0 active:translate-y-px rounded-[10px] flex items-center justify-center${passwordMatches ? " btn-glow-match" : ""}`}
           >
-            Log In
-          </span>
-        </button>
+            {/* Light gradient layer */}
+            <div className="absolute inset-0 rounded-[inherit]" style={{
+              backgroundImage: "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)",
+              opacity: darkMode ? 0 : 1,
+              transition: "opacity 600ms ease",
+            }} />
+            {/* Dark gradient layer */}
+            <div className="absolute inset-0 rounded-[inherit]" style={{
+              backgroundImage: "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, #1f2e3e 70%, #151f2b 100%)",
+              opacity: darkMode ? 1 : 0,
+              transition: "opacity 600ms ease",
+            }} />
+            <span
+              style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)", position: "relative", zIndex: 3 }}
+              className="font-['Favorit_Tumblr:Medium',sans-serif] leading-[normal] not-italic text-[22px] max-sm:text-[18px] text-center text-white tracking-[-0.52px]"
+            >
+              Log In
+            </span>
+          </button>
+        </div>
 
         {/* Input field box */}
         <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"
@@ -699,6 +729,7 @@ export default function Wireframe() {
         </p>
         {loginMode && usernameDone ? (
           <LoginPassword
+            ref={loginPasswordRef}
             darkMode={darkMode}
             onCorrect={() => navigate("/portfolio", { state: { unlocked: true } })}
             onLiveMatch={setPasswordMatches}

@@ -43,6 +43,12 @@ I'm Tahreem Rehman,
         >
           This is a placeholder while I build my portfolio, inspired by Tumblr, where I first started making things for the internet.
         </p>
+        <p
+          className="font-['Favorit_Tumblr:Regular',sans-serif] text-[15px] max-sm:text-[14px] leading-[1.65] mb-3"
+          style={{ color: darkMode ? "#B8B8B8" : "#3A3A3A", transition: "color 600ms ease" }}
+        >
+          click the "Log In" button to see my work.
+        </p>
 
         <button
           type="button"
