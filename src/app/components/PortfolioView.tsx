@@ -44,6 +44,9 @@ import filmPoolside from "../../assets/portfolio/film-poolside.jpg";
 import filmMiswak from "../../assets/portfolio/film-miswak.jpg";
 import workAlbumSingles from "../../assets/portfolio/work-album-singles.png";
 import workWaxSeal from "../../assets/portfolio/work-wax-seal.jpg";
+import workNegativeSpaceButton from "../../assets/portfolio/work-negative-space-button.mp4";
+import workKellyEllsworth from "../../assets/portfolio/work-kelly-ellsworth.jpeg";
+import workSeverance from "../../assets/portfolio/work-severance.mp4";
 
 interface Props {
   darkMode: boolean;
@@ -117,10 +120,15 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
 }
 
 type Cell =
-  | { type: "image"; src: string }
-  | { type: "video"; src: string }
+  | { type: "image"; src: string; width?: number; height?: number; caption?: string }
+  | { type: "video"; src: string; width?: number; height?: number; caption?: string }
   | { type: "writing"; text: string; href?: string }
-  | { type: "tools" };
+  | { type: "tools" }
+  // Two media items that must always render stacked together as one tile —
+  // used for a piece of work shown right alongside its inspiration reference.
+  | { type: "pair"; top: Extract<Cell, { type: "image" | "video" }>; bottom: Extract<Cell, { type: "image" | "video" }> };
+
+const FILM_CAPTION = "shot on 35mm film by me";
 
 const ARENA_CHANNEL_SLUG = "ujoh1nntq5m";
 
@@ -351,79 +359,85 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
 const CELLS: Cell[] = [
   { type: "tools" },
   { type: "writing", text: "most people overthink taste, its just an instinct", href: "https://x.com/gentlycarved/status/2019074356308050205" },
-  { type: "image", src: workPosterSherry },
+  { type: "image", src: workPosterSherry, width: 825, height: 1275, caption: "book design for sherry's intro." },
 
   { type: "writing", text: "you will simply not improve as a designer if you don't do 100 iterations of an idea.", href: "https://x.com/gentlycarved/status/2095690790747934922" },
-  { type: "image", src: workSoap },
-  { type: "image", src: filmWater },
-  { type: "image", src: workTshirt },
-  { type: "image", src: workNative },
+  { type: "image", src: workSoap, width: 1935, height: 1440, caption: "concept for gentlycarved studio + logo design" },
+  { type: "image", src: filmWater, width: 1600, height: 1060, caption: FILM_CAPTION },
+  { type: "image", src: workTshirt, width: 2048, height: 1372, caption: "concept t-shirt for are.na" },
+  { type: "image", src: workNative, width: 1920, height: 1080, caption: "website design + identity for Native - native.works" },
 
   { type: "writing", text: "the interface you design becomes truly scalable when users can dream inside of it. It should be easy for them to imagine new realities inside of it.", href: "https://x.com/gentlycarved/status/1981473473978368370" },
-  { type: "image", src: filmCafe },
-  { type: "image", src: workGallery },
+  { type: "image", src: filmCafe, width: 1600, height: 1060, caption: FILM_CAPTION },
+  { type: "image", src: workGallery, width: 2522, height: 1391, caption: "Gallery in my color palette tool - Iris" },
 
   { type: "writing", text: "I will always need a design canvas before working in code", href: "https://x.com/gentlycarved/status/2038664880505376825" },
-  { type: "image", src: filmBoat },
-  { type: "image", src: workGeoai },
-  { type: "image", src: workHalftone },
+  { type: "image", src: filmBoat, width: 1600, height: 1060, caption: FILM_CAPTION },
+  { type: "image", src: workGeoai, width: 1455, height: 1080, caption: "Reinventing how geologists log core on a striplog interface" },
+  { type: "image", src: workHalftone, width: 1786, height: 724, caption: "logo + type experiment for gentlycarved" },
 
   { type: "writing", text: "The Iris color tool was inspired by an 18th-century cyanometer — a device for measuring the blueness of the sky.", href: "https://x.com/gentlycarved/status/2028332716291150208" },
-  { type: "image", src: filmRoad },
-  { type: "video", src: work03 },
-  { type: "image", src: workIris },
-  { type: "image", src: filmStreet },
+  { type: "image", src: filmRoad, width: 994, height: 659, caption: FILM_CAPTION },
+  { type: "video", src: work03, width: 2298, height: 1248 },
+  { type: "image", src: workIris, width: 1871, height: 1388, caption: "screenshot from my color palette tool - Iris" },
+  { type: "image", src: filmStreet, width: 1600, height: 1060, caption: FILM_CAPTION },
 
   { type: "writing", text: "\"when you design interfaces you are —literally— designing the sensory organs people use to perceive information\"", href: "https://x.com/gentlycarved/status/2023526271381368924" },
-  { type: "image", src: workCyanometerHistorical },
+  { type: "image", src: workCyanometerHistorical, width: 1802, height: 1634, caption: "use cases for my color palette tool - Iris" },
 
   { type: "writing", text: "\"What we call 'interface' in the context of computer technology already exists within us: a network that mediates our subjectivity, that synthesizes what we perceive and the world that is perceived.\" — Seiko Mikami (Molecular Informatics, 2004)" },
-  { type: "image", src: workTrailer },
-  { type: "image", src: filmFresco },
-  { type: "image", src: workPosterBoard },
+  { type: "image", src: workTrailer, width: 933, height: 419, caption: "sticker design of GeologicAI trailer/core scanner" },
+  { type: "image", src: filmFresco, width: 1600, height: 1060, caption: FILM_CAPTION },
+  { type: "image", src: workPosterBoard, width: 1125, height: 1019, caption: "screenshot of a random Figma file" },
 
   { type: "writing", text: "something so millennial-coded about seeing photorealistic & device mockups on a design portfolio (sorry)", href: "https://x.com/gentlycarved/status/2049563662898131135" },
-  { type: "image", src: workCyanometer },
-  { type: "image", src: filmInterior },
-  { type: "image", src: workPosters },
+  { type: "image", src: workCyanometer, width: 1280, height: 1137, caption: "cyanometer - the main inspiration for my color palette tool - Iris" },
+  { type: "image", src: filmInterior, width: 1600, height: 1060, caption: FILM_CAPTION },
+  { type: "image", src: workPosters, width: 1080, height: 1080, caption: "poster design for the Viaduct Season $ by The Toronto Society" },
 
   { type: "writing", text: "These flowers are Tulipa sprengeri — their survival connects to what Douthat's talk was about: what we choose to preserve.", href: "https://x.com/gentlycarved/status/2095245562584928618" },
-  { type: "video", src: work04 },
-  { type: "image", src: filmCrowdHill },
+  { type: "video", src: work04, width: 1280, height: 720 },
+  { type: "image", src: filmCrowdHill, width: 994, height: 659, caption: FILM_CAPTION },
 
   { type: "writing", text: "AI is only as effective as your judgement, imagination and articulation.", href: "https://x.com/gentlycarved/status/1955336976531411447" },
-  { type: "image", src: workBelieve },
+  { type: "image", src: workBelieve, width: 825, height: 1277, caption: "Iteration of Ross Douthat book advertisement in a playbill" },
 
   { type: "writing", text: "we're still making chat interfaces because AI is unreliable.", href: "https://x.com/gentlycarved/status/2084455071849624051" },
-  { type: "video", src: work05 },
+  { type: "video", src: work05, width: 1280, height: 720 },
 
   { type: "writing", text: "sometimes I'm like, yeah well your website is beautiful because the images are beautiful", href: "https://x.com/gentlycarved/status/1937236176882061778" },
-  { type: "image", src: filmPoolside },
+  { type: "image", src: filmPoolside, width: 1600, height: 1060, caption: FILM_CAPTION },
 
   { type: "writing", text: "6.5 billion for a design agency. I have so many thoughts, but I'm mostly optimistic simply because this allows designers to lead these crazy times", href: "https://x.com/gentlycarved/status/1925247370591105232" },
-  { type: "image", src: workTahreemBg },
+  { type: "image", src: workTahreemBg, width: 2529, height: 1402, caption: "landing page for my website" },
 
   { type: "writing", text: "if you like my work, ask me to go through a work trial and then meet me after for a chat, I feel like this would make design hiring a bit easier.", href: "https://x.com/gentlycarved/status/2058990882976645145" },
-  { type: "image", src: workDesk },
+  { type: "image", src: workDesk, width: 1440, height: 1080, caption: "my desk" },
 
   { type: "writing", text: "Sincerely, but with a lightness of touch." },
-  { type: "image", src: filmMiswak },
+  { type: "image", src: filmMiswak, width: 994, height: 659, caption: FILM_CAPTION },
 
   { type: "writing", text: "Designing for Geologists →", href: "https://x.com/gentlycarved/status/2026095227929235775" },
-  { type: "image", src: workMemeticMap },
+  { type: "image", src: workMemeticMap, width: 919, height: 1275, caption: "book design + diagram design for Luke Burgis's lecture on the \"The Three City Problem\"" },
 
   { type: "writing", text: "Designing for Geologists — Field Notes #2 →", href: "https://x.com/gentlycarved/status/2047497932421693589" },
-  { type: "image", src: workCoretable2 },
-  { type: "image", src: filmCeiling },
-  { type: "image", src: workCoretable3 },
-  { type: "video", src: work06 },
-  { type: "image", src: workPosterLuke },
-  { type: "image", src: filmStreetMecca },
-  { type: "image", src: workCrossword },
-  { type: "video", src: work07 },
-  { type: "image", src: workAlbumSingles },
-  { type: "image", src: filmLakeTerrace },
-  { type: "image", src: workWaxSeal },
+  { type: "image", src: workCoretable2, width: 1706, height: 932, caption: "design for exporting logging data on an interface called \"CoreTable\"" },
+  { type: "image", src: filmCeiling, width: 994, height: 659, caption: FILM_CAPTION },
+  { type: "image", src: workCoretable3, width: 1301, height: 994, caption: "Logging tools for CoreTable" },
+  { type: "video", src: work06, width: 3024, height: 466 },
+  { type: "image", src: workPosterLuke, width: 825, height: 1275, caption: "Luke Burgis intro design in playbill." },
+  { type: "image", src: filmStreetMecca, width: 994, height: 659, caption: FILM_CAPTION },
+  { type: "image", src: workCrossword, width: 1007, height: 1410, caption: "Crossword design iteration for the Viaduct Season 4. by The Toronto Society." },
+  { type: "video", src: work07, width: 1732, height: 1620 },
+  { type: "image", src: workAlbumSingles, width: 1072, height: 1102, caption: "single cover art creative direction + design for Sam Austins" },
+  { type: "image", src: filmLakeTerrace, width: 1600, height: 1060, caption: FILM_CAPTION },
+  { type: "image", src: workWaxSeal, width: 968, height: 968, caption: "gentlycarved studio concept done in photoshop + logo design" },
+  {
+    type: "pair",
+    top: { type: "image", src: workKellyEllsworth, width: 960, height: 959, caption: "Kelly Ellsworth — the inspiration behind the negative-space hover idea." },
+    bottom: { type: "video", src: workNegativeSpaceButton, width: 1280, height: 720, caption: "negative-space hover interaction, inspired by the piece above." },
+  },
+  { type: "video", src: workSeverance, width: 1280, height: 720 },
 ];
 
 function WritingCell({ text, href }: { text: string; href?: string }) {
@@ -474,9 +488,27 @@ function ProjectTile({
       className="project-tile relative w-full overflow-hidden block cursor-zoom-in"
     >
       {cell.type === "image" ? (
-        <img src={cell.src} alt="" loading="lazy" className="block w-full h-auto" style={{ background: cellBg }} />
+        <img
+          src={cell.src}
+          alt=""
+          loading="lazy"
+          width={cell.width}
+          height={cell.height}
+          className="block w-full h-auto"
+          style={{ background: cellBg, aspectRatio: cell.width && cell.height ? `${cell.width} / ${cell.height}` : undefined }}
+        />
       ) : (
-        <video src={cell.src} autoPlay muted loop playsInline className="block w-full h-auto" style={{ background: cellBg }} />
+        <video
+          src={cell.src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          width={cell.width}
+          height={cell.height}
+          className="block w-full h-auto"
+          style={{ background: cellBg, aspectRatio: cell.width && cell.height ? `${cell.width} / ${cell.height}` : undefined }}
+        />
       )}
       <div className="fuzzy-overlay" style={{ background: cellBg }} />
       <div className="metal-frame" />
@@ -489,7 +521,7 @@ function Lightbox({ cell, onClose }: { cell: Extract<Cell, { type: "image" | "vi
   return (
     <div
       className="fixed inset-0 flex items-center justify-center p-6 max-sm:p-3"
-      style={{ background: "rgba(0,0,0,0.86)", zIndex: 95 }}
+      style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(2px)", zIndex: 95 }}
       onClick={onClose}
     >
       <button
@@ -497,30 +529,38 @@ function Lightbox({ cell, onClose }: { cell: Extract<Cell, { type: "image" | "vi
         onClick={onClose}
         aria-label="Close"
         className="fixed flex items-center justify-center rounded-full"
-        style={{ top: 20, right: 20, width: 36, height: 36, background: "rgba(255,255,255,0.12)", color: "#fff" }}
+        style={{ top: 20, right: 20, width: 36, height: 36, background: "rgba(0,0,0,0.06)", color: "#3a3a3a" }}
       >
         <X size={17} strokeWidth={2} />
       </button>
-      {cell.type === "image" ? (
-        <img
-          src={cell.src}
-          alt=""
-          className="max-w-full max-h-full object-contain"
-          style={{ borderRadius: 4 }}
-          onClick={(e) => e.stopPropagation()}
-        />
-      ) : (
-        <video
-          src={cell.src}
-          controls
-          autoPlay
-          loop
-          playsInline
-          className="max-w-full max-h-full object-contain"
-          style={{ borderRadius: 4 }}
-          onClick={(e) => e.stopPropagation()}
-        />
-      )}
+      <div className="flex flex-col items-center gap-3 max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
+        {cell.type === "image" ? (
+          <img
+            src={cell.src}
+            alt=""
+            className="max-w-full max-h-full object-contain"
+            style={{ borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.18)" }}
+          />
+        ) : (
+          <video
+            src={cell.src}
+            controls
+            autoPlay
+            loop
+            playsInline
+            className="max-w-full max-h-full object-contain"
+            style={{ borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.18)" }}
+          />
+        )}
+        {cell.caption && (
+          <div
+            className="font-['Ronzino',sans-serif] text-[13px] text-center max-w-[480px]"
+            style={{ color: "#5a5757" }}
+          >
+            {cell.caption}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -617,6 +657,11 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
                 <WritingCell text={cell.text} href={cell.href} />
               ) : cell.type === "tools" ? (
                 <ToolsTile onOpen={() => setToolsOpen(true)} />
+              ) : cell.type === "pair" ? (
+                <div className="flex flex-col gap-2 max-sm:gap-1.5">
+                  <ProjectTile cell={cell.top} cellBg={cellBg} onOpen={() => setLightbox(cell.top)} />
+                  <ProjectTile cell={cell.bottom} cellBg={cellBg} onOpen={() => setLightbox(cell.bottom)} />
+                </div>
               ) : (
                 <ProjectTile cell={cell} cellBg={cellBg} onOpen={() => setLightbox(cell)} />
               )}
