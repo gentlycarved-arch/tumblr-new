@@ -434,8 +434,8 @@ const CELLS: Cell[] = [
   { type: "image", src: workWaxSeal, width: 968, height: 968, caption: "gentlycarved studio concept done in photoshop + logo design" },
   {
     type: "pair",
-    top: { type: "image", src: workKellyEllsworth, width: 960, height: 959, caption: "Kelly Ellsworth — the inspiration behind the negative-space hover idea." },
-    bottom: { type: "video", src: workNegativeSpaceButton, width: 1280, height: 720, caption: "negative-space hover interaction, inspired by the piece above." },
+    top: { type: "image", src: workKellyEllsworth, width: 960, height: 959, caption: "Kelly Ellsworth — the inspiration behind this negative-space hover interaction." },
+    bottom: { type: "video", src: workNegativeSpaceButton, width: 1280, height: 720, caption: "a negative-space hover interaction, inspired by the Kelly Ellsworth painting shown alongside it." },
   },
   { type: "video", src: workSeverance, width: 1280, height: 720 },
 ];
@@ -517,10 +517,12 @@ function ProjectTile({
 }
 
 /** Full-size view of a single tile, opened by clicking it in the grid. */
-function Lightbox({ cell, onClose }: { cell: Extract<Cell, { type: "image" | "video" }>; onClose: () => void }) {
+/** Shows one media item, or — for a paired tile — the clicked item followed by its
+ * partner beneath it, in whichever order they were clicked. */
+function Lightbox({ cells, onClose }: { cells: Extract<Cell, { type: "image" | "video" }>[]; onClose: () => void }) {
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center p-6 max-sm:p-3"
+      className="fixed inset-0 flex items-center justify-center p-6 max-sm:p-3 overflow-y-auto"
       style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(2px)", zIndex: 95 }}
       onClick={onClose}
     >
@@ -533,33 +535,37 @@ function Lightbox({ cell, onClose }: { cell: Extract<Cell, { type: "image" | "vi
       >
         <X size={17} strokeWidth={2} />
       </button>
-      <div className="flex flex-col items-center gap-3 max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
-        {cell.type === "image" ? (
-          <img
-            src={cell.src}
-            alt=""
-            className="max-w-full max-h-full object-contain"
-            style={{ borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.18)" }}
-          />
-        ) : (
-          <video
-            src={cell.src}
-            controls
-            autoPlay
-            loop
-            playsInline
-            className="max-w-full max-h-full object-contain"
-            style={{ borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.18)" }}
-          />
-        )}
-        {cell.caption && (
-          <div
-            className="font-['Ronzino',sans-serif] text-[13px] text-center max-w-[480px]"
-            style={{ color: "#5a5757" }}
-          >
-            {cell.caption}
+      <div className="flex flex-col items-center gap-10 max-sm:gap-6 max-w-full my-auto" onClick={(e) => e.stopPropagation()}>
+        {cells.map((cell, i) => (
+          <div key={i} className="flex flex-col items-center gap-3 max-w-full max-h-full">
+            {cell.type === "image" ? (
+              <img
+                src={cell.src}
+                alt=""
+                className="max-w-full max-h-[80vh] object-contain"
+                style={{ borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.18)" }}
+              />
+            ) : (
+              <video
+                src={cell.src}
+                controls
+                autoPlay
+                loop
+                playsInline
+                className="max-w-full max-h-[80vh] object-contain"
+                style={{ borderRadius: 4, boxShadow: "0 10px 40px rgba(0,0,0,0.18)" }}
+              />
+            )}
+            {cell.caption && (
+              <div
+                className="font-['Ronzino',sans-serif] text-[13px] text-center max-w-[480px]"
+                style={{ color: "#5a5757" }}
+              >
+                {cell.caption}
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
     </div>
   );
@@ -570,7 +576,7 @@ function Lightbox({ cell, onClose }: { cell: Extract<Cell, { type: "image" | "vi
 export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
   const bg = "#ffffff";
   const cellBg = "#fff";
-  const [lightbox, setLightbox] = useState<Extract<Cell, { type: "image" | "video" }> | null>(null);
+  const [lightbox, setLightbox] = useState<Extract<Cell, { type: "image" | "video" }>[] | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
 
@@ -659,11 +665,11 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
                 <ToolsTile onOpen={() => setToolsOpen(true)} />
               ) : cell.type === "pair" ? (
                 <div className="flex flex-col gap-2 max-sm:gap-1.5">
-                  <ProjectTile cell={cell.top} cellBg={cellBg} onOpen={() => setLightbox(cell.top)} />
-                  <ProjectTile cell={cell.bottom} cellBg={cellBg} onOpen={() => setLightbox(cell.bottom)} />
+                  <ProjectTile cell={cell.top} cellBg={cellBg} onOpen={() => setLightbox([cell.top, cell.bottom])} />
+                  <ProjectTile cell={cell.bottom} cellBg={cellBg} onOpen={() => setLightbox([cell.bottom, cell.top])} />
                 </div>
               ) : (
-                <ProjectTile cell={cell} cellBg={cellBg} onOpen={() => setLightbox(cell)} />
+                <ProjectTile cell={cell} cellBg={cellBg} onOpen={() => setLightbox([cell])} />
               )}
             </div>
           ))}
@@ -677,7 +683,7 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
         </div>
       </div>
 
-      {lightbox && <Lightbox cell={lightbox} onClose={() => setLightbox(null)} />}
+      {lightbox && <Lightbox cells={lightbox} onClose={() => setLightbox(null)} />}
       {toolsOpen && <ToolsModal onClose={() => setToolsOpen(false)} />}
     </div>
   );
