@@ -406,6 +406,83 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
   );
 }
 
+const REAL_PASSWORD = "affogato";
+const FAKE_USERNAME = "TahreemsPortfolio99";
+
+/** Types `text` out once, character by character, then reports done. */
+function useTypeOnce(text: string, active: boolean) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!active) { setDisplayed(""); setDone(false); return; }
+    if (displayed.length >= text.length) { setDone(true); return; }
+    const t = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), typeDelay());
+    return () => clearTimeout(t);
+  }, [active, displayed, text]);
+
+  return { displayed, done };
+}
+
+/** Once "Log In" is clicked, the fake username/typewriter fields become a real
+ * username display + password input, so a visitor can actually log in right here. */
+function LoginPassword({
+  darkMode,
+  onCorrect,
+  onLiveMatch,
+}: {
+  darkMode: boolean;
+  onCorrect: () => void;
+  onLiveMatch: (matches: boolean) => void;
+}) {
+  const [value, setValue] = useState("");
+  const [wrong, setWrong] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const color = darkMode ? "#c0bcbc" : "#888484";
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  // Live feedback: the moment what's typed matches, before Enter is pressed or anything is clicked.
+  useEffect(() => {
+    onLiveMatch(value.trim().toLowerCase() === REAL_PASSWORD.toLowerCase());
+  }, [value, onLiveMatch]);
+
+  function submit() {
+    if (value.trim().toLowerCase() === REAL_PASSWORD.toLowerCase()) {
+      onCorrect();
+    } else {
+      setWrong(true);
+      setValue("");
+    }
+  }
+
+  return (
+    <div
+      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] left-[38.5%] right-[41%] max-sm:left-[11%] max-sm:right-[16%] top-[53.9%] max-sm:top-[53%]"
+      style={{ animation: "fadeIn 300ms ease" }}
+    >
+      <input
+        ref={inputRef}
+        type="password"
+        value={value}
+        onChange={(e) => { setValue(e.target.value); setWrong(false); }}
+        onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+        placeholder="type the password…"
+        className="w-full bg-transparent outline-none not-italic text-[22px] max-sm:text-[18px] tracking-[-0.44px]"
+        style={{ color, caretColor: color }}
+      />
+      {wrong && (
+        <div
+          className="absolute top-full left-0 mt-1 text-[13px] max-sm:text-[11px]"
+          style={{ color: "#d05a5a", animation: "fadeIn 200ms ease" }}
+        >
+          that's not it, try again.
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Typewriter({ darkMode }: { darkMode: boolean }) {
   const { displayed, pausing } = useTypewriter();
   const color = darkMode ? "#c0bcbc" : "#888484";
@@ -459,6 +536,9 @@ export default function Wireframe() {
   // While a visitor is adding an image, blank the slideshow and show their pick as a preview.
   const [addingImage, setAddingImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loginMode, setLoginMode] = useState(false);
+  const [passwordMatches, setPasswordMatches] = useState(false);
+  const { displayed: usernameDisplayed, done: usernameDone } = useTypeOnce(FAKE_USERNAME, loginMode);
   const navigate = useNavigate();
   // Theme frozen at the moment the add flow opens, so the hidden slideshow can't flip it mid-add.
   const frozenDark = useRef<boolean | null>(null);
@@ -526,6 +606,15 @@ export default function Wireframe() {
         <style>{`
           .btn-glow {
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.35);
+            transition: box-shadow 300ms ease;
+          }
+          .btn-glow-match {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 4px rgba(0,0,0,0.2), 0 0 10px 2px rgba(126,180,224,0.85), 0 0 28px 6px rgba(126,180,224,0.55), 0 0 0 1.5px rgba(255,255,255,0.6);
+            animation: loginGlowPulse 1.4s ease-in-out infinite;
+          }
+          @keyframes loginGlowPulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.18); }
           }
           @keyframes fadeIn {
             from { opacity: 0; }
@@ -534,8 +623,8 @@ export default function Wireframe() {
         `}</style>
         <button
           type="button"
-          onClick={() => navigate("/portfolio")}
-          className="btn-glow absolute active:translate-y-px inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center"
+          onClick={() => setLoginMode(true)}
+          className={`btn-glow absolute active:translate-y-px inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%] rounded-[10px] flex items-center justify-center${passwordMatches ? " btn-glow-match" : ""}`}
         >
           {/* Light gradient layer */}
           <div className="absolute inset-0 rounded-[inherit]" style={{
@@ -593,8 +682,30 @@ export default function Wireframe() {
             color: darkMode ? "#c0bcbc" : "#888484",
             transition: "color 600ms ease",
           }}
-        >Product Designer</p>
-        <Typewriter darkMode={darkMode} />
+        >
+          {loginMode ? (
+            <>
+              {usernameDisplayed}
+              {!usernameDone && (
+                <span
+                  className="inline-block w-[2px] h-[22px] max-sm:h-[18px] ml-[2px] align-[-4px]"
+                  style={{ background: darkMode ? "#c0bcbc" : "#888484" }}
+                />
+              )}
+            </>
+          ) : (
+            "Product Designer"
+          )}
+        </p>
+        {loginMode && usernameDone ? (
+          <LoginPassword
+            darkMode={darkMode}
+            onCorrect={() => navigate("/portfolio", { state: { unlocked: true } })}
+            onLiveMatch={setPasswordMatches}
+          />
+        ) : !loginMode ? (
+          <Typewriter darkMode={darkMode} />
+        ) : null}
         <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} darkMode={darkMode} />
         {/* Visitor image upload — only shown once Supabase is configured */}
         {uploadsOn && (
