@@ -365,7 +365,7 @@ const CELLS: Cell[] = [
   { type: "image", src: workSoap, width: 1935, height: 1440, caption: "concept for gentlycarved studio + logo design" },
   { type: "image", src: filmWater, width: 1600, height: 1060, caption: FILM_CAPTION },
   { type: "image", src: workTshirt, width: 2048, height: 1372, caption: "concept t-shirt for are.na" },
-  { type: "image", src: workNative, width: 1920, height: 1080, caption: "website design + identity for Native - native.works" },
+  { type: "image", src: workNative, width: 2522, height: 592, caption: "website design + identity for Native - native.works" },
 
   { type: "writing", text: "the interface you design becomes truly scalable when users can dream inside of it. It should be easy for them to imagine new realities inside of it.", href: "https://x.com/gentlycarved/status/1981473473978368370" },
   { type: "image", src: filmCafe, width: 1600, height: 1060, caption: FILM_CAPTION },
