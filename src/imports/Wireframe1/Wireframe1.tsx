@@ -408,6 +408,7 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
 
 const REAL_PASSWORD = "affogato";
 const FAKE_USERNAME = "TahreemsPortfolio99";
+const WRONG_PASSWORD_MESSAGE = "hmm..not it, try again..";
 
 /** Types `text` out once, character by character, then reports done. */
 function useTypeOnce(text: string, active: boolean) {
@@ -434,11 +435,13 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
   darkMode: boolean;
   onCorrect: () => void;
   onLiveMatch: (matches: boolean) => void;
-}>(function LoginPassword({ darkMode, onCorrect, onLiveMatch }, ref) {
+  onWrong: (wrong: boolean) => void;
+}>(function LoginPassword({ darkMode, onCorrect, onLiveMatch, onWrong }, ref) {
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const color = darkMode ? "#c0bcbc" : "#888484";
+  const { displayed: errorDisplayed } = useTypeOnce(WRONG_PASSWORD_MESSAGE, wrong);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
 
@@ -446,6 +449,8 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
   useEffect(() => {
     onLiveMatch(value.trim().toLowerCase() === REAL_PASSWORD.toLowerCase());
   }, [value, onLiveMatch]);
+
+  useEffect(() => { onWrong(wrong); }, [wrong, onWrong]);
 
   function submit() {
     if (value.trim().toLowerCase() === REAL_PASSWORD.toLowerCase()) {
@@ -469,18 +474,14 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
         value={value}
         onChange={(e) => { setValue(e.target.value); setWrong(false); }}
         onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
-        placeholder="type the password…"
-        className="w-full bg-transparent outline-none not-italic text-[22px] max-sm:text-[18px] tracking-[-0.44px]"
-        style={{ color, caretColor: color }}
+        placeholder={wrong ? errorDisplayed : "type the password…"}
+        className={`w-full bg-transparent outline-none not-italic text-[22px] max-sm:text-[18px] tracking-[-0.44px]${wrong ? " wrong-placeholder" : ""}`}
+        style={{
+          color: wrong ? "#c23b3b" : color,
+          caretColor: wrong ? "#c23b3b" : color,
+          transition: "color 200ms ease",
+        }}
       />
-      {wrong && (
-        <div
-          className="absolute top-full left-0 mt-1 text-[13px] max-sm:text-[11px]"
-          style={{ color: "#d05a5a", animation: "fadeIn 200ms ease" }}
-        >
-          that's not it, try again.
-        </div>
-      )}
     </div>
   );
 });
@@ -540,6 +541,7 @@ export default function Wireframe() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loginMode, setLoginMode] = useState(false);
   const [passwordMatches, setPasswordMatches] = useState(false);
+  const [passwordWrong, setPasswordWrong] = useState(false);
   const [loginBtnHover, setLoginBtnHover] = useState(false);
   const loginPasswordRef = useRef<LoginPasswordHandle>(null);
   const { displayed: usernameDisplayed, done: usernameDone } = useTypeOnce(FAKE_USERNAME, loginMode);
@@ -571,16 +573,17 @@ export default function Wireframe() {
         alt=""
         src={nextSrc}
         className="absolute inset-0 size-full object-cover pointer-events-none"
-        style={{ zIndex: 0 }}
+        style={{ zIndex: 0, opacity: loginMode ? 0.65 : 1, transition: "opacity 300ms ease" }}
       />
-      {/* Current image on top — fades out to reveal next. Hidden while adding an image. */}
+      {/* Current image on top — fades out to reveal next. Hidden while adding an image.
+          Dimmed to half while logging in, so the fields read clearly. */}
       <img
         alt=""
         src={currentSrc}
         className="absolute inset-0 size-full object-cover pointer-events-none"
         style={{
           zIndex: 1,
-          opacity: addingImage ? 0 : fading ? 0 : 1,
+          opacity: (addingImage ? 0 : fading ? 0 : 1) * (loginMode ? 0.65 : 1),
           transition: `opacity ${addingImage ? 300 : fadeDuration}ms ease-in-out`,
         }}
       />
@@ -619,6 +622,28 @@ export default function Wireframe() {
           @keyframes loginGlowPulse {
             0%, 100% { filter: brightness(1); }
             50% { filter: brightness(1.18); }
+          }
+          .login-box-glow {
+            -webkit-box-shadow: 0px 0px 80px 12px rgba(255,255,255,0.95);
+            -moz-box-shadow: 0px 0px 80px 12px rgba(255,255,255,0.95);
+            box-shadow: 0px 0px 80px 12px rgba(255,255,255,0.95);
+            animation: loginBoxGlowPulse 1.4s ease-in-out infinite;
+          }
+          @keyframes loginBoxGlowPulse {
+            0%, 100% { opacity: 0.75; }
+            50% { opacity: 1; }
+          }
+          .wrong-placeholder::placeholder {
+            color: #c23b3b;
+            opacity: 1;
+          }
+          .login-box-glow-wrong {
+            box-shadow: 0px 0px 60px 8px rgba(220,38,38,0.55);
+            animation: wrongPasswordPulse 1.2s ease-in-out infinite;
+          }
+          @keyframes wrongPasswordPulse {
+            0%, 100% { box-shadow: 0px 0px 40px 4px rgba(220,38,38,0.4); }
+            50% { box-shadow: 0px 0px 70px 10px rgba(220,38,38,0.65); }
           }
           @keyframes fadeIn {
             from { opacity: 0; }
@@ -694,6 +719,12 @@ export default function Wireframe() {
             }}
           />
           <div className="absolute inset-0 rounded-[inherit] shadow-[inset_0px_0px_5.8px_-1px_black]" />
+          {/* Glow overlay — pulses once the fields become an active login form; turns red on a wrong password */}
+          {loginMode && (
+            <div
+              className={`absolute inset-0 rounded-[inherit] pointer-events-none ${passwordWrong ? "login-box-glow-wrong" : "login-box-glow"}`}
+            />
+          )}
         </div>
 
         {/* Divider */}
@@ -733,6 +764,7 @@ export default function Wireframe() {
             darkMode={darkMode}
             onCorrect={() => navigate("/portfolio", { state: { unlocked: true } })}
             onLiveMatch={setPasswordMatches}
+            onWrong={setPasswordWrong}
           />
         ) : !loginMode ? (
           <Typewriter darkMode={darkMode} />
