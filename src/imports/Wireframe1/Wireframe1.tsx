@@ -573,18 +573,27 @@ export default function Wireframe() {
         alt=""
         src={nextSrc}
         className="absolute inset-0 size-full object-cover pointer-events-none"
-        style={{ zIndex: 0, opacity: loginMode ? 0.65 : 1, transition: "opacity 300ms ease" }}
+        style={{ zIndex: 0 }}
       />
-      {/* Current image on top — fades out to reveal next. Hidden while adding an image.
-          Dimmed to half while logging in, so the fields read clearly. */}
+      {/* Current image on top — fades out to reveal next. Hidden while adding an image. */}
       <img
         alt=""
         src={currentSrc}
         className="absolute inset-0 size-full object-cover pointer-events-none"
         style={{
           zIndex: 1,
-          opacity: (addingImage ? 0 : fading ? 0 : 1) * (loginMode ? 0.65 : 1),
+          opacity: addingImage ? 0 : fading ? 0 : 1,
           transition: `opacity ${addingImage ? 300 : fadeDuration}ms ease-in-out`,
+        }}
+      />
+      {/* Darkens the background while logging in, so the glowing card reads as the focus */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          zIndex: 1,
+          background: "#000",
+          opacity: loginMode ? 0.82 : 0,
+          transition: "opacity 350ms ease",
         }}
       />
       {/* Blank canvas + live preview shown while a visitor is adding an image */}
