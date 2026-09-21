@@ -408,7 +408,15 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
 
 const REAL_PASSWORD = "affogato";
 const FAKE_USERNAME = "TahreemsPortfolio99";
-const WRONG_PASSWORD_MESSAGE = "hmm..not it, try again..";
+// Gets more annoyed with every failed attempt; stays put once it runs out.
+const WRONG_PASSWORD_MESSAGES = [
+  "hmm..not it, try again..",
+  "nope. try again.",
+  "still wrong. focus.",
+  "ok now i'm judging you a little.",
+  "seriously?? try again.",
+  "at this point just email me.",
+];
 
 /** Types `text` out once, character by character, then reports done. */
 function useTypeOnce(text: string, active: boolean) {
@@ -439,9 +447,11 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
 }>(function LoginPassword({ darkMode, onCorrect, onLiveMatch, onWrong }, ref) {
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const color = darkMode ? "#c0bcbc" : "#888484";
-  const { displayed: errorDisplayed } = useTypeOnce(WRONG_PASSWORD_MESSAGE, wrong);
+  const wrongMessage = WRONG_PASSWORD_MESSAGES[Math.min(Math.max(attempt - 1, 0), WRONG_PASSWORD_MESSAGES.length - 1)];
+  const { displayed: errorDisplayed } = useTypeOnce(wrongMessage, wrong);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
 
@@ -456,6 +466,7 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
     if (value.trim().toLowerCase() === REAL_PASSWORD.toLowerCase()) {
       onCorrect();
     } else {
+      setAttempt((a) => a + 1);
       setWrong(true);
       setValue("");
     }
