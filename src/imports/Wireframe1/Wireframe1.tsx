@@ -92,6 +92,11 @@ function typeDelay() {
   return 90 + Math.random() * 110;
 }
 
+function typeDelayFast() {
+  if (Math.random() < 0.1) return 180 + Math.random() * 160;
+  return 55 + Math.random() * 70;
+}
+
 function backspaceDelay(isCorrection = false) {
   if (isCorrection) return 80 + Math.random() * 60; // faster when fixing typo
   if (Math.random() < 0.12) return 180 + Math.random() * 150;
@@ -426,7 +431,7 @@ function useTypeOnce(text: string, active: boolean) {
   useEffect(() => {
     if (!active) { setDisplayed(""); setDone(false); return; }
     if (displayed.length >= text.length) { setDone(true); return; }
-    const t = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), typeDelay());
+    const t = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), typeDelayFast());
     return () => clearTimeout(t);
   }, [active, displayed, text]);
 
