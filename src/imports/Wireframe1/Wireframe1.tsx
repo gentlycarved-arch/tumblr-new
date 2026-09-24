@@ -683,19 +683,16 @@ export default function Wireframe() {
           {/* Hover tooltip — desktop only */}
           {loginBtnHover && !loginMode && (
             <div
-              className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-3 whitespace-nowrap rounded-[8px] px-3 py-1.5 pointer-events-none"
+              className="hidden sm:flex items-center justify-center absolute top-full left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap rounded-[13px] px-4 h-[34px] pointer-events-none"
               style={{
                 zIndex: 20,
-                background: darkMode ? "rgba(26,26,26,0.92)" : "rgba(248,248,248,0.95)",
-                color: darkMode ? "#E0E0E0" : "#3a3a3a",
-                boxShadow: darkMode
-                  ? "0 0 0 1px rgba(255,255,255,0.14), 0 2px 10px rgba(0,0,0,0.3)"
-                  : "0 0 0 1px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.14)",
-                backdropFilter: "blur(6px)",
+                background: "#2a2a2a",
+                color: "#a8a4a4",
+                boxShadow: "0 0 0 1px rgba(255,255,255,0.28), 0 2px 10px rgba(0,0,0,0.35)",
                 animation: "fadeIn 150ms ease",
               }}
             >
-              <span className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px]">
+              <span className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] leading-none">
                 click this button to see my work
               </span>
             </div>
