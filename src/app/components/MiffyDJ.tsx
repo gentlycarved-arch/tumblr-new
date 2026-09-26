@@ -13,16 +13,6 @@ const NOTES = [
   "M-27.3 23.8A11 8.5 -20 1 1 -6.7 16.2A11 8.5 -20 1 1 -27.3 23.8ZM2.7 17.8A11 8.5 -20 1 1 23.3 10.2A11 8.5 -20 1 1 2.7 17.8ZM-8.5 18V-24h4.5V18zM21.3 12V-30h4.5V12zM-8.5 -24L25.8 -31V-22L-8.5 -15z",
 ];
 
-// Two-tone gradients from the Motherlode poster: sunset, sky, pink stone, teal meadow, amber, plum.
-const NOTE_GRADIENTS = [
-  ["#ee5a2b", "#f7b23e"],
-  ["#2f7ee0", "#9ea9f6"],
-  ["#e06aae", "#b8a4f0"],
-  ["#1fa39a", "#8cbc42"],
-  ["#f39a35", "#f5cf55"],
-  ["#3b2a6b", "#7c6cdb"],
-];
-const noteFill = (i: number) => `url(#mdj-note-${i % NOTE_GRADIENTS.length})`;
 const LINE = { stroke: "#000", strokeLinecap: "round", strokeLinejoin: "round" } as const;
 // [x, y, drift] in drawing units: off the speakers, records, keys, laptop and ear cups.
 const AMBIENT: [number, number, number][] = [
@@ -34,15 +24,24 @@ const AMBIENT: [number, number, number][] = [
   [1010, 754, 46],
   [1351, 598, 30],
   [750, 506, 52],
+  [-40, 752, -40],
+  [-450, 700, -34],
+  [1090, 758, 40],
+  [1470, 606, 36],
 ];
 const EAR_CUPS: [number, number][] = [[196, 512], [748, 518]];
+const VB = { x: -700, y: 60, w: 2439, h: 824 };
 // Teaser notes over the grid: [left %, delay s, duration s, sway px].
 const TEASERS: [number, number, number, number][] = [
   [8, 1.5, 18, 22],
-  [71, 5, 20, -26],
-  [29, 8.5, 19, 18],
-  [90, 12, 21, -22],
-  [52, 15.5, 18.5, 26],
+  [71, 3.5, 20, -26],
+  [40, 6, 19, 18],
+  [90, 8, 21, -22],
+  [22, 10.5, 18.5, 26],
+  [58, 12.5, 20.5, -20],
+  [82, 15, 19.5, 24],
+  [4, 17, 21, -18],
+  [48, 19, 18, 20],
 ];
 const STAGGER = 550;
 const LAND = 1600;
@@ -84,6 +83,10 @@ const CSS = `
     from { transform: translateX(calc(var(--sway) * -1)) rotate(-10deg); }
     to { transform: translateX(var(--sway)) rotate(10deg); }
   }
+  .mdj-hover { pointer-events: auto; }
+  .mdj-hover:hover, .mdj-hover:hover * { animation-play-state: paused; }
+  .mdj-hover path { transition: scale 200ms ease; }
+  .mdj-hover:hover path { scale: 1.35; }
   @keyframes mdj-fly {
     0% { transform: translate(var(--dx), var(--dy)) scale(.4); opacity: 0; animation-timing-function: ease-out; }
     10% { transform: translate(calc(var(--dx) * .92), calc(var(--dy) * .9)) rotate(-10deg); opacity: 1; animation-timing-function: ease-in-out; }
@@ -105,21 +108,29 @@ const CSS = `
 function Note({ i, className, style }: { i: number; className: string; style?: CSSProperties }) {
   return (
     <svg viewBox="-34 -37 68 72" className={className} style={{ overflow: "visible", ...style }}>
-      <path d={NOTES[i % 2]} fill={noteFill(i)} filter="url(#mdj-glow)" />
+      <path d={NOTES[i % 2]} fill="url(#mdj-note)" filter="url(#mdj-glow)" />
     </svg>
   );
 }
 
-function TeaserNotes({ fading, onFaded }: { fading: boolean; onFaded: () => void }) {
+function TeaserNotes({ fading }: { fading: boolean }) {
   return (
     <div
       aria-hidden
       className="fixed inset-0 overflow-hidden pointer-events-none"
       style={{ zIndex: 85, opacity: fading ? 0 : 1, transition: "opacity 800ms ease" }}
-      onTransitionEnd={onFaded}
     >
       {TEASERS.map(([left, delay, duration, sway], i) => (
-        <span key={i} className="mdj-rise" style={{ left: `${left}%`, animationDelay: `${delay}s`, animationDuration: `${duration}s` }}>
+        <span
+          key={i}
+          className="mdj-rise mdj-hover"
+          style={{
+            left: `${left}%`,
+            animationDelay: `${delay}s`,
+            animationDuration: `${duration}s`,
+            pointerEvents: fading ? "none" : undefined,
+          }}
+        >
           <Note i={i} className="mdj-sway w-7 h-[30px]" style={{ "--sway": `${sway}px` } as CSSProperties} />
         </span>
       ))}
@@ -131,7 +142,7 @@ function MiffyDJ({ svgRef, ambientDelay }: { svgRef: RefObject<SVGSVGElement>; a
   return (
     <svg
       ref={svgRef}
-      viewBox="-700 60 2439 824"
+      viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`}
       preserveAspectRatio="xMidYMax slice"
       className="block w-full aspect-[2439/824] max-sm:aspect-[1300/824]"
       role="img"
@@ -139,12 +150,10 @@ function MiffyDJ({ svgRef, ambientDelay }: { svgRef: RefObject<SVGSVGElement>; a
     >
       <style>{CSS}</style>
       <defs>
-        {NOTE_GRADIENTS.map(([from, to], i) => (
-          <linearGradient key={i} id={`mdj-note-${i}`} x1="0" y1="1" x2="1" y2="0">
-            <stop offset="0" stopColor={from} />
-            <stop offset="1" stopColor={to} />
-          </linearGradient>
-        ))}
+        <linearGradient id="mdj-note" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stopColor="#ff1493" />
+          <stop offset="1" stopColor="#ff69b4" />
+        </linearGradient>
         <filter id="mdj-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="7" result="blur" />
           <feMerge>
@@ -244,17 +253,23 @@ function MiffyDJ({ svgRef, ambientDelay }: { svgRef: RefObject<SVGSVGElement>; a
       {ambientDelay !== null &&
         AMBIENT.map(([x, y, drift], i) => (
           <g key={i} transform={`translate(${x} ${y})`}>
-            <path
-              d={NOTES[i % 2]}
-              className="mdj-float"
-              fill={noteFill(i)}
-              filter="url(#mdj-glow)"
-              style={{ "--drift": `${drift}px`, animationDelay: `${ambientDelay + i * 550}ms` } as CSSProperties}
-            />
+            <g
+              className="mdj-float mdj-hover"
+              style={{ "--drift": `${drift}px`, animationDelay: `${ambientDelay + i * 370}ms` } as CSSProperties}
+            >
+              <circle r="40" fill="transparent" />
+              <path d={NOTES[i % 2]} fill="url(#mdj-note)" filter="url(#mdj-glow)" />
+            </g>
           </g>
         ))}
     </svg>
   );
+}
+
+function toPage(svg: SVGSVGElement, [x, y]: [number, number]) {
+  const r = svg.getBoundingClientRect();
+  const k = Math.max(r.width / VB.w, r.height / VB.h);
+  return { x: r.left + (r.width - VB.w * k) / 2 + (x - VB.x) * k, y: r.bottom - VB.h * k + (y - VB.y) * k };
 }
 
 /** Miffy's DJ table as the page footer. When it scrolls into view, notes float up out of her
@@ -274,15 +289,14 @@ export function MiffyFooter({ links }: { links: ReactNode[] }) {
       ([entry]) => {
         if (!entry.isIntersecting) return;
         io.disconnect();
-        const ctm = svgRef.current?.getScreenCTM();
-        if (!ctm || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
           setInstant(true);
           return;
         }
         setFlights(
           slotRefs.current.map((slot, i) => {
             const r = slot!.getBoundingClientRect();
-            const p = new DOMPoint(...EAR_CUPS[i % 2]).matrixTransform(ctm);
+            const p = toPage(svgRef.current!, EAR_CUPS[i % 2]);
             return { dx: p.x - (r.left + r.width / 2), dy: p.y - (r.top + r.height / 2) };
           }),
         );
@@ -293,9 +307,16 @@ export function MiffyFooter({ links }: { links: ReactNode[] }) {
     return () => io.disconnect();
   }, []);
 
+  const reached = flights !== null || instant;
+  useEffect(() => {
+    if (!reached) return;
+    const t = setTimeout(() => setTeaserGone(true), 900);
+    return () => clearTimeout(t);
+  }, [reached]);
+
   return (
     <>
-      {!teaserGone && <TeaserNotes fading={flights !== null || instant} onFaded={() => setTeaserGone(true)} />}
+      {!teaserGone && <TeaserNotes fading={reached} />}
       <footer className="px-[4%] mt-[26rem] max-sm:mt-60">
         <div ref={boxRef} className="relative">
           <nav className="absolute bottom-full mb-8 max-sm:mb-5 left-[48.3%] max-sm:left-[46.8%] -translate-x-1/2 flex items-center gap-4 max-sm:gap-3">
