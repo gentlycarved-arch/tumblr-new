@@ -47,6 +47,7 @@ import workWaxSeal from "../../assets/portfolio/work-wax-seal.jpg";
 import workNegativeSpaceButton from "../../assets/portfolio/work-negative-space-button.mp4";
 import workKellyEllsworth from "../../assets/portfolio/work-kelly-ellsworth.jpeg";
 import workSeverance from "../../assets/portfolio/work-severance.mp4";
+import { MiffyFooter } from "./MiffyDJ";
 
 interface Props {
   darkMode: boolean;
@@ -675,13 +676,14 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
           ))}
         </div>
 
-        <div className="flex items-center justify-center gap-4 max-sm:gap-x-3 max-sm:gap-y-1 flex-wrap mt-10 mb-2 px-4">
-          <NavPill onClick={() => setInfoOpen(true)}>info</NavPill>
-          {NAV_LINKS.map((link) => (
-            <NavPill key={link.label} href={link.href}>{link.label}</NavPill>
-          ))}
-        </div>
       </div>
+
+      <MiffyFooter
+        links={[
+          <NavPill key="info" onClick={() => setInfoOpen(true)}>info</NavPill>,
+          ...NAV_LINKS.map((link) => <NavPill key={link.label} href={link.href}>{link.label}</NavPill>),
+        ]}
+      />
 
       {lightbox && <Lightbox cells={lightbox} onClose={() => setLightbox(null)} />}
       {toolsOpen && <ToolsModal onClose={() => setToolsOpen(false)} />}
