@@ -97,12 +97,41 @@ const CSS = `
   }
   @keyframes mdj-reveal {
     from { opacity: 0; transform: scale(.6); filter: blur(4px); visibility: hidden; }
+    65% { opacity: 1; transform: scale(1.08); filter: none; visibility: visible; }
     to { opacity: 1; transform: none; filter: none; visibility: visible; }
+  }
+  @keyframes mdj-pop-line {
+    from { stroke-dashoffset: 1.05; opacity: 0; }
+    8%, 85% { opacity: 1; }
+    45% { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -1.05; opacity: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     .mdj-head, .mdj-rh, .mdj-lh, .mdj-float { animation: none; }
   }
 `;
+
+// Uneven, slightly bent strokes fanning out on both sides of link i; seeded so they don't change between renders.
+function popMarks(i: number) {
+  let seed = ((i + 1) * 2654435761) % 4294967296;
+  const rand = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
+  const f = (v: number) => v.toFixed(1);
+  return ([0, 1] as const).map((side) => {
+    const n = 4 + Math.floor(rand() * 2);
+    return Array.from({ length: n }, (_, k) => {
+      const spread = (k / (n - 1) - 0.5) * 2.2 + (rand() - 0.5) * 0.4;
+      const a = side ? spread : Math.PI - spread;
+      const ox = side ? 0 : 16;
+      const r0 = 2 + rand() * 1.5;
+      const r1 = r0 + 4.5 + rand() * 4.5;
+      const bend = (rand() - 0.5) * 2.4;
+      const x0 = ox + Math.cos(a) * r0, y0 = 10 + Math.sin(a) * r0;
+      const x1 = ox + Math.cos(a) * r1, y1 = 10 + Math.sin(a) * r1;
+      const cx = (x0 + x1) / 2 - Math.sin(a) * bend, cy = (y0 + y1) / 2 + Math.cos(a) * bend;
+      return { d: `M${f(x0)} ${f(y0)}Q${f(cx)} ${f(cy)} ${f(x1)} ${f(y1)}`, width: 1.3 + rand() * 0.8, delay: Math.round(rand() * 70) };
+    });
+  });
+}
 
 // Gradients and the glow live in MiffyDJ's <defs>, which is always mounted alongside these.
 function Note({ i, className, style }: { i: number; className: string; style?: CSSProperties }) {
@@ -328,12 +357,33 @@ export function MiffyFooter({ links }: { links: ReactNode[] }) {
                     instant
                       ? undefined
                       : flights
-                        ? { animation: `mdj-reveal ${REVEAL}ms ease-out ${i * STAGGER + LAND}ms both` }
+                        ? { animation: `mdj-reveal ${REVEAL}ms ease-out ${i * STAGGER + LAND}ms backwards` }
                         : { visibility: "hidden" }
                   }
                 >
                   {link}
                 </span>
+                {flights &&
+                  popMarks(i).map((marks, side) => (
+                    <svg
+                      key={side}
+                      viewBox="0 0 16 20"
+                      className={`absolute top-1/2 -translate-y-1/2 w-4 h-5 max-sm:w-3.5 max-sm:h-[18px] overflow-visible pointer-events-none ${side ? "left-full" : "right-full"}`}
+                    >
+                      {marks.map((m) => (
+                        <path
+                          key={m.d}
+                          d={m.d}
+                          pathLength={1}
+                          fill="none"
+                          stroke="#ff1493"
+                          strokeWidth={m.width}
+                          strokeLinecap="round"
+                          style={{ strokeDasharray: "1 2", animation: `mdj-pop-line 380ms ease-out ${i * STAGGER + LAND - 60 + m.delay}ms both` }}
+                        />
+                      ))}
+                    </svg>
+                  ))}
                 {flights && (
                   <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                     <Note
