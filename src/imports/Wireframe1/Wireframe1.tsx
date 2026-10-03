@@ -834,7 +834,7 @@ export default function Wireframe() {
             style={{ zIndex: 30, animation: "fadeIn 500ms ease" }}
           >
             <div
-              className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] max-sm:text-[11px] leading-snug px-3 py-2 max-sm:px-2.5 max-sm:py-1.5 rounded-[10px]"
+              className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] leading-snug px-3 py-2 max-sm:px-3.5 max-sm:py-1.5 rounded-[10px]"
               style={{
                 background: darkMode ? "rgba(26,26,26,0.78)" : "rgba(248,248,248,0.9)",
                 color: darkMode ? "#E0E0E0" : "#3a3a3a",

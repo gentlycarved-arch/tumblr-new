@@ -138,7 +138,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   return (
     <div
-      className="absolute flex flex-col items-end top-6 right-6 max-sm:top-9"
+      className="absolute flex flex-col items-end top-6 right-6 max-sm:top-9 max-sm:right-4"
       style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -151,7 +151,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
         <button
           type="button"
           onClick={open}
-          className={`${font} px-4 py-2 max-sm:px-3 max-sm:py-1.5 rounded-full text-[15px] max-sm:text-[12px] leading-none whitespace-nowrap`}
+          className={`${font} px-4 py-2 max-sm:px-3.5 max-sm:py-1.5 rounded-full max-sm:rounded-[10px] text-[15px] max-sm:text-[13px] leading-none max-sm:leading-snug whitespace-nowrap`}
           style={{
             background: darkMode ? "rgba(26,26,26,0.82)" : "rgba(248,248,248,0.9)",
             color: hover ? (darkMode ? "#fff" : "#2a2a2a") : heading,
