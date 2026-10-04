@@ -10,8 +10,18 @@ interface Props {
   onSubmit: (text: string) => void;
 }
 
-const COLLAPSED_PX = 128; // visible height when collapsed: handle + trigger row (+ safe-area room)
+const COLLAPSED_PX = 128; // visible height when collapsed: handle + teaser + trigger row (+ safe-area room)
 const EXPANDED_VH = 86;   // sheet height when swiped open, almost takes over the screen
+
+// Tease the newest confession that's long enough to cut off mid-sentence.
+function pickTeaser(confessions: string[]) {
+  if (!confessions.length) return null;
+  const index = Math.max(0, confessions.findIndex((c) => c.trim().split(/\s+/).length >= 5));
+  const words = confessions[index].trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const text = words.length < 3 ? words.join(" ") : words.slice(0, Math.min(7, Math.ceil(words.length / 2))).join(" ") + "…";
+  return { index, text };
+}
 
 /**
  * Mobile: a bottom sheet that owns the confession area. Collapsed it shows just a
@@ -20,7 +30,11 @@ const EXPANDED_VH = 86;   // sheet height when swiped open, almost takes over th
  */
 export function ConfessionSheetMobile({ darkMode, status, error, confessions, onSubmit }: Props) {
   const [open, setOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
+  const teaser = pickTeaser(confessions);
+  // Opening the sheet lands on the full version of the teased confession.
+  const ordered = teaser ? [confessions[teaser.index], ...confessions.filter((_, k) => k !== teaser.index)] : confessions;
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startY: number; startTop: number } | null>(null);
 
@@ -56,6 +70,7 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
     (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
     dragRef.current = { startY: e.clientY, startTop: el.getBoundingClientRect().top };
     el.style.transition = "none";
+    setDragging(true);
   }
 
   function onDragMove(e: React.PointerEvent) {
@@ -72,6 +87,7 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
     const el = sheetRef.current;
     if (!ds || !el) return;
     dragRef.current = null;
+    setDragging(false);
     el.style.transition = "top 320ms cubic-bezier(0.32,0.72,0,1)";
     const moved = e.clientY - ds.startY;
     if (Math.abs(moved) < 6) {
@@ -125,6 +141,14 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
           <div style={{ width: 36, height: 4, borderRadius: 2, background: darkMode ? "#444" : "#d8d8d8" }} />
         </div>
 
+        {!open && teaser && (
+          <div className="px-5 pb-2 shrink-0" style={{ touchAction: "none" }} {...dragHandlers}>
+            <div className={`${font} text-[13px] leading-snug truncate`} style={{ color: heading }}>
+              “{teaser.text}”
+            </div>
+          </div>
+        )}
+
         <div
           className="flex items-center justify-between px-5 shrink-0"
           style={{ touchAction: "none", paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
@@ -152,14 +176,14 @@ export function ConfessionSheetMobile({ darkMode, status, error, confessions, on
               onSubmit={onSubmit}
               onCancel={closeAll}
             />
-          ) : confessions.length === 0 ? (
+          ) : !open && !dragging ? null : confessions.length === 0 ? (
             <div className={`${font} text-[13px] pt-6 text-center`} style={{ color: muted, opacity: 0.6 }}>
               no confessions yet. be the first.
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {confessions.map((c, i) => (
-                <div key={i} className={`${font} text-[13px] leading-snug`} style={{ color: muted }}>
+              {ordered.map((c, i) => (
+                <div key={i} className={`${font} text-[13px] leading-snug`} style={{ color: teaser && i === 0 ? heading : muted }}>
                   “{c}”
                 </div>
               ))}
