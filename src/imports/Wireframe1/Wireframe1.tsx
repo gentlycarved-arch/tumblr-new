@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { useNavigate } from "react-router";
+import { Sun, Moon } from "lucide-react";
 import bgImage from "../Wireframe_-_2.png";
 import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
@@ -258,156 +259,40 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
   );
 }
 
+/** One round button, styled like the "?" button: a sun in light mode, a moon in dark mode. */
 function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
-  const TRACK_W = 80;
-  const TRACK_H = 42;
-  const KNOB = 34;
-  const PAD = (TRACK_H - KNOB) / 2;
-  const knobX = darkMode ? TRACK_W - KNOB - PAD : PAD;
-
+  const [hover, setHover] = useState(false);
+  const icon = (dark: boolean) => ({
+    position: "absolute" as const,
+    inset: 0,
+    margin: "auto",
+    filter: "drop-shadow(0 1px 1.5px rgba(0,0,0,0.4))",
+    opacity: darkMode === dark ? 1 : 0,
+    transform: darkMode === dark ? "rotate(0deg) scale(1)" : "rotate(-60deg) scale(0.6)",
+    transition: "opacity 300ms ease, transform 300ms ease",
+  });
   return (
-    <div
-      className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center max-sm:hidden"
-      style={{ zIndex: 10 }}
+    <button
+      type="button"
+      onClick={onToggle}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+      className="absolute top-8 left-1/2 -translate-x-1/2 max-sm:hidden size-[32px] rounded-full active:scale-95"
+      style={{
+        zIndex: 10,
+        background: hover
+          ? "radial-gradient(70% 70% at 50% 30%, #a5a2a2 0%, #6e6b6b 100%)"
+          : "radial-gradient(70% 70% at 50% 30%, #9e9b9b 0%, #636060 100%)",
+        boxShadow: hover
+          ? "0 0 0 1px rgba(0,0,0,0.15), inset 0 0 0 1.5px rgba(255,255,255,0.6)"
+          : "0 0 0 1px rgba(0,0,0,0.15)",
+        transition: "scale 150ms ease",
+      }}
     >
-      {/* The toggle switch */}
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-label="Cycle light / auto / dark mode"
-        style={{
-          width: TRACK_W, height: TRACK_H, position: "relative",
-          filter: darkMode ? "drop-shadow(0 0 10px rgba(255,255,255,0.18))" : "none",
-          transition: "filter 600ms ease",
-        }}
-      >
-        <svg width={TRACK_W} height={TRACK_H} viewBox={`0 0 ${TRACK_W} ${TRACK_H}`} fill="none">
-          <defs>
-            <radialGradient id="knobGrad" cx="50%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#a8a5a5" />
-              <stop offset="100%" stopColor="#707070" />
-            </radialGradient>
-            <radialGradient id="knobGradDark" cx="50%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#5a5757" />
-              <stop offset="100%" stopColor="#3a3838" />
-            </radialGradient>
-            <clipPath id="moonClip">
-              <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" />
-            </clipPath>
-            <filter id="moonSoft" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="0.45" />
-            </filter>
-          </defs>
-
-          {/* Track — light layer (white/light gray) */}
-          <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
-            fill="rgba(235,233,233,0.85)"
-            stroke="rgba(0,0,0,0.12)"
-            strokeWidth="1"
-            style={{ opacity: darkMode ? 0 : 1, transition: "opacity 600ms ease" }}
-          />
-          {/* Track — dark layer (charcoal) */}
-          <rect x="0.5" y="0.5" width={TRACK_W - 1} height={TRACK_H - 1} rx={TRACK_H / 2} ry={TRACK_H / 2}
-            fill="#1A1A1A"
-            stroke="rgba(255,255,255,0.25)"
-            strokeWidth="1.5"
-            style={{ opacity: darkMode ? 1 : 0, transition: "opacity 600ms ease" }}
-          />
-          {/* Knob */}
-          <circle
-            cx={knobX + KNOB / 2}
-            cy={TRACK_H / 2}
-            r={KNOB / 2}
-            fill={darkMode ? "url(#knobGradDark)" : "url(#knobGrad)"}
-            style={{ transition: "cx 250ms ease" }}
-          />
-          {/* Knob border */}
-          <circle
-            cx={knobX + KNOB / 2}
-            cy={TRACK_H / 2}
-            r={KNOB / 2}
-            fill="none"
-            stroke="rgba(0,0,0,0.15)"
-            strokeWidth="1"
-            style={{ transition: "cx 250ms ease" }}
-          />
-          {/* Knob top highlight */}
-          <circle
-            cx={knobX + KNOB / 2}
-            cy={TRACK_H / 2}
-            r={KNOB / 2 - 1}
-            fill="none"
-            stroke="rgba(255,255,255,0.45)"
-            strokeWidth="1"
-            style={{ transition: "cx 250ms ease" }}
-          />
-
-          {/* Icon inside knob */}
-          <g style={{ transition: "transform 250ms ease", transform: `translateX(${knobX}px)` }}>
-            {darkMode ? (
-              // Skeuomorphic Moon — white crescent with softened glow edges
-              <g filter="url(#moonSoft)">
-                {/* Main crescent body */}
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="7" fill="white" clipPath="url(#moonClip)" />
-                {/* Cutout circle to form crescent */}
-                <circle cx={KNOB / 2 + 5} cy={TRACK_H / 2 - 1.5} r="5.8" fill="url(#knobGradDark)" clipPath="url(#moonClip)" />
-                {/* Top-left highlight for depth */}
-                <circle cx={KNOB / 2 - 1} cy={TRACK_H / 2 - 2.5} r="7" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" clipPath="url(#moonClip)" />
-                {/* Bottom shadow for depth */}
-                <circle cx={KNOB / 2 + 1} cy={TRACK_H / 2 + 1} r="7" fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="1" clipPath="url(#moonClip)" />
-              </g>
-            ) : (
-              // Skeuomorphic Sun — white with depth
-              <g>
-                {/* Rays with slight shadow */}
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
-                  const rad = deg * Math.PI / 180;
-                  const cx = KNOB / 2;
-                  const cy = TRACK_H / 2;
-                  return (
-                    <line
-                      key={deg}
-                      x1={cx + Math.cos(rad) * 6.2}
-                      y1={cy + Math.sin(rad) * 6.2}
-                      x2={cx + Math.cos(rad) * 8.2}
-                      y2={cy + Math.sin(rad) * 8.2}
-                      stroke="rgba(0,0,0,0.15)"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                    />
-                  );
-                })}
-                {/* White rays on top */}
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
-                  const rad = deg * Math.PI / 180;
-                  const cx = KNOB / 2;
-                  const cy = TRACK_H / 2;
-                  return (
-                    <line
-                      key={deg}
-                      x1={cx + Math.cos(rad) * 6.2}
-                      y1={cy + Math.sin(rad) * 6.2}
-                      x2={cx + Math.cos(rad) * 8.2}
-                      y2={cy + Math.sin(rad) * 8.2}
-                      stroke="white"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  );
-                })}
-                {/* Core shadow */}
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.8" fill="rgba(0,0,0,0.1)" />
-                {/* White core */}
-                <circle cx={KNOB / 2} cy={TRACK_H / 2} r="4.5" fill="white" />
-                {/* Top highlight */}
-                <circle cx={KNOB / 2 - 0.8} cy={TRACK_H / 2 - 1} r="4.5" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="0.8" />
-              </g>
-            )}
-          </g>
-        </svg>
-      </button>
-
-    </div>
+      <Sun size={17} strokeWidth={2} color="#fff" style={icon(false)} />
+      <Moon size={16} strokeWidth={2} color="#fff" style={icon(true)} />
+    </button>
   );
 }
 
@@ -423,7 +308,7 @@ const WRONG_PASSWORD_MESSAGES = [
   "at this point just email me.",
 ];
 
-/** Types `text` out once, character by character, then reports done. */
+/** Types `text` out once, character by character, then reports done. `skip` jumps to the end. */
 function useTypeOnce(text: string, active: boolean) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
@@ -435,7 +320,7 @@ function useTypeOnce(text: string, active: boolean) {
     return () => clearTimeout(t);
   }, [active, displayed, text]);
 
-  return { displayed, done };
+  return { displayed, done, skip: () => setDisplayed(text) };
 }
 
 /** Once "Log In" is clicked, the fake username/typewriter fields become a real
@@ -481,7 +366,7 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
 
   return (
     <div
-      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] left-[38.5%] right-[41%] max-sm:left-[11%] max-sm:right-[16%] top-[53.9%] max-sm:top-[53%]"
+      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] left-[38.5%] right-[41%] max-sm:left-[11%] max-sm:right-[16%] top-[53.9%] max-sm:top-[52.6%]"
       style={{ animation: "fadeIn 300ms ease" }}
     >
       <input
@@ -560,7 +445,16 @@ export default function Wireframe() {
   const [passwordWrong, setPasswordWrong] = useState(false);
   const [loginBtnHover, setLoginBtnHover] = useState(false);
   const loginPasswordRef = useRef<LoginPasswordHandle>(null);
-  const { displayed: usernameDisplayed, done: usernameDone } = useTypeOnce(FAKE_USERNAME, loginMode);
+  const { displayed: usernameDisplayed, done: usernameDone, skip: skipUsername } = useTypeOnce(FAKE_USERNAME, loginMode);
+  const typingUsername = loginMode && !usernameDone;
+
+  // Any key while the username is still typing skips straight to the password field.
+  useEffect(() => {
+    if (!typingUsername) return;
+    const onKey = (e: KeyboardEvent) => { if (!e.metaKey && !e.ctrlKey && !e.altKey) skipUsername(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [typingUsername, skipUsername]);
   const navigate = useNavigate();
   // Theme frozen at the moment the add flow opens, so the hidden slideshow can't flip it mid-add.
   const frozenDark = useRef<boolean | null>(null);
@@ -790,7 +684,27 @@ export default function Wireframe() {
           />
         ) : !loginMode ? (
           <Typewriter darkMode={darkMode} />
-        ) : null}
+        ) : (
+          // Above the input card, tucked into its top-right corner — a small grey take on the Log In button
+          <button
+            type="button"
+            onClick={skipUsername}
+            className="btn-glow absolute right-[37.62%] max-sm:right-[8%] top-[46.19%] max-sm:top-[44%] h-[22px] max-sm:h-[28px] px-2.5 max-sm:px-3 rounded-[7px] max-sm:rounded-[8px] -translate-y-[calc(100%+6px)] max-sm:-translate-y-[calc(100%+8px)] overflow-hidden"
+            style={{ animation: "fadeIn 300ms ease" }}
+          >
+            <div className="absolute inset-0" style={{
+              backgroundImage: darkMode
+                ? "radial-gradient(ellipse at 50% 35%, #5a5a5a 0%, #4a4a4a 35%, #3a3a3a 70%, #2e2e2e 100%)"
+                : "radial-gradient(ellipse at 50% 35%, #c4c2c2 0%, #b2afaf 35%, #9c9999 70%, #8c8989 100%)",
+            }} />
+            <span
+              className="relative font-['Favorit_Tumblr:Medium',sans-serif] text-[11px] max-sm:text-[12px] leading-none text-white whitespace-nowrap"
+              style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)" }}
+            >
+              skip typing
+            </span>
+          </button>
+        )}
         <Frame open={tooltipOpen} onToggle={() => setTooltipOpen((v) => !v)} darkMode={darkMode} />
         {/* Visitor image upload — only shown once Supabase is configured */}
         {uploadsOn && (
