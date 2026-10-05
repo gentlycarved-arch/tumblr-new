@@ -151,13 +151,13 @@ function RecruiterBio() {
   return (
     <>
       <p className="mb-3">
-        Currently designing every interface at GeologicAI, from the hardware that scans core to CoreTable, geological description, and AI products for mineral discovery. I'm drawn to niche problems that come from new technology, and I like making complicated tools feel simple so experts can focus on the work that matters.
+        I am a product designer. I design every interface at GeologicAI, from the hardware that scans core to CoreTable and AI products for mineral discovery.
+      </p>
+      <p className="mb-3">
+        Before that: payroll onboarding at FreshBooks, credit card research at RBC, and service design for high school thrift trades.
       </p>
       <p>
-        Previously designed the new payroll onboarding experience at FreshBooks, built on Gusto's API partnership, researched how people search for and choose a credit card at RBC, and did service and data design for high school thrift trades, tracking the water and waste saved with every swap.
-      </p>
-      <p className="mt-3">
-        I'm the kind of designer who'd rather sit next to the people using the tool than guess how they use it.
+        I'm drawn to niche problems that come from new technology, and I'd rather sit next to the people using the tool than guess how they use it.
       </p>
     </>
   );
@@ -166,22 +166,17 @@ function RecruiterBio() {
 function PersonalBio() {
   return (
     <>
-      <a
-        href="https://x.com/gentlycarved/status/2023526271381368924"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block mb-1.5 font-medium text-[16px] leading-snug hover:opacity-70 transition-opacity"
-        style={{ color: "#2a2a2a" }}
-      >
+      <p className="mb-3">
         “when you design interfaces you are —literally— designing the sensory organs people use to perceive information”
-      </a>
-      <p className="mb-4 text-[12px]" style={{ color: "#8a8686" }}>
+      </p>
+      <p className="mb-3">
         — É. Urcades, via{" "}
         <a
           href="https://aaronzlewis.com/blog/2021/01/17/inside-the-digital-sensorium/"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+          className="underline"
+          style={{ color: "#0000EE" }}
         >
           Inside the digital sensorium
         </a>

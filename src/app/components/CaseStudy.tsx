@@ -113,8 +113,8 @@ const EASE = "cubic-bezier(0.22, 0.8, 0.24, 1)";
 
 /**
  * A case study as one long page layered over the portfolio. It opens already
- * scrolled to the section the visitor came from; the clicked image flies from its grid
- * spot into place while the portfolio blurs back and the page comes into focus around it.
+ * scrolled to the section the visitor came from and simply fades in over the
+ * blurred-back portfolio.
  */
 export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: () => void }) {
   const study = CASE_STUDIES[entry.study];
@@ -122,7 +122,6 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
   const [closing, setClosing] = useState(false);
-  const [flight, setFlight] = useState<{ media: Media; from: DOMRect; to: DOMRect } | null>(null);
   const reduceMotion = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Open at the entry's section, before the first paint.
@@ -132,8 +131,6 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
     if (!scroller || !target) { setShown(true); return; }
     const r = target.getBoundingClientRect();
     scroller.scrollTop += r.top + r.height / 2 - window.innerHeight / 2;
-    const media = SECTIONS.flatMap((s) => s.items).find((it): it is Media => it.type !== "link" && it.src === entry.key);
-    if (media && entry.rect && !reduceMotion) setFlight({ media, from: entry.rect, to: target.getBoundingClientRect() });
     requestAnimationFrame(() => setShown(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -178,8 +175,7 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
           className="max-w-[760px] mx-auto px-6 max-sm:px-4 pt-[18vh] pb-[24vh]"
           style={{
             opacity: shown ? 1 : 0,
-            filter: shown ? "blur(0px)" : "blur(8px)",
-            transition: `opacity ${dur}ms ${EASE} ${shown && flight ? 140 : 0}ms, filter ${dur}ms ${EASE} ${shown && flight ? 140 : 0}ms`,
+            transition: `opacity ${dur}ms ${EASE}`,
           }}
         >
           <header className="text-center mb-24 max-sm:mb-16">
@@ -215,11 +211,7 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
                     </a>
                   ) : (
                     <figure key={item.src} className="flex flex-col gap-3">
-                      <MediaView
-                        media={item}
-                        csKey={keyOf(item)}
-                        hidden={!!flight && flight.media.src === item.src}
-                      />
+                      <MediaView media={item} csKey={keyOf(item)} />
                       {item.caption && (
                         <figcaption className="font-['Areal',sans-serif] text-[14px] text-center" style={{ color: "#5a5757" }}>
                           {item.caption}
@@ -258,51 +250,20 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
       >
         <X size={17} strokeWidth={2} />
       </button>
-
-      {flight && <Flight {...flight} onDone={() => setFlight(null)} />}
     </div>
   );
 }
 
-function MediaView({ media, csKey, hidden }: { media: Media; csKey: string; hidden: boolean }) {
+function MediaView({ media, csKey }: { media: Media; csKey: string }) {
   const common = {
     "data-cs-key": csKey,
     className: "block w-full h-auto rounded-[4px]",
     style: {
       aspectRatio: `${media.width} / ${media.height}`,
       boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
-      visibility: hidden ? ("hidden" as const) : undefined,
     },
   };
   return media.type === "image"
     ? <img src={media.src} alt="" width={media.width} height={media.height} {...common} />
     : <video src={media.src} autoPlay muted loop playsInline width={media.width} height={media.height} {...common} />;
-}
-
-/** The clicked tile flying from its spot in the grid to its place in the case study. */
-function Flight({ media, from, to, onDone }: { media: Media; from: DOMRect; to: DOMRect; onDone: () => void }) {
-  const ref = useRef<HTMLElement | null>(null);
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const s = from.width / to.width;
-    const anim = el.animate(
-      [
-        { transform: `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${s})`, borderRadius: "4px" },
-        { transform: "none", borderRadius: "4px" },
-      ],
-      { duration: 640, easing: EASE },
-    );
-    anim.onfinish = onDone;
-    return () => anim.cancel();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const style = {
-    position: "fixed" as const, left: to.left, top: to.top, width: to.width, height: to.height,
-    transformOrigin: "top left", objectFit: "cover" as const, borderRadius: 4,
-    boxShadow: "0 12px 40px rgba(0,0,0,0.12)", pointerEvents: "none" as const,
-  };
-  return media.type === "image"
-    ? <img ref={(n) => { ref.current = n; }} src={media.src} alt="" style={style} />
-    : <video ref={(n) => { ref.current = n; }} src={media.src} autoPlay muted loop playsInline style={style} />;
 }
