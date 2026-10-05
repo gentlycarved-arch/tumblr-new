@@ -67,7 +67,7 @@ const NAV_LINKS: { label: string; href: string }[] = [
 
 function NavPill({ children, onClick, href }: { children: React.ReactNode; onClick?: () => void; href?: string }) {
   const className =
-    "font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] max-sm:text-[12px] leading-none whitespace-nowrap underline underline-offset-2 transition-colors";
+    "font-['Areal',sans-serif] font-medium text-[13px] max-sm:text-[12px] leading-none whitespace-nowrap underline underline-offset-2 transition-colors";
   const style: React.CSSProperties = {
     color: "#2a2a2a",
     textDecorationColor: "#b8b4b4",
@@ -107,11 +107,11 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="font-['Favorit_Tumblr:Regular',sans-serif] rounded-[14px] p-5 w-[380px] max-w-full text-[14px] leading-[1.65] max-h-[80vh] overflow-y-auto"
+        className="font-['Areal',sans-serif] rounded-[14px] p-5 w-[380px] max-w-full text-[14px] leading-[1.65] max-h-[80vh] overflow-y-auto"
         style={{ background: "#FAFAFA", color: "#3A3A3A", boxShadow: "0 10px 30px rgba(0,0,0,0.25)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div role="tablist" className="inline-flex p-[3px] mb-4 rounded-full" style={{ background: "#ECECEC" }}>
+        <div role="tablist" className="inline-flex p-[3px] mb-6 rounded-full" style={{ background: "#ECECEC" }}>
           {INFO_TABS.map((t) => (
             <button
               key={t.id}
@@ -119,7 +119,7 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
               role="tab"
               aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className="font-['Favorit_Tumblr:Medium',sans-serif] text-[12px] leading-none px-3 py-[7px] rounded-full transition-[background-color,color,box-shadow] duration-200"
+              className="font-['Areal',sans-serif] font-medium text-[12px] leading-none px-3 py-[7px] rounded-full transition-[background-color,color,box-shadow] duration-200"
               style={
                 tab === t.id
                   ? { background: "#FFFFFF", color: "#2a2a2a", boxShadow: "0 1px 3px rgba(0,0,0,0.12)" }
@@ -131,6 +131,17 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
           ))}
         </div>
         {tab === "personal" ? <PersonalBio /> : <RecruiterBio />}
+        <p className="mt-4 pt-3 text-[12px] border-t" style={{ color: "#8a8686", borderColor: "#E6E3E3" }}>
+          shoutout to this font:{" "}
+          <a
+            href="https://abcdinamo.com/typefaces/areal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+          >
+            Areal
+          </a>
+        </p>
       </div>
     </div>
   );
@@ -159,10 +170,10 @@ function PersonalBio() {
         href="https://x.com/gentlycarved/status/2023526271381368924"
         target="_blank"
         rel="noopener noreferrer"
-        className="block mb-1.5 text-[19px] max-sm:text-[17px] leading-snug italic hover:opacity-70 transition-opacity"
-        style={{ color: "#2a2a2a", fontFamily: "'Aujournuit', sans-serif" }}
+        className="block mb-1.5 font-medium text-[16px] leading-snug hover:opacity-70 transition-opacity"
+        style={{ color: "#2a2a2a" }}
       >
-        "when you design interfaces you are —literally— designing the sensory organs people use to perceive information"
+        “when you design interfaces you are —literally— designing the sensory organs people use to perceive information”
       </a>
       <p className="mb-4 text-[12px]" style={{ color: "#8a8686" }}>
         — É. Urcades, via{" "}
@@ -265,10 +276,10 @@ function ToolsTile({ onOpen }: { onOpen: () => void }) {
         boxShadow: "inset 0 0 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)",
       }}
     >
-      <p className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1" style={{ color: "#212529" }}>
+      <p className="font-['Areal',sans-serif] font-medium text-[16px] mb-1" style={{ color: "#212529" }}>
         my design toolbox
       </p>
-      <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug mb-3" style={{ color: "#888" }}>
+      <p className="font-['Areal',sans-serif] text-[13px] leading-snug mb-3" style={{ color: "#888" }}>
         a collection of tools that I use as a designer, gathered on Are.na.
       </p>
       {tools && (
@@ -278,14 +289,14 @@ function ToolsTile({ onOpen }: { onOpen: () => void }) {
               {tool.thumb && (
                 <img src={tool.thumb} alt="" className="w-5 h-5 rounded-[4px] object-cover flex-shrink-0" style={{ background: "#eee" }} />
               )}
-              <span className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] truncate" style={{ color: "#5a5757" }}>
+              <span className="font-['Areal',sans-serif] text-[13px] truncate" style={{ color: "#5a5757" }}>
                 {tool.title}
               </span>
             </li>
           ))}
         </ul>
       )}
-      <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[12px]" style={{ color: "#a8a4a4" }}>
+      <p className="font-['Areal',sans-serif] text-[12px]" style={{ color: "#a8a4a4" }}>
         <span className="max-sm:hidden">click to view the rest</span>
         <span className="sm:hidden">tap to see the rest</span>
       </p>
@@ -323,10 +334,10 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="font-['Favorit_Tumblr:Medium',sans-serif] text-[16px] mb-1" style={{ color: "#212529" }}>
+        <p className="font-['Areal',sans-serif] font-medium text-[16px] mb-1" style={{ color: "#212529" }}>
           my design toolbox
         </p>
-        <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] leading-snug mb-3" style={{ color: "#888" }}>
+        <p className="font-['Areal',sans-serif] text-[13px] leading-snug mb-3" style={{ color: "#888" }}>
           a collection of tools that I use as a designer, gathered on Are.na.
         </p>
         <Link
@@ -336,18 +347,18 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
           onMouseEnter={(e) => (e.currentTarget.style.background = "#f4f4f4")}
           onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
         >
-          <span className="font-['Favorit_Tumblr:Regular',sans-serif] text-[14px]" style={{ color: "#212529" }}>
+          <span className="font-['Areal',sans-serif] text-[14px]" style={{ color: "#212529" }}>
             Iris — my color tool
           </span>
           <ArrowUpRight size={14} style={{ color: "#888", flexShrink: 0 }} />
         </Link>
       {error && (
-        <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px]" style={{ color: "#888" }}>
+        <p className="font-['Areal',sans-serif] text-[13px]" style={{ color: "#888" }}>
           couldn't load the are.na channel right now.
         </p>
       )}
       {!error && !tools && (
-        <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px]" style={{ color: "#888" }}>
+        <p className="font-['Areal',sans-serif] text-[13px]" style={{ color: "#888" }}>
           loading…
         </p>
       )}
@@ -368,7 +379,7 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
                   {tool.thumb && (
                     <img src={tool.thumb} alt="" className="w-6 h-6 rounded-[4px] object-cover flex-shrink-0" style={{ background: "#eee" }} />
                   )}
-                  <span className="font-['Favorit_Tumblr:Regular',sans-serif] text-[14px] truncate" style={{ color: "#212529" }}>
+                  <span className="font-['Areal',sans-serif] text-[14px] truncate" style={{ color: "#212529" }}>
                     {tool.title}
                   </span>
                 </span>
@@ -383,7 +394,7 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={() => setShowCode((v) => !v)}
-            className="font-['Favorit_Tumblr:Regular',sans-serif] text-[13px] underline underline-offset-2 transition-colors"
+            className="font-['Areal',sans-serif] text-[13px] underline underline-offset-2 transition-colors"
             style={{ color: "#3a7fd4" }}
           >
             {showCode ? "hide the code ↑" : "want this on your site? here's the code →"}
@@ -391,7 +402,7 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
 
           {showCode && (
             <div className="mt-2">
-              <p className="font-['Favorit_Tumblr:Regular',sans-serif] text-[12px] leading-snug mb-2" style={{ color: "#888" }}>
+              <p className="font-['Areal',sans-serif] text-[12px] leading-snug mb-2" style={{ color: "#888" }}>
                 drop this into any page — swap in your own Are.na channel slug — and it'll render a live list of links from that channel.
               </p>
               <pre
@@ -409,7 +420,7 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
                   btn.textContent = "copied!";
                   setTimeout(() => { btn.textContent = original; }, 1500);
                 }}
-                className="mt-2 font-['Favorit_Tumblr:Medium',sans-serif] text-[12px] px-3 py-1.5 rounded-full transition-colors"
+                className="mt-2 font-['Areal',sans-serif] font-medium text-[12px] px-3 py-1.5 rounded-full transition-colors"
                 style={{ background: "#e9eaed", color: "#5a5757" }}
               >
                 copy code
@@ -634,7 +645,7 @@ function Lightbox({ cells, onClose }: { cells: Extract<Cell, { type: "image" | "
             )}
             {cell.caption && (
               <div
-                className="font-['Ronzino',sans-serif] text-[13px] text-center max-w-[480px]"
+                className="font-['Areal',sans-serif] text-[13px] text-center max-w-[480px]"
                 style={{ color: "#5a5757" }}
               >
                 {cell.caption}
@@ -715,10 +726,10 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-start mb-16 px-1 gap-2 max-sm:grid-cols-1 max-sm:px-0">
           <div className="max-sm:hidden" />
           <div className="flex flex-col items-center text-center gap-2 max-w-[420px] min-w-0 max-sm:max-w-full mx-auto">
-            <div className="font-['Favorit_Tumblr:Medium',sans-serif] text-[15px]" style={{ color: "#2a2a2a" }}>
+            <div className="font-['Areal',sans-serif] font-medium text-[15px]" style={{ color: "#2a2a2a" }}>
               Tahreem Rehman
             </div>
-            <div className="font-['Ronzino',sans-serif] text-[13px] leading-snug px-4">
+            <div className="font-['Areal',sans-serif] text-[13px] leading-snug px-4">
               <span style={{ color: "#2a2a2a" }}>product designer who's always daydreaming on the internet.</span>
             </div>
             <div className="flex items-center justify-center gap-4 max-sm:gap-x-3 max-sm:gap-y-1 flex-wrap mt-1 px-4">

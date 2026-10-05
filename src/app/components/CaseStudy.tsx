@@ -153,7 +153,7 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
   }, [closing]);
 
   const dur = reduceMotion ? 0 : 520;
-  const font = "font-['Favorit_Tumblr:Medium',sans-serif]";
+  const font = "font-['Areal',sans-serif] font-medium";
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 110 }}>
@@ -183,20 +183,20 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
           }}
         >
           <header className="text-center mb-24 max-sm:mb-16">
-            <div className="font-['Favorit_Tumblr:Regular',sans-serif] text-[12px] tracking-[0.15em] uppercase" style={{ color: "#a8a4a4" }}>
+            <div className="font-['Areal',sans-serif] text-[12px] tracking-[0.15em] uppercase" style={{ color: "#a8a4a4" }}>
               {study.subtitle}
             </div>
-            <h2 className="font-['Ronzino',sans-serif] text-[34px] max-sm:text-[26px] leading-tight mt-2" style={{ color: "#2a2a2a" }}>
+            <h2 className="font-['Areal',sans-serif] text-[34px] max-sm:text-[26px] leading-tight mt-2" style={{ color: "#2a2a2a" }}>
               {study.title}
             </h2>
-            <p className="font-['Ronzino',sans-serif] text-[15px] mt-2" style={{ color: "#5a5757" }}>
+            <p className="font-['Areal',sans-serif] text-[15px] mt-2" style={{ color: "#5a5757" }}>
               {study.tagline}
             </p>
           </header>
 
           {SECTIONS.map((section) => (
             <section key={section.heading} className="mb-28 max-sm:mb-20">
-              <div className="font-['Favorit_Tumblr:Regular',sans-serif] text-[12px] tracking-[0.15em] uppercase mb-5" style={{ color: "#a8a4a4" }}>
+              <div className="font-['Areal',sans-serif] text-[12px] tracking-[0.15em] uppercase mb-5" style={{ color: "#a8a4a4" }}>
                 {section.heading}
               </div>
               <div className="flex flex-col gap-12 max-sm:gap-9">
@@ -221,7 +221,7 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
                         hidden={!!flight && flight.media.src === item.src}
                       />
                       {item.caption && (
-                        <figcaption className="font-['Ronzino',sans-serif] text-[14px] text-center" style={{ color: "#5a5757" }}>
+                        <figcaption className="font-['Areal',sans-serif] text-[14px] text-center" style={{ color: "#5a5757" }}>
                           {item.caption}
                         </figcaption>
                       )}
