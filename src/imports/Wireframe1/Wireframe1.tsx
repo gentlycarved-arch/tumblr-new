@@ -261,8 +261,8 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
 }
 
 /** One round button in the shared corner-button style: a sun in light mode, a moon in dark mode.
- * Sits top-right, just left of "add an image" (or in the corner when uploads are off). */
-function ModeToggle({ darkMode, onToggle, besideAddImage }: { darkMode: boolean; onToggle: () => void; besideAddImage: boolean }) {
+ * Sits in the top-right corner, with "add an image" just to its left. */
+function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
   const [hover, setHover] = useState(false);
   const icon = (dark: boolean) => ({
     position: "absolute" as const,
@@ -280,8 +280,8 @@ function ModeToggle({ darkMode, onToggle, besideAddImage }: { darkMode: boolean;
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-      className={`absolute top-6 ${besideAddImage ? "right-[159px]" : "right-6"} max-sm:hidden size-[31px] rounded-full active:scale-95`}
-      style={{ zIndex: 10, ...glossyButtonStyle(darkMode, hover) }}
+      className="absolute top-6 right-6 max-sm:hidden size-[31px] rounded-full active:scale-95"
+      style={{ zIndex: 10, ...glossyButtonStyle(hover, darkMode ? "blue" : "sun") }}
     >
       <Sun size={17} strokeWidth={2} color="#fff" style={icon(false)} />
       <Moon size={16} strokeWidth={2} color="#fff" style={icon(true)} />
@@ -359,7 +359,7 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
 
   return (
     <div
-      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] left-[38.5%] right-[41%] max-sm:left-[11%] max-sm:right-[16%] top-[53.9%] max-sm:top-[52.6%]"
+      className="absolute font-['Favorit_Tumblr:Medium',sans-serif] left-[38.5%] right-[41%] max-sm:left-[11%] max-sm:right-[16%] top-[53.3%] max-sm:top-[52.2%]"
       style={{ animation: "fadeIn 300ms ease" }}
     >
       <input
@@ -369,7 +369,7 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
         onChange={(e) => { setValue(e.target.value); setWrong(false); }}
         onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
         placeholder={wrong ? errorDisplayed : "type the password…"}
-        className={`w-full bg-transparent outline-none not-italic text-[22px] max-sm:text-[18px] tracking-[-0.44px]${wrong ? " wrong-placeholder" : ""}`}
+        className={`login-password w-full bg-transparent outline-none not-italic text-[22px] max-sm:text-[18px] tracking-[-0.44px]${wrong ? " wrong-placeholder" : ""}`}
         style={{
           color: wrong ? "#c23b3b" : color,
           caretColor: wrong ? "#c23b3b" : color,
@@ -519,7 +519,7 @@ export default function Wireframe() {
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
-        <ModeToggle darkMode={darkMode} onToggle={handleToggle} besideAddImage={uploadsOn} />
+        <ModeToggle darkMode={darkMode} onToggle={handleToggle} />
         <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
@@ -556,6 +556,13 @@ export default function Wireframe() {
           @keyframes wrongPasswordPulse {
             0%, 100% { box-shadow: 0px 0px 40px 4px rgba(220,38,38,0.4); }
             50% { box-shadow: 0px 0px 70px 10px rgba(220,38,38,0.65); }
+          }
+          /* Browsers paint autofilled fields light blue; keep the login field see-through */
+          .login-password:-webkit-autofill,
+          .login-password:-webkit-autofill:hover,
+          .login-password:-webkit-autofill:focus {
+            -webkit-text-fill-color: ${darkMode ? "#c0bcbc" : "#888484"};
+            transition: background-color 9999999s ease-in-out 0s;
           }
           @keyframes fadeIn {
             from { opacity: 0; }
@@ -678,11 +685,11 @@ export default function Wireframe() {
         ) : !loginMode ? (
           <Typewriter darkMode={darkMode} />
         ) : (
-          // Above the input card, tucked into its top-right corner — a small grey take on the Log In button
+          // Inside the input card, at the right end of the username row — a small grey take on the Log In button
           <button
             type="button"
             onClick={skipUsername}
-            className="btn-glow absolute right-[37.62%] max-sm:right-[8%] top-[46.19%] max-sm:top-[44%] h-[22px] max-sm:h-[28px] px-2.5 max-sm:px-3 rounded-[7px] max-sm:rounded-[8px] -translate-y-[calc(100%+6px)] max-sm:-translate-y-[calc(100%+8px)] overflow-hidden"
+            className="btn-glow absolute right-[38.5%] max-sm:right-[11%] top-[49.1%] max-sm:top-[47.5%] -translate-y-1/2 h-[24px] max-sm:h-[28px] px-3 max-sm:px-3.5 rounded-[7px] max-sm:rounded-[8px] overflow-hidden inline-flex items-center justify-center"
             style={{ animation: "fadeIn 300ms ease" }}
           >
             <div className="absolute inset-0" style={{
@@ -691,7 +698,7 @@ export default function Wireframe() {
                 : "radial-gradient(ellipse at 50% 35%, #c4c2c2 0%, #b2afaf 35%, #9c9999 70%, #8c8989 100%)",
             }} />
             <span
-              className="relative font-['Favorit_Tumblr:Medium',sans-serif] text-[11px] max-sm:text-[12px] leading-none text-white whitespace-nowrap"
+              className="relative font-['Favorit_Tumblr:Medium',sans-serif] text-[12px] max-sm:text-[13px] leading-none text-white whitespace-nowrap"
               style={{ textShadow: "0 1px 1px rgba(0,0,0,0.25)" }}
             >
               skip typing

@@ -39,7 +39,7 @@ export function ConfessionFlow({ darkMode, status, error, confessions, onSubmit 
           type="button"
           onClick={() => setOpen(true)}
           className={`${font} px-4 py-2 rounded-full text-[15px] leading-none whitespace-nowrap active:scale-95`}
-          style={glossyButtonStyle(darkMode, hover)}
+          style={glossyButtonStyle(hover)}
         >
           leave a confession
         </button>

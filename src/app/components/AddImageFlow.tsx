@@ -22,7 +22,7 @@ const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, 
 /**
  * "add an image" flow. Opening it blanks the background; picking a file or link
  * shows it full-bleed so the visitor can see how it looks behind the site, add a note,
- * and submit. Sits bottom-center on mobile, top-right on desktop.
+ * and submit. Sits bottom-center on mobile, top-right on desktop (just left of the light/dark toggle).
  */
 export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAddingChange, onPreviewChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -139,7 +139,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
 
   return (
     <div
-      className="absolute flex flex-col items-end top-6 right-6 max-sm:top-9 max-sm:right-4"
+      className="absolute flex flex-col items-end top-6 right-[67px] max-sm:top-9 max-sm:right-4"
       style={{ zIndex: 40 }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -153,7 +153,7 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
           type="button"
           onClick={open}
           className={`${font} px-4 py-2 max-sm:px-3.5 max-sm:py-1.5 rounded-full max-sm:rounded-[10px] text-[15px] max-sm:text-[13px] leading-none max-sm:leading-snug whitespace-nowrap active:scale-95`}
-          style={glossyButtonStyle(darkMode, hover)}
+          style={glossyButtonStyle(hover)}
         >
           add an image
         </button>

@@ -1,12 +1,12 @@
 import type { CSSProperties } from "react";
 
-/** Softly lit button fill shared by the corner buttons (light/dark toggle, "leave a confession",
- * "add an image"): yellowy orange in light mode, dark blue at night, with the "?" button's
- * border and white hover ring. */
-export function glossyButtonStyle(darkMode: boolean, hover: boolean): CSSProperties {
-  const [top, bottom] = darkMode
-    ? hover ? ["#4b6d9e", "#223c63"] : ["#3f6191", "#1b3155"]
-    : hover ? ["#ffcf70", "#f5962a"] : ["#ffc55a", "#f08a12"];
+/** Softly lit button fill shared by the corner buttons ("leave a confession", "add an image",
+ * the light/dark toggle): dark blue, or yellowy orange for the toggle in light mode, with the
+ * "?" button's border and white hover ring. */
+export function glossyButtonStyle(hover: boolean, tone: "blue" | "sun" = "blue"): CSSProperties {
+  const [top, bottom] = tone === "sun"
+    ? hover ? ["#ffcf70", "#f5962a"] : ["#ffc55a", "#f08a12"]
+    : hover ? ["#4b6d9e", "#223c63"] : ["#3f6191", "#1b3155"];
   return {
     background: `radial-gradient(70% 70% at 50% 30%, ${top} 0%, ${bottom} 100%)`,
     boxShadow: hover
