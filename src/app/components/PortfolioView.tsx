@@ -151,7 +151,7 @@ function RecruiterBio() {
   return (
     <>
       <p className="mb-3">
-        I am a product designer. I design every interface at GeologicAI, from the hardware that scans core to CoreTable and AI products for mineral discovery.
+        I am a product designer. I currently design every interface at GeologicAI, from the hardware that scans core to CoreTable and AI products for mineral discovery.
       </p>
       <p className="mb-3">
         Before that: payroll onboarding at FreshBooks, credit card research at RBC, and service design for high school thrift trades.
