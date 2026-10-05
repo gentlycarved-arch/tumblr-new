@@ -8,7 +8,7 @@ import workTahreemBg from "../../assets/portfolio/work-tahreem-bg.jpg";
 import workTshirt from "../../assets/portfolio/work-tshirt.jpg";
 import workIris from "../../assets/portfolio/work-iris.jpg";
 import workGallery from "../../assets/portfolio/work-gallery.jpg";
-import workNative from "../../assets/portfolio/work-native.jpg";
+import workNative from "../../assets/portfolio/work-native-montage.gif";
 import workHalftone from "../../assets/portfolio/work-halftone.jpg";
 import workDesk from "../../assets/portfolio/work-desk.jpg";
 import workPosterBoard from "../../assets/portfolio/work-poster-board.jpg";
@@ -125,8 +125,8 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
 }
 
 type Cell =
-  | { type: "image"; src: string; width?: number; height?: number; caseStudy?: string; caption?: string }
-  | { type: "video"; src: string; width?: number; height?: number; caseStudy?: string; caption?: string }
+  | { type: "image"; src: string; width?: number; height?: number; caseStudy?: string; caption?: string; fullWidth?: boolean }
+  | { type: "video"; src: string; width?: number; height?: number; caseStudy?: string; caption?: string; fullWidth?: boolean }
   | { type: "writing"; text: string; href?: string; caseStudy?: string }
   | { type: "tools" }
   // Two media items that must always render stacked together as one tile —
@@ -370,7 +370,6 @@ const CELLS: Cell[] = [
   { type: "image", src: workSoap, width: 1935, height: 1440, caption: "concept for gentlycarved studio + logo design" },
   { type: "image", src: filmWater, width: 1600, height: 1060, caption: FILM_CAPTION },
   { type: "image", src: workTshirt, width: 2048, height: 1372, caption: "concept t-shirt for are.na, my fave place on the internet." },
-  { type: "image", src: workNative, width: 2522, height: 592, caption: "website design + identity for Native - native.works" },
 
   { type: "writing", text: "the interface you design becomes truly scalable when users can dream inside of it. It should be easy for them to imagine new realities inside of it.", href: "https://x.com/gentlycarved/status/1981473473978368370" },
   { type: "image", src: filmCafe, width: 1600, height: 1060, caption: FILM_CAPTION },
@@ -446,6 +445,7 @@ const CELLS: Cell[] = [
     bottom: { type: "video", src: workNegativeSpaceButton, width: 1280, height: 720, caption: "a negative-space hover interaction, inspired by the Kelly Ellsworth painting shown alongside it." },
   },
   { type: "video", src: workSeverance, width: 1280, height: 720 },
+  { type: "image", src: workNative, width: 1920, height: 1080, caseStudy: "native", caption: "website design + identity for Native - native.works", fullWidth: true },
 ];
 
 function WritingCell({ text, href, onOpen }: { text: string; href?: string; onOpen?: () => void }) {
@@ -671,7 +671,11 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
 
         <div className="columns-2 sm:columns-3 gap-2 max-sm:gap-1.5">
           {CELLS.map((cell, i) => (
-            <div key={i} className="break-inside-avoid mb-2 max-sm:mb-1.5">
+            <div
+              key={i}
+              className="break-inside-avoid mb-2 max-sm:mb-1.5"
+              style={"fullWidth" in cell && cell.fullWidth ? { columnSpan: "all" as const } : undefined}
+            >
               {cell.type === "writing" ? (
                 <WritingCell
                   text={cell.text}

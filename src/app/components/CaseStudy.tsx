@@ -12,6 +12,8 @@ import workIris from "../../assets/portfolio/work-iris.jpg";
 import workGallery from "../../assets/portfolio/work-gallery.jpg";
 import workCyanometer from "../../assets/portfolio/work-cyanometer.jpeg";
 import workCyanometerHistorical from "../../assets/portfolio/work-cyanometer-historical.gif";
+import workNative from "../../assets/portfolio/work-native.jpg";
+import workNativeMontage from "../../assets/portfolio/work-native-montage.gif";
 
 type MediaDef = { type: "image" | "video"; src: string; width: number; height: number };
 
@@ -28,6 +30,8 @@ export const CASE_STUDY_MEDIA = {
   workIris: { type: "image", src: workIris, width: 1871, height: 1388 },
   workCyanometerHistorical: { type: "image", src: workCyanometerHistorical, width: 1802, height: 1634 },
   workGallery: { type: "image", src: workGallery, width: 2522, height: 1391 },
+  workNativeMontage: { type: "image", src: workNativeMontage, width: 1920, height: 1080 },
+  workNative: { type: "image", src: workNative, width: 2522, height: 592 },
 } satisfies Record<string, MediaDef>;
 
 export type CaseStudyItemDef = { media: keyof typeof CASE_STUDY_MEDIA; caption?: string } | { link: string; text: string };
@@ -76,9 +80,16 @@ export const IRIS_SECTIONS: CaseStudySectionDef[] = [
   { heading: "try it", items: [{ link: "/iris", text: "open Iris →" }] },
 ];
 
+export const NATIVE_SECTIONS: CaseStudySectionDef[] = [
+  { heading: "the website", items: [{ media: "workNativeMontage", caption: "website design + identity for Native - native.works" }] },
+  { heading: "the identity", items: [{ media: "workNative" }] },
+  { heading: "visit", items: [{ link: "https://native.works", text: "native.works →" }] },
+];
+
 export const CASE_STUDIES: Record<string, { title: string; subtitle: string; tagline: string; sections: CaseStudySectionDef[] }> = {
   coretable: { title: "CoreTable", subtitle: "GeologicAI", tagline: "reinventing how geologists log core", sections: CORETABLE_SECTIONS },
   iris: { title: "Iris", subtitle: "colour palette tool", tagline: "a tool for exploring and generating colour palettes", sections: IRIS_SECTIONS },
+  native: { title: "Native", subtitle: "native.works", tagline: "website design + identity", sections: NATIVE_SECTIONS },
 };
 
 type Media = MediaDef & { caption?: string };
