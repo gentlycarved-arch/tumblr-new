@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ConfessionStatus } from "../../hooks/useConfessions";
 import { ConfessionFeed } from "./ConfessionFeed";
 import { ConfessionComposeCard } from "./ConfessionComposeCard";
+import { glossyButtonStyle } from "./glossyButton";
 
 interface Props {
   darkMode: boolean;
@@ -24,7 +25,6 @@ export function ConfessionFlow({ darkMode, status, error, confessions, onSubmit 
   const ring = darkMode
     ? "0 0 0 1.5px rgba(255,255,255,0.28), 0 10px 30px rgba(0,0,0,0.4)"
     : "0 0 0 1.5px rgba(0,0,0,0.1), 0 10px 30px rgba(0,0,0,0.18)";
-  const heading = darkMode ? "#E5E1E1" : "#4a4a4a";
   const font = "font-['Favorit_Tumblr:Medium',sans-serif]";
 
   return (
@@ -38,17 +38,8 @@ export function ConfessionFlow({ darkMode, status, error, confessions, onSubmit 
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className={`${font} px-4 py-2 rounded-full text-[15px] leading-none whitespace-nowrap`}
-          style={{
-            background: darkMode ? "rgba(26,26,26,0.82)" : "rgba(248,248,248,0.9)",
-            color: hover ? (darkMode ? "#fff" : "#2a2a2a") : heading,
-            boxShadow: darkMode
-              ? "0 0 0 1px rgba(255,255,255,0.18), 0 2px 10px rgba(0,0,0,0.3)"
-              : "0 0 0 1px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.14)",
-            backdropFilter: "blur(6px)",
-            WebkitBackdropFilter: "blur(6px)",
-            transition: "color 160ms ease, background 300ms ease",
-          }}
+          className={`${font} px-4 py-2 rounded-full text-[15px] leading-none whitespace-nowrap active:scale-95`}
+          style={glossyButtonStyle(darkMode, hover)}
         >
           leave a confession
         </button>

@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import type { UploadStatus } from "../../hooks/useUploads";
 import { MAX_COMMENT_LEN } from "../../lib/uploads";
+import { glossyButtonStyle } from "./glossyButton";
 
 interface Props {
   darkMode: boolean;
@@ -151,17 +152,8 @@ export function AddImageFlow({ darkMode, status, error, onFile, onLink, onAdding
         <button
           type="button"
           onClick={open}
-          className={`${font} px-4 py-2 max-sm:px-3.5 max-sm:py-1.5 rounded-full max-sm:rounded-[10px] text-[15px] max-sm:text-[13px] leading-none max-sm:leading-snug whitespace-nowrap`}
-          style={{
-            background: darkMode ? "rgba(26,26,26,0.82)" : "rgba(248,248,248,0.9)",
-            color: hover ? (darkMode ? "#fff" : "#2a2a2a") : heading,
-            boxShadow: darkMode
-              ? "0 0 0 1px rgba(255,255,255,0.18), 0 2px 10px rgba(0,0,0,0.3)"
-              : "0 0 0 1px rgba(0,0,0,0.08), 0 2px 10px rgba(0,0,0,0.14)",
-            backdropFilter: "blur(6px)",
-            WebkitBackdropFilter: "blur(6px)",
-            transition: "color 160ms ease, background 300ms ease",
-          }}
+          className={`${font} px-4 py-2 max-sm:px-3.5 max-sm:py-1.5 rounded-full max-sm:rounded-[10px] text-[15px] max-sm:text-[13px] leading-none max-sm:leading-snug whitespace-nowrap active:scale-95`}
+          style={glossyButtonStyle(darkMode, hover)}
         >
           add an image
         </button>

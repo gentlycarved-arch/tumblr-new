@@ -6,6 +6,7 @@ import logoImage from "../Group_3.png";
 import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { AddImageFlow } from "../../app/components/AddImageFlow";
+import { glossyButtonStyle } from "../../app/components/glossyButton";
 import { ConfessionFlow } from "../../app/components/ConfessionFlow";
 import { ConfessionSheetMobile } from "../../app/components/ConfessionSheetMobile";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
@@ -259,8 +260,9 @@ function Frame({ open, onToggle, darkMode }: { open: boolean; onToggle: () => vo
   );
 }
 
-/** One round button, styled like the "?" button: a sun in light mode, a moon in dark mode. */
-function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () => void }) {
+/** One round button in the shared corner-button style: a sun in light mode, a moon in dark mode.
+ * Sits top-right, just left of "add an image" (or in the corner when uploads are off). */
+function ModeToggle({ darkMode, onToggle, besideAddImage }: { darkMode: boolean; onToggle: () => void; besideAddImage: boolean }) {
   const [hover, setHover] = useState(false);
   const icon = (dark: boolean) => ({
     position: "absolute" as const,
@@ -278,17 +280,8 @@ function ModeToggle({ darkMode, onToggle }: { darkMode: boolean; onToggle: () =>
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-      className="absolute top-8 left-1/2 -translate-x-1/2 max-sm:hidden size-[32px] rounded-full active:scale-95"
-      style={{
-        zIndex: 10,
-        background: hover
-          ? "radial-gradient(70% 70% at 50% 30%, #a5a2a2 0%, #6e6b6b 100%)"
-          : "radial-gradient(70% 70% at 50% 30%, #9e9b9b 0%, #636060 100%)",
-        boxShadow: hover
-          ? "0 0 0 1px rgba(0,0,0,0.15), inset 0 0 0 1.5px rgba(255,255,255,0.6)"
-          : "0 0 0 1px rgba(0,0,0,0.15)",
-        transition: "scale 150ms ease",
-      }}
+      className={`absolute top-6 ${besideAddImage ? "right-[159px]" : "right-6"} max-sm:hidden size-[31px] rounded-full active:scale-95`}
+      style={{ zIndex: 10, ...glossyButtonStyle(darkMode, hover) }}
     >
       <Sun size={17} strokeWidth={2} color="#fff" style={icon(false)} />
       <Moon size={16} strokeWidth={2} color="#fff" style={icon(true)} />
@@ -526,7 +519,7 @@ export default function Wireframe() {
       {/* All content above the background layers (z-index: 2+) */}
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
-        <ModeToggle darkMode={darkMode} onToggle={handleToggle} />
+        <ModeToggle darkMode={darkMode} onToggle={handleToggle} besideAddImage={uploadsOn} />
         <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
