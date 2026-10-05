@@ -194,10 +194,10 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
             </p>
           </header>
 
-          {SECTIONS.map((section, si) => (
+          {SECTIONS.map((section) => (
             <section key={section.heading} className="mb-28 max-sm:mb-20">
               <div className="font-['Favorit_Tumblr:Regular',sans-serif] text-[12px] tracking-[0.15em] uppercase mb-5" style={{ color: "#a8a4a4" }}>
-                {String(si + 1).padStart(2, "0")} · {section.heading}
+                {section.heading}
               </div>
               <div className="flex flex-col gap-12 max-sm:gap-9">
                 {section.items.map((item) =>
