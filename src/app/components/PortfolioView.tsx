@@ -90,8 +90,16 @@ function NavPill({ children, onClick, href }: { children: React.ReactNode; onCli
   );
 }
 
-/** Bio popover shown from the Info pill, matching the bio used elsewhere on the site. */
+const INFO_TABS = [
+  { id: "personal", label: "personal" },
+  { id: "recruiter", label: "for recruiters" },
+] as const;
+
+type InfoTab = (typeof INFO_TABS)[number]["id"];
+
+/** Bio popover shown from the Info pill, with a personal bio and a short one for recruiters. */
 function InfoPopover({ onClose }: { onClose: () => void }) {
+  const [tab, setTab] = useState<InfoTab>("personal");
   return (
     <div
       className="fixed inset-0 flex items-start justify-center px-6 pt-24 max-sm:pt-16"
@@ -103,24 +111,80 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
         style={{ background: "#FAFAFA", color: "#3A3A3A", boxShadow: "0 10px 30px rgba(0,0,0,0.25)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="mb-3">I'm a designer.</p>
-        <p className="mb-3">
-          I have a strong point of view about how I'd like to see the world, and I scratch that itch by creating ideas on the internet.
-        </p>
-        <p className="mb-3">
-          I have a lot of niche interests, and I find ways to realize them into digital experiences, turning whatever I'm curious about that week into something people can actually use or look at.
-        </p>
-        <p className="mb-3">
-          I've taken on roles like design researcher, product designer, book designer, web designer. At the end of the day, I make things. No matter the context, no matter the medium.
-        </p>
-        <p className="mb-3">
-          I've designed specialized tools for geologists and scientific instruments. I've designed playbills for philosophical lectures. I've designed t-shirts. I've designed album covers for indie artists. The through-line isn't the industry, it's that someone had an idea worth shaping, and I showed up to shape it.
-        </p>
-        <p>
-          I like working with people and developing a vision for them, something they'll enjoy using, enjoy seeing, or enjoy holding. Good design should feel like it was made by someone who cared.
-        </p>
+        <div role="tablist" className="inline-flex p-[3px] mb-4 rounded-full" style={{ background: "#ECECEC" }}>
+          {INFO_TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              onClick={() => setTab(t.id)}
+              className="font-['Favorit_Tumblr:Medium',sans-serif] text-[12px] leading-none px-3 py-[7px] rounded-full transition-[background-color,color,box-shadow] duration-200"
+              style={
+                tab === t.id
+                  ? { background: "#FFFFFF", color: "#2a2a2a", boxShadow: "0 1px 3px rgba(0,0,0,0.12)" }
+                  : { background: "transparent", color: "#8a8686" }
+              }
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {tab === "personal" ? <PersonalBio /> : <RecruiterBio />}
       </div>
     </div>
+  );
+}
+
+function RecruiterBio() {
+  return (
+    <>
+      <p className="mb-3">
+        Currently designing every interface at GeologicAI, from the hardware that scans core to CoreTable, geological description, and AI products for mineral discovery. I'm drawn to niche problems that come from new technology, and I like making complicated tools feel simple so experts can focus on the work that matters.
+      </p>
+      <p>
+        Previously designed the new payroll onboarding experience at FreshBooks, built on Gusto's API partnership, researched how people search for and choose a credit card at RBC, and did service and data design for high school thrift trades, tracking the water and waste saved with every swap.
+      </p>
+      <p className="mt-3">
+        I'm the kind of designer who'd rather sit next to the people using the tool than guess how they use it.
+      </p>
+    </>
+  );
+}
+
+function PersonalBio() {
+  return (
+    <>
+      <a
+        href="https://x.com/gentlycarved/status/2023526271381368924"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block mb-1.5 text-[19px] max-sm:text-[17px] leading-snug italic hover:opacity-70 transition-opacity"
+        style={{ color: "#2a2a2a", fontFamily: "'Aujournuit', sans-serif" }}
+      >
+        "when you design interfaces you are —literally— designing the sensory organs people use to perceive information"
+      </a>
+      <p className="mb-4 text-[12px]" style={{ color: "#8a8686" }}>
+        — É. Urcades, via{" "}
+        <a
+          href="https://aaronzlewis.com/blog/2021/01/17/inside-the-digital-sensorium/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:opacity-70 transition-opacity"
+        >
+          Inside the digital sensorium
+        </a>
+      </p>
+      <p className="mb-3">
+        This is truly how I think about design. If an interface is how someone senses the world, then every colour, word, and pixel changes what they notice, and what they miss.
+      </p>
+      <p className="mb-3">
+        Sometimes that someone is me. I make things because I'm curious: a colour tool inspired by an 18th-century instrument for measuring the sky, photos shot on 35mm film, an interaction based on a painting, and a website where strangers leave confessions and Miffy plays records at the bottom of the page.
+      </p>
+      <p>
+        Sometimes it's a geologist reading drill core, or a business owner running payroll for the first time. Either way the job is the same: notice what they need to see, and make it easy to see.
+      </p>
+    </>
   );
 }
 
