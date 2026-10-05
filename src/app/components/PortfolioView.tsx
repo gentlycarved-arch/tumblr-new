@@ -31,12 +31,15 @@ import workPosterSherry from "../../assets/portfolio/work-poster-sherry.png";
 import workCrossword from "../../assets/portfolio/work-crossword.png";
 import workCoretable2 from "../../assets/portfolio/work-coretable-2.png";
 import workCoretable3 from "../../assets/portfolio/work-coretable-3.png";
+import workCoretableDrillholes from "../../assets/portfolio/work-coretable-drillholes.png";
+import workCoretableMineralMap from "../../assets/portfolio/work-coretable-mineral-map.webp";
 import workMemeticMap from "../../assets/portfolio/work-memetic-map.png";
 import filmCeiling from "../../assets/portfolio/film-ceiling.jpg";
 import filmRoad from "../../assets/portfolio/film-road.jpg";
 import filmCrowdHill from "../../assets/portfolio/film-crowd-hill.jpg";
 import filmStreetMecca from "../../assets/portfolio/film-street-mecca.jpg";
 import work06 from "../../assets/portfolio/work-06.mov";
+import workMineralogy from "../../assets/portfolio/work-mineralogy.mov";
 import work07 from "../../assets/portfolio/work-07.mov";
 import tumblrIcon from "../../assets/portfolio/tumblr-icon.png";
 import filmLakeTerrace from "../../assets/portfolio/film-lake-terrace.jpg";
@@ -48,6 +51,7 @@ import workNegativeSpaceButton from "../../assets/portfolio/work-negative-space-
 import workKellyEllsworth from "../../assets/portfolio/work-kelly-ellsworth.jpeg";
 import workSeverance from "../../assets/portfolio/work-severance.mp4";
 import { MiffyFooter } from "./MiffyDJ";
+import { CaseStudy, type CaseStudyEntry } from "./CaseStudy";
 
 interface Props {
   darkMode: boolean;
@@ -121,9 +125,9 @@ function InfoPopover({ onClose }: { onClose: () => void }) {
 }
 
 type Cell =
-  | { type: "image"; src: string; width?: number; height?: number; caption?: string }
-  | { type: "video"; src: string; width?: number; height?: number; caption?: string }
-  | { type: "writing"; text: string; href?: string }
+  | { type: "image"; src: string; width?: number; height?: number; caseStudy?: string; caption?: string }
+  | { type: "video"; src: string; width?: number; height?: number; caseStudy?: string; caption?: string }
+  | { type: "writing"; text: string; href?: string; caseStudy?: string }
   | { type: "tools" }
   // Two media items that must always render stacked together as one tile —
   // used for a piece of work shown right alongside its inspiration reference.
@@ -360,48 +364,48 @@ function ToolsModal({ onClose }: { onClose: () => void }) {
 const CELLS: Cell[] = [
   { type: "tools" },
   { type: "writing", text: "most people overthink taste, its just an instinct", href: "https://x.com/gentlycarved/status/2019074356308050205" },
-  { type: "image", src: workPosterSherry, width: 825, height: 1275, caption: "book design for sherry's intro." },
+  { type: "image", src: workPosterSherry, width: 825, height: 1275, caption: "Book design for Sherry’s introduction in the playbill for The Viaduct, a Toronto lecture series." },
 
   { type: "writing", text: "you will simply not improve as a designer if you don't do 100 iterations of an idea.", href: "https://x.com/gentlycarved/status/2095690790747934922" },
   { type: "image", src: workSoap, width: 1935, height: 1440, caption: "concept for gentlycarved studio + logo design" },
   { type: "image", src: filmWater, width: 1600, height: 1060, caption: FILM_CAPTION },
-  { type: "image", src: workTshirt, width: 2048, height: 1372, caption: "concept t-shirt for are.na" },
+  { type: "image", src: workTshirt, width: 2048, height: 1372, caption: "concept t-shirt for are.na, my fave place on the internet." },
   { type: "image", src: workNative, width: 2522, height: 592, caption: "website design + identity for Native - native.works" },
 
   { type: "writing", text: "the interface you design becomes truly scalable when users can dream inside of it. It should be easy for them to imagine new realities inside of it.", href: "https://x.com/gentlycarved/status/1981473473978368370" },
   { type: "image", src: filmCafe, width: 1600, height: 1060, caption: FILM_CAPTION },
-  { type: "image", src: workGallery, width: 2522, height: 1391, caption: "Gallery in my color palette tool - Iris" },
+  { type: "image", src: workGallery, width: 2522, height: 1391, caseStudy: "iris", caption: "Gallery design for Iris, a tool for exploring and generating colour palettes." },
 
   { type: "writing", text: "I will always need a design canvas before working in code", href: "https://x.com/gentlycarved/status/2038664880505376825" },
   { type: "image", src: filmBoat, width: 1600, height: 1060, caption: FILM_CAPTION },
-  { type: "image", src: workGeoai, width: 1455, height: 1080, caption: "Reinventing how geologists log core on a striplog interface" },
+  { type: "image", src: workGeoai, width: 1455, height: 1080, caseStudy: "coretable", caption: "Early prototype used to explore the overall layout, information hierarchy, and core-logging workflow of CoreTable Lite, helping validate how users would navigate the interface, view core data, and record geological observations." },
   { type: "image", src: workHalftone, width: 1786, height: 724, caption: "logo + type experiment for gentlycarved" },
 
-  { type: "writing", text: "The Iris color tool was inspired by an 18th-century cyanometer — a device for measuring the blueness of the sky.", href: "https://x.com/gentlycarved/status/2028332716291150208" },
+  { type: "writing", text: "The Iris color tool was inspired by an 18th-century cyanometer — a device for measuring the blueness of the sky.", href: "https://x.com/gentlycarved/status/2028332716291150208", caseStudy: "iris" },
   { type: "image", src: filmRoad, width: 994, height: 659, caption: FILM_CAPTION },
   { type: "video", src: work03, width: 2298, height: 1248 },
-  { type: "image", src: workIris, width: 1871, height: 1388, caption: "screenshot from my color palette tool - Iris" },
+  { type: "image", src: workIris, width: 1871, height: 1388, caseStudy: "iris", caption: "screenshot from my color palette tool - Iris" },
   { type: "image", src: filmStreet, width: 1600, height: 1060, caption: FILM_CAPTION },
 
   { type: "writing", text: "\"when you design interfaces you are —literally— designing the sensory organs people use to perceive information\"", href: "https://x.com/gentlycarved/status/2023526271381368924" },
-  { type: "image", src: workCyanometerHistorical, width: 1802, height: 1634, caption: "use cases for my color palette tool - Iris" },
+  { type: "image", src: workCyanometerHistorical, width: 1802, height: 1634, caseStudy: "iris", caption: "Examples of Iris, a colour palette exploration tool, showing how users can create, refine, and apply colour palettes across different visual and creative projects." },
 
   { type: "writing", text: "\"What we call 'interface' in the context of computer technology already exists within us: a network that mediates our subjectivity, that synthesizes what we perceive and the world that is perceived.\" — Seiko Mikami (Molecular Informatics, 2004)" },
-  { type: "image", src: workTrailer, width: 933, height: 419, caption: "sticker design of GeologicAI trailer/core scanner" },
+  { type: "image", src: workTrailer, width: 933, height: 419, caseStudy: "coretable", caption: "sticker design of GeologicAI trailer/core scanner" },
   { type: "image", src: filmFresco, width: 1600, height: 1060, caption: FILM_CAPTION },
   { type: "image", src: workPosterBoard, width: 1125, height: 1019, caption: "screenshot of a random Figma file" },
 
   { type: "writing", text: "something so millennial-coded about seeing photorealistic & device mockups on a design portfolio (sorry)", href: "https://x.com/gentlycarved/status/2049563662898131135" },
-  { type: "image", src: workCyanometer, width: 1280, height: 1137, caption: "cyanometer - the main inspiration for my color palette tool - Iris" },
+  { type: "image", src: workCyanometer, width: 1280, height: 1137, caseStudy: "iris", caption: "cyanometer - the main inspiration for my color palette tool - Iris" },
   { type: "image", src: filmInterior, width: 1600, height: 1060, caption: FILM_CAPTION },
-  { type: "image", src: workPosters, width: 1080, height: 1080, caption: "poster design for the Viaduct Season $ by The Toronto Society" },
+  { type: "image", src: workPosters, width: 1080, height: 1080, caption: "poster design for the Viaduct Season 4, a lecture series by The Toronto Society" },
 
   { type: "writing", text: "These flowers are Tulipa sprengeri — their survival connects to what Douthat's talk was about: what we choose to preserve.", href: "https://x.com/gentlycarved/status/2095245562584928618" },
   { type: "video", src: work04, width: 1280, height: 720 },
   { type: "image", src: filmCrowdHill, width: 994, height: 659, caption: FILM_CAPTION },
 
   { type: "writing", text: "AI is only as effective as your judgement, imagination and articulation.", href: "https://x.com/gentlycarved/status/1955336976531411447" },
-  { type: "image", src: workBelieve, width: 825, height: 1277, caption: "Iteration of Ross Douthat book advertisement in a playbill" },
+  { type: "image", src: workBelieve, width: 825, height: 1277, caption: "Iteration of Ross Douthat book advertisement in a playbill for The Viaduct a lecture series by The Toronto Society" },
 
   { type: "writing", text: "we're still making chat interfaces because AI is unreliable.", href: "https://x.com/gentlycarved/status/2084455071849624051" },
   { type: "video", src: work05, width: 1280, height: 720 },
@@ -418,19 +422,22 @@ const CELLS: Cell[] = [
   { type: "writing", text: "Sincerely, but with a lightness of touch." },
   { type: "image", src: filmMiswak, width: 994, height: 659, caption: FILM_CAPTION },
 
-  { type: "writing", text: "Designing for Geologists →", href: "https://x.com/gentlycarved/status/2026095227929235775" },
+  { type: "writing", text: "Designing for Geologists →", href: "https://x.com/gentlycarved/status/2026095227929235775", caseStudy: "coretable" },
   { type: "image", src: workMemeticMap, width: 919, height: 1275, caption: "book design + diagram design for Luke Burgis's lecture on the \"The Three City Problem\"" },
 
-  { type: "writing", text: "Designing for Geologists — Field Notes #2 →", href: "https://x.com/gentlycarved/status/2047497932421693589" },
-  { type: "image", src: workCoretable2, width: 1706, height: 932, caption: "design for exporting logging data on an interface called \"CoreTable\"" },
+  { type: "writing", text: "Designing for Geologists — Field Notes #2 →", href: "https://x.com/gentlycarved/status/2047497932421693589", caseStudy: "coretable" },
+  { type: "image", src: workCoretable2, width: 1706, height: 932, caseStudy: "coretable", caption: "Designing the export workflow for logging data, allowing geologists to select the information they need and export it in a format that can be used for analysis and downstream geological workflows." },
   { type: "image", src: filmCeiling, width: 994, height: 659, caption: FILM_CAPTION },
-  { type: "image", src: workCoretable3, width: 1301, height: 994, caption: "Logging tools for CoreTable" },
-  { type: "video", src: work06, width: 3024, height: 466 },
+  { type: "image", src: workCoretable3, width: 1301, height: 994, caseStudy: "coretable", caption: "Users can log geological information on the Striplog by dragging rectangles over specific depth intervals and applying attributes such as lithology, grain size, colour, alteration, mineralization, structures, and other core observations to each interval." },
+  { type: "image", src: workCoretableDrillholes, width: 1724, height: 1024, caseStudy: "coretable", caption: "Managing drillholes across projects in CoreTable while integrating with RMS, a separate software used for 3D modelling and visualizing core data." },
+  { type: "image", src: workCoretableMineralMap, width: 1782, height: 1107, caseStudy: "coretable", caption: "Allows geologists to view mineral distribution directly over scanned core, making it easier to correlate mineralization with visible geological features, identify patterns across intervals, and make more informed interpretations without switching between separate datasets." },
+  { type: "video", src: work06, width: 3024, height: 466, caseStudy: "coretable" },
   { type: "image", src: workPosterLuke, width: 825, height: 1275, caption: "Luke Burgis intro design in playbill." },
   { type: "image", src: filmStreetMecca, width: 994, height: 659, caption: FILM_CAPTION },
-  { type: "image", src: workCrossword, width: 1007, height: 1410, caption: "Crossword design iteration for the Viaduct Season 4. by The Toronto Society." },
+  { type: "image", src: workCrossword, width: 1007, height: 1410, caption: "Crossword design iteration for the Viaduct Season 4. a lecture series by The Toronto Society." },
+  { type: "video", src: workMineralogy, width: 1732, height: 706, caseStudy: "coretable" },
   { type: "video", src: work07, width: 1732, height: 1620 },
-  { type: "image", src: workAlbumSingles, width: 1072, height: 1102, caption: "single cover art creative direction + design for Sam Austins" },
+  { type: "image", src: workAlbumSingles, width: 1072, height: 1102, caption: "Cover art creative direction + design for Sam Austins" },
   { type: "image", src: filmLakeTerrace, width: 1600, height: 1060, caption: FILM_CAPTION },
   { type: "image", src: workWaxSeal, width: 968, height: 968, caption: "gentlycarved studio concept done in photoshop + logo design" },
   {
@@ -441,7 +448,7 @@ const CELLS: Cell[] = [
   { type: "video", src: workSeverance, width: 1280, height: 720 },
 ];
 
-function WritingCell({ text, href }: { text: string; href?: string }) {
+function WritingCell({ text, href, onOpen }: { text: string; href?: string; onOpen?: () => void }) {
   const color = "#5a5757";
   const content = (
     <div
@@ -454,7 +461,11 @@ function WritingCell({ text, href }: { text: string; href?: string }) {
 
   return (
     <div className="flex items-center px-3 py-4 max-sm:px-2 max-sm:py-3">
-      {href ? (
+      {onOpen ? (
+        <button type="button" onClick={onOpen} className="text-left hover:opacity-70 transition-opacity">
+          {content}
+        </button>
+      ) : href ? (
         <a
           href={href}
           target="_blank"
@@ -479,12 +490,12 @@ function ProjectTile({
 }: {
   cell: Extract<Cell, { type: "image" | "video" }>;
   cellBg: string;
-  onOpen: () => void;
+  onOpen: (rect: DOMRect) => void;
 }) {
   return (
     <button
       type="button"
-      onClick={onOpen}
+      onClick={(e) => onOpen(e.currentTarget.getBoundingClientRect())}
       aria-label="View full size"
       className="project-tile relative w-full overflow-hidden block cursor-zoom-in"
     >
@@ -578,6 +589,7 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
   const bg = "#ffffff";
   const cellBg = "#fff";
   const [lightbox, setLightbox] = useState<Extract<Cell, { type: "image" | "video" }>[] | null>(null);
+  const [caseEntry, setCaseEntry] = useState<CaseStudyEntry | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
 
@@ -661,7 +673,11 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
           {CELLS.map((cell, i) => (
             <div key={i} className="break-inside-avoid mb-2 max-sm:mb-1.5">
               {cell.type === "writing" ? (
-                <WritingCell text={cell.text} href={cell.href} />
+                <WritingCell
+                  text={cell.text}
+                  href={cell.href}
+                  onOpen={cell.caseStudy && cell.href ? () => setCaseEntry({ study: cell.caseStudy!, key: cell.href!, rect: null }) : undefined}
+                />
               ) : cell.type === "tools" ? (
                 <ToolsTile onOpen={() => setToolsOpen(true)} />
               ) : cell.type === "pair" ? (
@@ -670,7 +686,11 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
                   <ProjectTile cell={cell.bottom} cellBg={cellBg} onOpen={() => setLightbox([cell.bottom, cell.top])} />
                 </div>
               ) : (
-                <ProjectTile cell={cell} cellBg={cellBg} onOpen={() => setLightbox([cell])} />
+                <ProjectTile
+                  cell={cell}
+                  cellBg={cellBg}
+                  onOpen={(rect) => (cell.caseStudy ? setCaseEntry({ study: cell.caseStudy, key: cell.src, rect }) : setLightbox([cell]))}
+                />
               )}
             </div>
           ))}
@@ -686,6 +706,7 @@ export function PortfolioView({ onClose }: Omit<Props, "darkMode">) {
       />
 
       {lightbox && <Lightbox cells={lightbox} onClose={() => setLightbox(null)} />}
+      {caseEntry && <CaseStudy entry={caseEntry} onClose={() => setCaseEntry(null)} />}
       {toolsOpen && <ToolsModal onClose={() => setToolsOpen(false)} />}
     </div>
   );
