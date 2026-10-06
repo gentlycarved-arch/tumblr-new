@@ -25,7 +25,7 @@ function markSeen() {
   try { sessionStorage.setItem(SEEN_KEY, "1"); } catch { /* private mode: just show it again next time */ }
 }
 
-/** Retro banner across the whole top edge that reopens the order form after the pop-up is gone. */
+/** Retro banner across the whole top edge that opens the order form. */
 function AdBanner({ onClick }: { onClick: () => void }) {
   const text = "★ YOUR AD HERE ★ advertise on tahreem.cv ★ click me ★ YOUR AD HERE ★ two levels of annoying ★ starting at $200 ★";
   return (
@@ -53,8 +53,8 @@ function AdBanner({ onClick }: { onClick: () => void }) {
 
 /**
  * The site's ad slot: today's paid ad if one is running, otherwise a "your ad here"
- * pop-up (once per session) with yes / no thanks, then a banner at the top that
- * reopens the order form.
+ * banner at the top from the start, plus a pop-up (once per session, after 2s) with
+ * yes / no thanks. Both open the order form.
  */
 export function AdSlot({ darkMode }: { darkMode: boolean }) {
   const [show, setShow] = useState(() => !seenThisSession());
@@ -69,8 +69,8 @@ export function AdSlot({ darkMode }: { darkMode: boolean }) {
 
   return (
     <>
-      {show && <AdPopups ad={ad} onCta={onCta} onDone={() => { markSeen(); setShow(false); }} delayMs={paid ? undefined : 6000} />}
-      {!paid && !show && !ordering && <AdBanner onClick={() => setOrdering(true)} />}
+      {show && <AdPopups ad={ad} onCta={onCta} onDone={() => { markSeen(); setShow(false); }} delayMs={paid ? undefined : 2000} />}
+      {!paid && !ordering && <AdBanner onClick={() => setOrdering(true)} />}
       {ordering && <AdvertiseModal darkMode={darkMode} onClose={() => setOrdering(false)} />}
     </>
   );
