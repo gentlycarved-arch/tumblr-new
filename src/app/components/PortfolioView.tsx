@@ -185,7 +185,7 @@ function PersonalBio() {
         This is truly how I think about design. If an interface is how someone senses the world, then every colour, word, and pixel changes what they notice, and what they miss.
       </p>
       <p className="mb-3">
-        Sometimes that someone is me. I make things because I'm curious: a colour tool inspired by an 18th-century instrument for measuring the sky, photos shot on 35mm film, an interaction based on a painting, and a website where strangers leave confessions and Miffy plays records at the bottom of the page.
+        I want people to feel that way about the things I create. I make things because I'm curious: a colour tool inspired by an 18th-century instrument for measuring the sky, a button interaction based on a painting, a website where strangers leave confessions and DJ Miffy jamming at the bottom of this page.
       </p>
       <p>
         Sometimes it's a geologist reading drill core, or a business owner running payroll for the first time. Either way the job is the same: notice what they need to see, and make it easy to see.
