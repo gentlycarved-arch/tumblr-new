@@ -102,12 +102,15 @@ export function AdBody({ ad, onCta, onNo }: { ad: Ad; onCta: () => void; onNo?: 
     <button type="button" onClick={onNo} className="retro-btn px-3 py-1 text-[12px]">{ad.noLabel}</button>
   );
   const credit = <div className="text-[10px]" style={{ color: "#808080" }}>advertisement · {ad.company}</div>;
+  const logo = (cls = "") => ad.logo && <img src={ad.logo} alt={`${ad.company} logo`} className={`max-h-[44px] max-w-[160px] object-contain ${cls}`} />;
 
   if (ad.template === "system") {
     return (
       <div className="m-[2px] p-3 flex flex-col gap-2.5 text-black" style={{ background: "#d4d0c8" }}>
         <div className="flex gap-3 items-start">
-          <span className="text-[30px] leading-none" aria-hidden>⚠️</span>
+          {ad.logo
+            ? <img src={ad.logo} alt={`${ad.company} logo`} className="size-[36px] object-contain shrink-0" />
+            : <span className="text-[30px] leading-none" aria-hidden>⚠️</span>}
           <div className="flex flex-col gap-1 min-w-0 flex-1">
             <Headline ad={ad} color="#000080" size={14} />
             <p className="text-[12px] leading-snug">{ad.body}</p>
@@ -132,6 +135,7 @@ export function AdBody({ ad, onCta, onNo }: { ad: Ad; onCta: () => void; onNo?: 
         className="m-[2px] p-3 flex flex-col items-center text-center gap-2"
         style={{ background: "repeating-conic-gradient(from 0deg at 50% 40%, #fff35c 0deg 12deg, #ffd000 12deg 24deg)" }}
       >
+        {ad.logo && <div className="bg-white px-2 py-1">{logo()}</div>}
         <div className="text-[11px] font-bold tracking-wide px-2 bg-white" style={{ color: "#d40000" }}>★ CONGRATULATIONS ★</div>
         <Headline ad={ad} color="#0000cc" size={20} />
         {ad.image && <img src={ad.image} alt="" className="max-h-[110px] max-w-full object-contain border-2 border-white" />}
@@ -147,6 +151,7 @@ export function AdBody({ ad, onCta, onNo }: { ad: Ad; onCta: () => void; onNo?: 
 
   return (
     <div className="m-[2px] p-3 flex flex-col items-center text-center gap-2" style={{ background: ad.flash >= 3 ? "#fffbe6" : "#ffffff" }}>
+      {logo()}
       <Headline ad={ad} color="#d40000" size={17} />
       {ad.image && <img src={ad.image} alt="" className="max-h-[120px] max-w-full object-contain border border-[#808080]" />}
       <p className="text-[12px] leading-snug text-black">{ad.body}</p>

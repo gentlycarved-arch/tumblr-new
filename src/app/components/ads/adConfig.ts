@@ -53,6 +53,7 @@ export interface Ad {
   noLabel?: string; // optional second button that just closes the ad (the house ad's "no thanks")
   href: string;
   image?: string;
+  logo?: string;
   template: AdTemplate;
   flash: number; // 1–5
   annoy: number; // 1–5

@@ -268,6 +268,23 @@ export async function uploadImage(file: File, comment = ""): Promise<string> {
 }
 
 /**
+ * Upload an advertiser's logo for a pop-up ad order. It goes in an ads/ folder, so it
+ * never shows up in the shared gallery (that only lists the bucket's top level).
+ */
+export async function uploadAdLogo(file: File): Promise<string> {
+  if (!uploadsConfigured()) throw new Error("Uploads are not configured.");
+  if (!ALLOWED.includes(file.type)) throw new Error("Please choose a JPEG, PNG, GIF, WebP, or AVIF image.");
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error("That image is over 25 MB. Please pick a smaller one.");
+  const { body, ext, type } = await compress(file);
+  if (body.size > MAX_STORED_BYTES) {
+    throw new Error("That image is too large even after compression. Please pick a smaller one.");
+  }
+  const name = `ads/logo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  await putObject(name, body, type);
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${name}`;
+}
+
+/**
  * Add an image by URL (Cosmos / Are.na / any direct image link). Are.na block links
  * are auto-resolved. Stores only a tiny pointer — no image bytes. Returns the image URL.
  */

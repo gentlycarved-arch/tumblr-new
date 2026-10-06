@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { uploadAdLogo } from "../../../lib/uploads";
 import {
   AD_CONTACT_EMAIL, AD_PAYMENT_LINKS, AD_TEMPLATES, AD_TIERS, ANNOY_LEVELS, FLASH_LEVELS, tierFor,
   type Ad, type AdTemplate, type AdTier,
@@ -73,6 +74,9 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
   const [form, setForm] = useState({ company: "", headline: "", body: "", href: "", image: "", email: "" });
   const [previewing, setPreviewing] = useState(false);
   const [sent, setSent] = useState(false);
+  // The logo shows in the preview straight away (local copy) while it uploads in the background
+  const [logo, setLogo] = useState<{ preview: string; url?: string; uploading: boolean; error?: string } | null>(null);
+  const logoInput = useRef<HTMLInputElement>(null);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const tier = tierFor(flash, annoy);
@@ -84,12 +88,13 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
     cta: template === "system" ? "OK" : "CLICK HERE!",
     href: form.href || "#",
     image: form.image || undefined,
+    logo: logo?.preview,
     template,
     flash,
     annoy,
     startsOn: "",
   };
-  const ready = form.company.trim() && form.headline.trim() && form.href.trim() && form.email.trim();
+  const ready = form.company.trim() && form.headline.trim() && form.href.trim() && form.email.trim() && !logo?.uploading;
 
   const panelBg = darkMode ? "#1A1A1A" : "#FAFAFA";
   const ring = darkMode
@@ -110,6 +115,20 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
     setAnnoy(AD_TIERS[id].preset.annoy);
   }
 
+  async function pickLogo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    setLogo({ preview, uploading: true });
+    try {
+      const url = await uploadAdLogo(file);
+      setLogo((l) => (l?.preview === preview ? { preview, url, uploading: false } : l));
+    } catch (err) {
+      setLogo((l) => (l?.preview === preview ? { preview, uploading: false, error: (err as Error).message } : l));
+    }
+  }
+
   function sendAndPay() {
     const subject = `ad order: ${t.name} ($${t.price}) for ${form.company}`;
     const body = [
@@ -120,6 +139,7 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
       `headline: ${form.headline}`,
       `pitch: ${form.body}`,
       `link: ${form.href}`,
+      `logo: ${logo?.url || "(none)"}`,
       `image: ${form.image || "(none)"}`,
       `contact email: ${form.email}`,
     ].join("\n");
@@ -220,6 +240,24 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
               <label className="flex flex-col gap-1">{label("headline")}<input className={field} style={fieldStyle} value={form.headline} onChange={set("headline")} maxLength={40} placeholder="FREE STUFF INSIDE!!" /></label>
               <label className="flex flex-col gap-1">{label("link people go to")}<input className={field} style={fieldStyle} type="url" value={form.href} onChange={set("href")} placeholder="https://" /></label>
               <label className="flex flex-col gap-1 col-span-2 max-sm:col-span-1">{label("one line pitch")}<input className={field} style={fieldStyle} value={form.body} onChange={set("body")} maxLength={90} /></label>
+              <div className="flex flex-col gap-1 col-span-2 max-sm:col-span-1">
+                {label("your logo (optional)")}
+                <div className="flex items-center gap-2">
+                  <input ref={logoInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" className="hidden" onChange={pickLogo} />
+                  <button type="button" onClick={() => logoInput.current?.click()} className="rounded-[10px] px-3 py-2 text-[13px]" style={{ background: softBg, color: heading }}>
+                    {logo ? "change logo" : "upload logo"}
+                  </button>
+                  {logo && (
+                    <>
+                      <img src={logo.preview} alt="" className="h-[34px] max-w-[90px] object-contain rounded-[6px] p-1" style={{ background: "#fff" }} />
+                      <span className="text-[12px] flex-1 min-w-0 truncate" style={{ color: logo.error ? "#d9534f" : muted }}>
+                        {logo.uploading ? "uploading…" : logo.error ? logo.error : "added"}
+                      </span>
+                      <button type="button" onClick={() => setLogo(null)} className="text-[12px] underline underline-offset-2" style={{ color: muted }}>remove</button>
+                    </>
+                  )}
+                </div>
+              </div>
               <label className="flex flex-col gap-1 col-span-2 max-sm:col-span-1">{label("image link (optional)")}<input className={field} style={fieldStyle} type="url" value={form.image} onChange={set("image")} placeholder="https://…png" /></label>
             </div>
 
