@@ -167,7 +167,7 @@ function PersonalBio() {
   return (
     <>
       <p className="mb-3">
-        “when you design interfaces you are —literally— designing the sensory organs people use to perceive information”
+        “when you design interfaces you are <span className="whitespace-nowrap">—literally—</span> designing the sensory organs people use to perceive information”
       </p>
       <p className="mb-3">
         — É. Urcades, via{" "}
