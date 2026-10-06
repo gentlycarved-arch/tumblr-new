@@ -7,6 +7,7 @@ import logoImageDark from "../Group_3_dark.png";
 import { ConnectTooltip } from "../../app/components/connect-tooltip";
 import { AddImageFlow } from "../../app/components/AddImageFlow";
 import { glossyButtonStyle } from "../../app/components/glossyButton";
+import { AdSlot } from "../../app/components/ads/AdSlot";
 import { ConfessionFlow } from "../../app/components/ConfessionFlow";
 import { ConfessionSheetMobile } from "../../app/components/ConfessionSheetMobile";
 import { useArenaSlideshow, type SlideMode } from "../../hooks/useArenaSlideshow";
@@ -520,6 +521,8 @@ export default function Wireframe() {
       <div className="absolute inset-0" style={{ zIndex: 2 }}>
         {/* Dark / Light mode toggle */}
         <ModeToggle darkMode={darkMode} onToggle={handleToggle} />
+        {/* Pop-up ad slot: a paid ad when one is running, otherwise "your ad here" */}
+        <AdSlot darkMode={darkMode} />
         <Group darkMode={darkMode} />
         {/* Portfolio Request button — two gradient layers, opacity-transitioned */}
         <style>{`
@@ -570,6 +573,7 @@ export default function Wireframe() {
           }
         `}</style>
         <div
+          data-ad-avoid
           className="absolute inset-[61.43%_37.62%_32.62%_37.68%] max-sm:inset-[61%_8%_32%_8%]"
           onMouseEnter={() => setLoginBtnHover(true)}
           onMouseLeave={() => setLoginBtnHover(false)}
@@ -618,7 +622,7 @@ export default function Wireframe() {
         </div>
 
         {/* Input field box */}
-        <div className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"
+        <div data-ad-avoid className="absolute inset-[46.19%_37.62%_41.41%_37.68%] max-sm:inset-[44%_8%_42%_8%] pointer-events-none rounded-[13px]"
           style={{
             boxShadow: darkMode
               ? "0 0 0 1.5px rgba(255,255,255,0.3), 0 0 24px rgba(255,255,255,0.08)"
