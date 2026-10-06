@@ -1,6 +1,6 @@
 // Paid pop-up ads, early-2000s style. A buyer picks a template and how flashy + annoying
-// the ad is (1–5 each); those levels decide the tier and price. Tahreem reviews each order,
-// emails a payment link if she approves it, and adds the ad to ADS by hand once it's paid.
+// the ad is (1–5 each); those levels decide the tier and price. They pay up front, Tahreem
+// reviews the order, then adds the ad to ADS by hand or refunds it in full if she doesn't approve.
 
 export type AdTier = "annoying" | "very-annoying";
 export type AdTemplate = "classic" | "winner" | "system";
@@ -64,7 +64,7 @@ export const ADS: Ad[] = [];
 
 export const AD_CONTACT_EMAIL = "gentlycarved@gmail.com";
 
-/** Stripe Payment Links, emailed to the buyer once their ad is approved (not shown on the site). */
+/** Stripe Payment Links for each tier, opened when someone sends their order. */
 export const AD_PAYMENT_LINKS: Record<AdTier, string> = {
   annoying: "https://buy.stripe.com/eVqeVd2Ui2er21xatd2Ji00",
   "very-annoying": "https://buy.stripe.com/9B6cN57ay7yL0XtgRB2Ji01",

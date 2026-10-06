@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  AD_CONTACT_EMAIL, AD_TEMPLATES, AD_TIERS, ANNOY_LEVELS, FLASH_LEVELS, tierFor,
+  AD_CONTACT_EMAIL, AD_PAYMENT_LINKS, AD_TEMPLATES, AD_TIERS, ANNOY_LEVELS, FLASH_LEVELS, tierFor,
   type Ad, type AdTemplate, type AdTier,
 } from "./adConfig";
 import { AdBody, AdPopups, MessageAlert, RetroStyles, RetroWindow, useShake } from "./RetroPopup";
@@ -110,7 +110,7 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
     setAnnoy(AD_TIERS[id].preset.annoy);
   }
 
-  function sendForReview() {
+  function sendAndPay() {
     const subject = `ad order: ${t.name} ($${t.price}) for ${form.company}`;
     const body = [
       `tier: ${t.name} ($${t.price}, ${t.days} days)`,
@@ -123,6 +123,8 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
       `image: ${form.image || "(none)"}`,
       `contact email: ${form.email}`,
     ].join("\n");
+    // Stripe in a new tab first (still inside the click, so it isn't blocked), then the order email
+    window.open(`${AD_PAYMENT_LINKS[tier]}?prefilled_email=${encodeURIComponent(form.email)}`, "_blank", "noopener");
     window.location.href = `mailto:${AD_CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setSent(true);
   }
@@ -149,7 +151,7 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
             <div className="flex flex-col gap-1 pr-8">
               <div className="text-[18px]">advertise on my website</div>
               <div className="text-[13px] leading-snug" style={{ color: muted }}>
-                pick a template, choose how flashy and how annoying it gets, then send it to me. I review every ad first, and you only pay once I've approved yours.
+                pick a template, choose how flashy and how annoying it gets, then pay. I approve every ad before it goes up, and if I don't approve yours, you get a 100% full refund.
               </div>
             </div>
 
@@ -223,7 +225,7 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
 
             {sent && (
               <div className="text-[13px] leading-snug rounded-[10px] px-3 py-2" style={{ background: softBg }}>
-                thanks! your ad is ready to send. once I've reviewed it, I'll email you a payment link if it's approved. it goes up as soon as you've paid.
+                thanks! payment opened in a new tab and your order email is ready to send. your ad goes up once I've approved it. if I don't, you get a 100% full refund.
               </div>
             )}
 
@@ -231,10 +233,10 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
               <button type="button" onClick={() => setPreviewing(true)} className="flex-1 rounded-[10px] py-2.5 text-[14px]" style={{ background: softBg, color: heading }}>
                 try it for real
               </button>
-              <button type="button" onClick={sendForReview} disabled={!ready}
+              <button type="button" onClick={sendAndPay} disabled={!ready}
                 className="btn-glow flex-1 rounded-[10px] py-2.5 text-[14px] text-white"
                 style={{ background: darkMode ? BLUE_DARK : BLUE_LIGHT, opacity: ready ? 1 : 0.55, cursor: ready ? "pointer" : "default", textShadow: "0 1px 1px rgba(0,0,0,0.25)" }}>
-                send for review
+                send + pay ${t.price}
               </button>
             </div>
           </div>
