@@ -14,6 +14,8 @@ import workCyanometer from "../../assets/portfolio/work-cyanometer.jpeg";
 import workCyanometerHistorical from "../../assets/portfolio/work-cyanometer-historical.gif";
 import workNative from "../../assets/portfolio/work-native.jpg";
 import workNativeMontage from "../../assets/portfolio/work-native-montage.gif";
+import work04 from "../../assets/portfolio/work-04.mp4";
+import workSeverance from "../../assets/portfolio/work-severance.mp4";
 
 type MediaDef = { type: "image" | "video"; src: string; width: number; height: number };
 
@@ -32,6 +34,8 @@ export const CASE_STUDY_MEDIA = {
   workGallery: { type: "image", src: workGallery, width: 2522, height: 1391 },
   workNativeMontage: { type: "image", src: workNativeMontage, width: 1920, height: 1080 },
   workNative: { type: "image", src: workNative, width: 2522, height: 592 },
+  work04: { type: "video", src: work04, width: 1280, height: 720 },
+  workSeverance: { type: "video", src: workSeverance, width: 1280, height: 720 },
 } satisfies Record<string, MediaDef>;
 
 export type CaseStudyItemDef = { media: keyof typeof CASE_STUDY_MEDIA; caption?: string } | { link: string; text: string };
@@ -86,10 +90,16 @@ export const NATIVE_SECTIONS: CaseStudySectionDef[] = [
   { heading: "visit", items: [{ link: "https://native.works", text: "native.works →" }] },
 ];
 
-export const CASE_STUDIES: Record<string, { title: string; subtitle: string; tagline: string; sections: CaseStudySectionDef[] }> = {
+// No section headings here, just the title, a note and the two videos.
+export const SEVERANCE_SECTIONS: CaseStudySectionDef[] = [
+  { heading: "", items: [{ media: "work04" }, { media: "workSeverance" }] },
+];
+
+export const CASE_STUDIES: Record<string, { title: string; subtitle?: string; tagline?: string; sections: CaseStudySectionDef[] }> = {
   coretable: { title: "CoreTable", subtitle: "GeologicAI", tagline: "reinventing how geologists log core", sections: CORETABLE_SECTIONS },
   iris: { title: "Iris", subtitle: "colour palette tool", tagline: "a tool for exploring and generating colour palettes", sections: IRIS_SECTIONS },
   native: { title: "Native", subtitle: "native.works", tagline: "website design + identity", sections: NATIVE_SECTIONS },
+  severance: { title: "Severance Word Search", tagline: "in the process of revamping it currently", sections: SEVERANCE_SECTIONS },
 };
 
 type Media = MediaDef & { caption?: string };
@@ -179,22 +189,28 @@ export function CaseStudy({ entry, onClose }: { entry: CaseStudyEntry; onClose: 
           }}
         >
           <header className="text-center mb-24 max-sm:mb-16">
-            <div className="font-['Areal',sans-serif] text-[12px] tracking-[0.15em] uppercase" style={{ color: "#a8a4a4" }}>
-              {study.subtitle}
-            </div>
-            <h2 className="font-['Areal',sans-serif] text-[34px] max-sm:text-[26px] leading-tight mt-2" style={{ color: "#2a2a2a" }}>
+            {study.subtitle && (
+              <div className="font-['Areal',sans-serif] text-[12px] tracking-[0.15em] uppercase mb-2" style={{ color: "#a8a4a4" }}>
+                {study.subtitle}
+              </div>
+            )}
+            <h2 className="font-['Areal',sans-serif] text-[34px] max-sm:text-[26px] leading-tight" style={{ color: "#2a2a2a" }}>
               {study.title}
             </h2>
-            <p className="font-['Areal',sans-serif] text-[15px] mt-2" style={{ color: "#5a5757" }}>
-              {study.tagline}
-            </p>
+            {study.tagline && (
+              <p className="font-['Areal',sans-serif] text-[15px] mt-2" style={{ color: "#5a5757" }}>
+                {study.tagline}
+              </p>
+            )}
           </header>
 
           {SECTIONS.map((section) => (
-            <section key={section.heading} className="mb-28 max-sm:mb-20">
-              <div className="font-['Areal',sans-serif] text-[12px] tracking-[0.15em] uppercase mb-5" style={{ color: "#a8a4a4" }}>
-                {section.heading}
-              </div>
+            <section key={section.heading || "main"} className="mb-28 max-sm:mb-20">
+              {section.heading && (
+                <div className="font-['Areal',sans-serif] text-[12px] tracking-[0.15em] uppercase mb-5" style={{ color: "#a8a4a4" }}>
+                  {section.heading}
+                </div>
+              )}
               <div className="flex flex-col gap-12 max-sm:gap-9">
                 {section.items.map((item) =>
                   item.type === "link" ? (

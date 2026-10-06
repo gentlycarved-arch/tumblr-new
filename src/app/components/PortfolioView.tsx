@@ -470,7 +470,7 @@ const CELLS: Cell[] = [
   { type: "image", src: workPosters, width: 1080, height: 1080, caption: "poster design for the Viaduct Season 4, a lecture series by The Toronto Society" },
 
   { type: "writing", text: "These flowers are Tulipa sprengeri — their survival connects to what Douthat's talk was about: what we choose to preserve.", href: "https://x.com/gentlycarved/status/2095245562584928618" },
-  { type: "video", src: work04, width: 1280, height: 720 },
+  { type: "video", src: work04, width: 1280, height: 720, caseStudy: "severance" },
   { type: "image", src: filmCrowdHill, width: 994, height: 659, caption: FILM_CAPTION },
 
   { type: "writing", text: "AI is only as effective as your judgement, imagination and articulation.", href: "https://x.com/gentlycarved/status/1955336976531411447" },
@@ -514,7 +514,7 @@ const CELLS: Cell[] = [
     top: { type: "image", src: workKellyEllsworth, width: 960, height: 959, caption: "Kelly Ellsworth — the inspiration behind this negative-space hover interaction." },
     bottom: { type: "video", src: workNegativeSpaceButton, width: 1280, height: 720, caption: "a negative-space hover interaction, inspired by the Kelly Ellsworth painting shown alongside it." },
   },
-  { type: "video", src: workSeverance, width: 1280, height: 720 },
+  { type: "video", src: workSeverance, width: 1280, height: 720, caseStudy: "severance" },
   { type: "image", src: workNative, width: 1920, height: 1080, caseStudy: "native", caption: "website design + identity for Native - native.works", fullWidth: true },
 ];
 
