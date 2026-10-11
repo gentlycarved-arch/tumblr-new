@@ -4,7 +4,7 @@ import {
   AD_CONTACT_EMAIL, AD_PAYMENT_LINKS, AD_TEMPLATES, AD_TIERS, ANNOY_LEVELS, FLASH_LEVELS, VIRUS_WINDOWS, tierFor,
   type Ad, type AdTemplate, type AdTier,
 } from "./adConfig";
-import { AdBody, AdPopups, MessageAlert, RetroStyles, RetroWindow, VirusWindow, useShake } from "./RetroPopup";
+import { AdBody, AdPopups, MessageAlert, RetroStyles, RetroWindow, AdWindow, useShake } from "./RetroPopup";
 
 const FONT = "font-['Favorit_Tumblr:Medium',sans-serif]";
 const BLUE_LIGHT = "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)";
@@ -79,12 +79,12 @@ function LivePreview({ ad }: { ad: Ad }) {
   const storm = useStormLoop(virus);
   return (
     <div className="flex flex-col items-center p-6 max-sm:p-4 min-h-[300px] justify-center">
-      {/* top tier: "System message" windows popping open one after another behind the ad, on a loop */}
+      {/* top tier: copies of the ad popping open one after another, on a loop */}
       {virus && (
         <div className="relative w-[300px] max-w-full h-[200px] -mb-[64px] pointer-events-none" aria-hidden>
           {Array.from({ length: Math.min(storm.step, PREVIEW_STACK) }, (_, i) => (
             <div key={`${storm.loop}-${i}`} className="absolute origin-top-left scale-[0.78]" style={{ left: -30 + i * 8, top: i * 15 }}>
-              <div className="retro-pop"><VirusWindow ad={ad} onOk={() => {}} /></div>
+              <div className="retro-pop"><AdWindow ad={ad} onClose={() => {}} onCta={() => {}} /></div>
             </div>
           ))}
           <span className="absolute left-[236px] -top-3 rotate-[6deg] rounded-full px-2 py-[3px] text-[10px] font-bold leading-none z-10"
@@ -268,6 +268,10 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
                 );
               })}
             </div>
+            <p className="-mt-2 text-[11px] leading-snug" style={{ color: muted }}>
+              the unbearably annoying tier was{" "}
+              <a href="https://x.com/Julia_westphall" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">@Julia_westphall</a>'s idea
+            </p>
 
             <div className="flex flex-col gap-1.5">
               {label("template")}

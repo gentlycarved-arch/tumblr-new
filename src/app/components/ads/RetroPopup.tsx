@@ -273,23 +273,11 @@ function useClearOfLogin(open: boolean) {
   return { ref, style };
 }
 
-/** One of the virus tier's cascade windows: a grey "System message" with a red error icon. */
-export function VirusWindow({ ad, onOk }: { ad: Ad; onOk: () => void }) {
+/** One full copy of the ad as a pop-up window (the unbearably annoying tier stacks twenty of these). */
+export function AdWindow({ ad, onClose, onCta, onNo, width = 280 }: { ad: Ad; onClose: () => void; onCta: () => void; onNo?: () => void; width?: number }) {
   return (
-    <RetroWindow title="System message" onClose={onOk} width={280}>
-      <div className="m-[2px] px-4 pt-4 pb-3 flex flex-col gap-3 text-black" style={{ background: "#c0c0c0" }}>
-        <div className="flex items-center gap-3">
-          <span aria-hidden className="shrink-0 size-[34px] rounded-full flex items-center justify-center text-white text-[20px] font-bold leading-none"
-            style={{ background: "radial-gradient(circle at 35% 30%, #ff5a5a, #d40000 70%)", boxShadow: "1px 1px 0 #600" }}>×</span>
-          <div className="min-w-0 flex flex-col gap-0.5">
-            <div className="text-[13px] font-bold leading-tight truncate" style={{ fontFamily: "'Courier New', monospace" }}>{ad.headline}</div>
-            <div className="text-[11px] leading-snug truncate" style={{ color: "#333" }}>{ad.company}</div>
-          </div>
-        </div>
-        <div className="flex justify-center">
-          <button type="button" onClick={onOk} className="retro-btn w-[90px] py-1 text-[12px]">OK</button>
-        </div>
-      </div>
+    <RetroWindow title={`${ad.company} — Special Offer!!`} onClose={onClose} width={width} flashing={ad.flash >= 5}>
+      <AdBody ad={ad} onCta={onCta} onNo={onNo} />
     </RetroWindow>
   );
 }
@@ -329,8 +317,8 @@ function layoutCascade(w: number, h: number, n: number) {
 }
 
 /**
- * The virus tier: twenty windows cascade open one after another, and each has to be
- * closed on its own. The last (top) one is the actual ad. Escape still closes them all.
+ * The unbearably annoying tier: twenty copies of the ad cascade open one after another,
+ * and each has to be closed on its own. Escape still closes them all.
  */
 function VirusPopups({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void; onDone: () => void; delayMs?: number }) {
   const n = VIRUS_WINDOWS;
@@ -339,7 +327,7 @@ function VirusPopups({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void
   const [layout, setLayout] = useState<ReturnType<typeof layoutCascade> | null>(null);
   const probeRef = useRef<HTMLDivElement>(null);
 
-  // Measure a window (the taller of the plain one and the ad) and lay the cascade out around the login
+  // Measure a window and lay the cascade out around the login
   useLayoutEffect(() => {
     const place = () => {
       const kids = [...(probeRef.current?.children ?? [])] as HTMLElement[];
@@ -348,8 +336,11 @@ function VirusPopups({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void
       setLayout(layoutCascade(w, h, n));
     };
     place();
+    // re-lay out on resize, and once the measuring copies change size (e.g. the logo loads)
+    const ro = new ResizeObserver(place);
+    [...(probeRef.current?.children ?? [])].forEach((k) => ro.observe(k));
     window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
+    return () => { ro.disconnect(); window.removeEventListener("resize", place); };
   }, [n]);
 
   // Open them one after another (all at once if the visitor prefers less motion)
@@ -381,8 +372,7 @@ function VirusPopups({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void
       <RetroStyles />
       {/* hidden copies used only to measure the window size */}
       <div ref={probeRef} aria-hidden className="fixed left-0 top-0 pointer-events-none" style={{ visibility: "hidden" }}>
-        <div className="w-max"><VirusWindow ad={ad} onOk={() => {}} /></div>
-        <div className="w-max"><RetroWindow title="" onClose={() => {}} width={280}><AdBody ad={ad} onCta={() => {}} /></RetroWindow></div>
+        <div className="w-max"><AdWindow ad={ad} onClose={() => {}} onCta={() => {}} /></div>
       </div>
       {layout && Array.from({ length: spawned }, (_, i) => i).filter((i) => !closed.has(i)).map((i) => (
         <div
@@ -397,13 +387,7 @@ function VirusPopups({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void
           }}
         >
           <div className="retro-pop">
-            {i === n - 1 ? (
-              <RetroWindow title={`${ad.company} — Special Offer!!`} onClose={() => close(i)} width={280} flashing={ad.flash >= 5}>
-                <AdBody ad={ad} onCta={() => { onCta(); onDone(); }} onNo={() => close(i)} />
-              </RetroWindow>
-            ) : (
-              <VirusWindow ad={ad} onOk={() => close(i)} />
-            )}
+            <AdWindow ad={ad} onClose={() => close(i)} onCta={() => { onCta(); onDone(); }} onNo={() => close(i)} />
           </div>
         </div>
       ))}
