@@ -6,7 +6,7 @@ import { AdvertiseModal } from "./AdvertiseModal";
 const HOUSE_AD: Ad = {
   company: "tahreem.cv",
   headline: "YOUR AD HERE!!!",
-  body: "Want your company on this website? Two levels of annoying, starting at $200.",
+  body: "Want your company on this website? Three levels of annoying, starting at $200.",
   cta: "YES!",
   noLabel: "no thanks",
   href: "#advertise",
@@ -27,7 +27,7 @@ function markSeen() {
 
 /** Retro banner across the whole top edge that opens the order form. */
 function AdBanner({ onClick }: { onClick: () => void }) {
-  const text = "★ YOUR AD HERE ★ advertise on tahreem.cv ★ click me ★ YOUR AD HERE ★ two levels of annoying ★ starting at $200 ★";
+  const text = "★ YOUR AD HERE ★ advertise on tahreem.cv ★ click me ★ YOUR AD HERE ★ three levels of annoying ★ starting at $200 ★";
   return (
     <button
       type="button"

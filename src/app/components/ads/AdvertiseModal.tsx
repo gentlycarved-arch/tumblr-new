@@ -1,16 +1,17 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { uploadAdLogo } from "../../../lib/uploads";
 import {
-  AD_CONTACT_EMAIL, AD_PAYMENT_LINKS, AD_TEMPLATES, AD_TIERS, ANNOY_LEVELS, FLASH_LEVELS, tierFor,
+  AD_CONTACT_EMAIL, AD_PAYMENT_LINKS, AD_TEMPLATES, AD_TIERS, ANNOY_LEVELS, FLASH_LEVELS, VIRUS_WINDOWS, tierFor,
   type Ad, type AdTemplate, type AdTier,
 } from "./adConfig";
-import { AdBody, AdPopups, MessageAlert, RetroStyles, RetroWindow, useShake } from "./RetroPopup";
+import { AdBody, AdPopups, MessageAlert, RetroStyles, RetroWindow, VirusWindow, useShake } from "./RetroPopup";
 
 const FONT = "font-['Favorit_Tumblr:Medium',sans-serif]";
 const BLUE_LIGHT = "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)";
 const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, #1f2e3e 70%, #151f2b 100%)";
+const VIRUS_RED = "radial-gradient(ellipse at 50% 35%, #ff6a5a 0%, #e0261b 45%, #a80f0a 100%)";
 
-/** A 1–5 scale with a line under it saying what the current level does. */
+/** A 1–N scale (one step per level description) with a line under it saying what the current level does. Step 6 is the virus. */
 function Scale({ label, value, onChange, levels, darkMode }: {
   label: string; value: number; onChange: (v: number) => void; levels: string[]; darkMode: boolean;
 }) {
@@ -19,10 +20,10 @@ function Scale({ label, value, onChange, levels, darkMode }: {
     <div className="flex flex-col gap-1.5">
       <div className="flex items-baseline justify-between text-[13px]">
         <span>{label}</span>
-        <span style={{ color: muted }}>{value} / 5</span>
+        <span style={{ color: muted }}>{value} / {levels.length}</span>
       </div>
       <div className="flex gap-1.5" role="radiogroup" aria-label={label}>
-        {[1, 2, 3, 4, 5].map((n) => (
+        {levels.map((_, i) => i + 1).map((n) => (
           <button
             key={n}
             type="button"
@@ -32,12 +33,12 @@ function Scale({ label, value, onChange, levels, darkMode }: {
             onClick={() => onChange(n)}
             className="flex-1 h-[26px] rounded-[7px] text-[12px] transition-colors"
             style={{
-              background: n <= value ? (darkMode ? BLUE_DARK : BLUE_LIGHT) : darkMode ? "#2a2a2a" : "#e9eaed",
-              color: n <= value ? "#fff" : muted,
+              background: n <= value ? (value >= 6 ? VIRUS_RED : darkMode ? BLUE_DARK : BLUE_LIGHT) : darkMode ? "#2a2a2a" : "#e9eaed",
+              color: n <= value ? "#fff" : n === 6 ? "#d9534f" : muted,
               boxShadow: n <= value ? "inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.2)" : "none",
             }}
           >
-            {n}
+            {n === 6 ? "☠" : n}
           </button>
         ))}
       </div>
@@ -46,18 +47,59 @@ function Scale({ label, value, onChange, levels, darkMode }: {
   );
 }
 
+const PREVIEW_STACK = 12;
+
+/**
+ * Loops the preview's pop-up storm: windows pop open one after another, the ad lands
+ * on top, it holds for a moment, then it all starts again. Returns how many are open
+ * (PREVIEW_STACK + 1 = everything, ad included) and which loop we're on.
+ */
+function useStormLoop(on: boolean) {
+  const [step, setStep] = useState(PREVIEW_STACK + 1);
+  const [loop, setLoop] = useState(0);
+  useEffect(() => {
+    if (!on || matchMedia("(prefers-reduced-motion: reduce)").matches) { setStep(PREVIEW_STACK + 1); return; }
+    const hold = 30; // ticks to linger once they're all open (~2s)
+    let i = 0;
+    setStep(0);
+    const t = setInterval(() => {
+      i += 1;
+      if (i > PREVIEW_STACK + 1 + hold) { i = 0; setLoop((l) => l + 1); }
+      setStep(Math.min(i, PREVIEW_STACK + 1));
+    }, 70);
+    return () => clearInterval(t);
+  }, [on]);
+  return { step, loop };
+}
+
 /** The ad drawn in place, flashing/shaking/alerting at the chosen levels. */
 function LivePreview({ ad }: { ad: Ad }) {
-  const shakeKey = useShake(ad.annoy >= 4);
+  const virus = ad.annoy >= 6;
+  const shakeKey = useShake(ad.annoy >= 4 && !virus);
+  const storm = useStormLoop(virus);
   return (
     <div className="flex flex-col items-center p-6 max-sm:p-4 min-h-[300px] justify-center">
-      <div key={shakeKey} className={shakeKey ? "retro-shake" : ""}>
+      {/* top tier: "System message" windows popping open one after another behind the ad, on a loop */}
+      {virus && (
+        <div className="relative w-[300px] max-w-full h-[200px] -mb-[64px] pointer-events-none" aria-hidden>
+          {Array.from({ length: Math.min(storm.step, PREVIEW_STACK) }, (_, i) => (
+            <div key={`${storm.loop}-${i}`} className="absolute origin-top-left scale-[0.78]" style={{ left: -30 + i * 8, top: i * 15 }}>
+              <div className="retro-pop"><VirusWindow ad={ad} onOk={() => {}} /></div>
+            </div>
+          ))}
+          <span className="absolute left-[236px] -top-3 rotate-[6deg] rounded-full px-2 py-[3px] text-[10px] font-bold leading-none z-10"
+            style={{ background: "#d40000", color: "#fff" }}>×{VIRUS_WINDOWS}</span>
+        </div>
+      )}
+      <div key={virus ? `ad-${storm.loop}` : shakeKey}
+        className={`relative ${shakeKey ? "retro-shake" : ""} ${virus && storm.step > PREVIEW_STACK ? "retro-pop" : ""}`}
+        style={virus && storm.step <= PREVIEW_STACK ? { visibility: "hidden" } : undefined}>
         <RetroWindow title={`${ad.company} — Special Offer!!`} onClose={() => {}} width={300} flashing={ad.flash >= 5}>
           <AdBody ad={ad} onCta={() => {}} />
         </RetroWindow>
       </div>
       {/* Tucked under the main window's corner, like it just popped up on top */}
-      {ad.annoy >= 3 && (
+      {ad.annoy >= 3 && !virus && (
         <div className="self-end -mt-3 mr-1 scale-[0.85] origin-top-right">
           <MessageAlert onClose={() => {}} onCta={() => {}} />
         </div>
@@ -144,7 +186,8 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
       `contact email: ${form.email}`,
     ].join("\n");
     // Stripe in a new tab first (still inside the click, so it isn't blocked), then the order email
-    window.open(`${AD_PAYMENT_LINKS[tier]}?prefilled_email=${encodeURIComponent(form.email)}`, "_blank", "noopener");
+    const pay = AD_PAYMENT_LINKS[tier];
+    if (pay) window.open(`${pay}?prefilled_email=${encodeURIComponent(form.email)}`, "_blank", "noopener");
     window.location.href = `mailto:${AD_CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setSent(true);
   }
@@ -179,9 +222,9 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
               {(Object.keys(AD_TIERS) as AdTier[]).map((id) => {
                 const def = AD_TIERS[id];
                 const on = tier === id;
-                const hot = id === "very-annoying";
-                // annoying-ish stays calm and blue; extremely annoying is a shimmering hot gradient
-                const style: React.CSSProperties = hot
+                const top = id === "virus";
+                // calm blue → soft pink → the top tier gets the shimmering hot gradient and sticker
+                const style: React.CSSProperties = top
                   ? {
                       color: "#fff",
                       textShadow: "0 1px 2px rgba(120,0,40,0.45)",
@@ -190,27 +233,37 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
                         : "0 0 0 1px rgba(255,45,149,0.4)",
                       filter: on ? "none" : "saturate(0.8)",
                     }
-                  : {
-                      background: on
-                        ? darkMode ? "linear-gradient(180deg, #26364a, #1f2c3d)" : "linear-gradient(180deg, #f3f8fe, #e2edf9)"
-                        : darkMode ? "#1f2630" : "#f6f9fd",
-                      boxShadow: on ? `0 0 0 2px ${darkMode ? "#5b84b3" : "#6a9fd8"}` : `0 0 0 1px ${darkMode ? "#2f3b4a" : "#dbe5f1"}`,
-                    };
-                const priceColor = hot ? "#fff" : darkMode ? "#9ec3ee" : "#3a6ea5";
-                const sub = hot ? "rgba(255,255,255,0.9)" : muted;
+                  : id === "very-annoying"
+                    ? {
+                        background: on
+                          ? darkMode ? "linear-gradient(180deg, #4a2338, #3a1b2c)" : "linear-gradient(180deg, #fff2f7, #ffe1ec)"
+                          : darkMode ? "#2e1f27" : "#fff7fa",
+                        boxShadow: on ? `0 0 0 2px ${darkMode ? "#d0588f" : "#ff7ab0"}` : `0 0 0 1px ${darkMode ? "#4a2f3c" : "#f6d3e1"}`,
+                      }
+                    : {
+                        background: on
+                          ? darkMode ? "linear-gradient(180deg, #26364a, #1f2c3d)" : "linear-gradient(180deg, #f3f8fe, #e2edf9)"
+                          : darkMode ? "#1f2630" : "#f6f9fd",
+                        boxShadow: on ? `0 0 0 2px ${darkMode ? "#5b84b3" : "#6a9fd8"}` : `0 0 0 1px ${darkMode ? "#2f3b4a" : "#dbe5f1"}`,
+                      };
+                const priceColor = top ? "#fff" : id === "very-annoying" ? (darkMode ? "#ff9cc4" : "#d61f6d") : darkMode ? "#9ec3ee" : "#3a6ea5";
+                const sub = top ? "rgba(255,255,255,0.92)" : muted;
+                const detail = top
+                  ? `${VIRUS_WINDOWS} pop-ups at once, closed one by one · stays up ${def.days} days`
+                  : `up to level ${def.maxLevel} · stays up ${def.days} days`;
                 return (
                   <button key={id} type="button" role="radio" aria-checked={on} onClick={() => pickTier(id)}
-                    className={`relative text-left rounded-[12px] p-3 flex flex-col gap-0.5 transition-[box-shadow,filter] duration-200 ${hot ? "retro-hot" : ""}`}
+                    className={`relative text-left rounded-[12px] p-3 flex flex-col gap-0.5 transition-[box-shadow,filter] duration-200 ${top ? "retro-hot col-span-2" : ""}`}
                     style={style}>
-                    {hot && (
-                      <span className="absolute -top-2 -right-1.5 rotate-[8deg] rounded-full px-2 py-[3px] text-[10px] leading-none font-bold"
+                    {top && (
+                      <span className="absolute -top-2 -right-1.5 rotate-[6deg] rounded-full px-2 py-[3px] text-[10px] leading-none font-bold"
                         style={{ background: "#ffeb00", color: "#d40000", boxShadow: "0 1px 3px rgba(0,0,0,0.25)", textShadow: "none" }}>
                         ★ HOT ★
                       </span>
                     )}
-                    <span className="text-[13px]">{def.name}{hot ? "!!" : ""}</span>
+                    <span className="text-[13px]">{def.name}{top ? "!!" : ""}</span>
                     <span className="text-[20px]" style={{ color: priceColor }}>${def.price}</span>
-                    <span className="text-[12px]" style={{ color: sub }}>up to level {def.maxLevel} · stays up {def.days} days</span>
+                    <span className="text-[12px]" style={{ color: sub }}>{detail}</span>
                   </button>
                 );
               })}
@@ -263,7 +316,7 @@ export function AdvertiseModal({ darkMode, onClose }: { darkMode: boolean; onClo
 
             {sent && (
               <div className="text-[13px] leading-snug rounded-[10px] px-3 py-2" style={{ background: softBg }}>
-                thanks! payment opened in a new tab and your order email is ready to send. your ad goes up once I've approved it. if I don't, you get a 100% full refund.
+                thanks! {AD_PAYMENT_LINKS[tier] ? "payment opened in a new tab and your order email is ready to send." : "your order email is ready to send, and I'll email you a payment link."} your ad goes up once I've approved it. if I don't, you get a 100% full refund.
               </div>
             )}
 

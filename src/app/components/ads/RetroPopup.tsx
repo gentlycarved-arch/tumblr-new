@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import type { Ad } from "./adConfig";
+import { VIRUS_WINDOWS, type Ad } from "./adConfig";
 
 const RETRO_FONT = "Tahoma, Verdana, 'Segoe UI', sans-serif";
 const LOUD_FONT = "'Arial Black', Impact, sans-serif";
@@ -193,24 +193,18 @@ export function useShake(on: boolean) {
   return key;
 }
 
-const DELAY_BY_ANNOY = [4000, 2500, 2000, 1500, 1000];
+const DELAY_BY_ANNOY = [4000, 2500, 2000, 1500, 1000, 800];
 
 type Box = { left: number; top: number; right: number; bottom: number };
 const overlaps = (a: Box, b: Box) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
 
-/**
- * Where the main pop-up goes: somewhere that never covers the login field or the
- * Log In button (anything marked data-ad-avoid). Tries the corners first; if none is
- * clear it sits in the bigger gap above or below the login and shrinks to fit.
- */
-function placeClearOfLogin(w: number, h: number): CSSProperties {
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const m = vw < 640 ? 16 : 24;
+/** The login field + Log In button (anything marked data-ad-avoid), padded, that ads must never cover. */
+function loginBox(): Box | null {
   const pad = 16; // breathing room around the login, and room for the shake
   const rects = [...document.querySelectorAll<HTMLElement>("[data-ad-avoid]")]
     .map((el) => el.getBoundingClientRect())
     .filter((r) => r.width && r.height);
-  const avoid: Box | null = rects.length
+  return rects.length
     ? {
         left: Math.min(...rects.map((r) => r.left)) - pad,
         top: Math.min(...rects.map((r) => r.top)) - pad,
@@ -218,7 +212,20 @@ function placeClearOfLogin(w: number, h: number): CSSProperties {
         bottom: Math.max(...rects.map((r) => r.bottom)) + pad + 40, // + the Log In tooltip under the button
       }
     : null;
-  const top = vw < 640 ? 40 : 72; // below the corner buttons
+}
+
+/** Page margin, and the top edge ads stay below (clear of the corner buttons). */
+const edges = (vw: number) => ({ m: vw < 640 ? 16 : 24, top: vw < 640 ? 40 : 72 });
+
+/**
+ * Where the main pop-up goes: somewhere that never covers the login.
+ * Tries the corners first; if none is clear it sits in the bigger gap above or
+ * below the login and shrinks to fit.
+ */
+function placeClearOfLogin(w: number, h: number): CSSProperties {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const { m, top } = edges(vw);
+  const avoid = loginBox();
   const spots = [
     { left: vw - m - w, top: vh - m - h },
     { left: m, top: vh - m - h },
@@ -266,12 +273,154 @@ function useClearOfLogin(open: boolean) {
   return { ref, style };
 }
 
+/** One of the virus tier's cascade windows: a grey "System message" with a red error icon. */
+export function VirusWindow({ ad, onOk }: { ad: Ad; onOk: () => void }) {
+  return (
+    <RetroWindow title="System message" onClose={onOk} width={280}>
+      <div className="m-[2px] px-4 pt-4 pb-3 flex flex-col gap-3 text-black" style={{ background: "#c0c0c0" }}>
+        <div className="flex items-center gap-3">
+          <span aria-hidden className="shrink-0 size-[34px] rounded-full flex items-center justify-center text-white text-[20px] font-bold leading-none"
+            style={{ background: "radial-gradient(circle at 35% 30%, #ff5a5a, #d40000 70%)", boxShadow: "1px 1px 0 #600" }}>×</span>
+          <div className="min-w-0 flex flex-col gap-0.5">
+            <div className="text-[13px] font-bold leading-tight truncate" style={{ fontFamily: "'Courier New', monospace" }}>{ad.headline}</div>
+            <div className="text-[11px] leading-snug truncate" style={{ color: "#333" }}>{ad.company}</div>
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <button type="button" onClick={onOk} className="retro-btn w-[90px] py-1 text-[12px]">OK</button>
+        </div>
+      </div>
+    </RetroWindow>
+  );
+}
+
+/**
+ * Lays the virus cascade out clear of the login: picks the biggest free area (beside,
+ * above or below the login), then spaces and, if needed, shrinks the stack to fit it.
+ */
+function layoutCascade(w: number, h: number, n: number) {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const { m, top } = edges(vw);
+  const avoid = loginBox();
+  const screen = { left: m, top, right: vw - m, bottom: vh - m };
+  const areas = avoid
+    ? [
+        { ...screen, left: avoid.right },
+        { ...screen, right: avoid.left },
+        { ...screen, bottom: avoid.top },
+        { ...screen, top: avoid.bottom },
+      ]
+    : [screen];
+  let best = { left: m, top, dx: 0, dy: 0, scale: 0.4, fit: -1 };
+  for (const a of areas) {
+    const aw = a.right - a.left, ah = a.bottom - a.top;
+    if (aw <= 0 || ah <= 0) continue;
+    // keep at least a sliver of every window showing, shrink if even that doesn't fit
+    const scale = Math.max(0.4, Math.min(1, aw / (w + (n - 1) * 4), ah / (h + (n - 1) * 8)));
+    const dx = Math.min(28, Math.max(0, (aw - w * scale) / (n - 1)));
+    const dy = Math.min(34, Math.max(0, (ah - h * scale) / (n - 1)));
+    const fit = scale * 1000 + Math.min(dx, 28) + Math.min(dy, 34);
+    if (fit > best.fit) {
+      const sw = w * scale + (n - 1) * dx, sh = h * scale + (n - 1) * dy;
+      best = { left: a.left + (aw - sw) / 2, top: a.top + (ah - sh) / 2, dx, dy, scale, fit };
+    }
+  }
+  return best;
+}
+
+/**
+ * The virus tier: twenty windows cascade open one after another, and each has to be
+ * closed on its own. The last (top) one is the actual ad. Escape still closes them all.
+ */
+function VirusPopups({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void; onDone: () => void; delayMs?: number }) {
+  const n = VIRUS_WINDOWS;
+  const [spawned, setSpawned] = useState(0);
+  const [closed, setClosed] = useState<Set<number>>(() => new Set());
+  const [layout, setLayout] = useState<ReturnType<typeof layoutCascade> | null>(null);
+  const probeRef = useRef<HTMLDivElement>(null);
+
+  // Measure a window (the taller of the plain one and the ad) and lay the cascade out around the login
+  useLayoutEffect(() => {
+    const place = () => {
+      const kids = [...(probeRef.current?.children ?? [])] as HTMLElement[];
+      if (!kids.length) return;
+      const w = Math.max(...kids.map((k) => k.offsetWidth)), h = Math.max(...kids.map((k) => k.offsetHeight));
+      setLayout(layoutCascade(w, h, n));
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [n]);
+
+  // Open them one after another (all at once if the visitor prefers less motion)
+  useEffect(() => {
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let i = 0;
+    let tick: ReturnType<typeof setInterval> | undefined;
+    const start = setTimeout(() => {
+      if (reduce) { setSpawned(n); return; }
+      tick = setInterval(() => { i += 1; setSpawned(i); if (i >= n) clearInterval(tick); }, 90);
+    }, delayMs ?? DELAY_BY_ANNOY[5]);
+    return () => { clearTimeout(start); clearInterval(tick); };
+  }, [n, delayMs]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onDone(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onDone]);
+
+  function close(i: number) {
+    const next = new Set(closed).add(i);
+    setClosed(next);
+    if (next.size >= n) onDone();
+  }
+
+  return (
+    <>
+      <RetroStyles />
+      {/* hidden copies used only to measure the window size */}
+      <div ref={probeRef} aria-hidden className="fixed left-0 top-0 pointer-events-none" style={{ visibility: "hidden" }}>
+        <div className="w-max"><VirusWindow ad={ad} onOk={() => {}} /></div>
+        <div className="w-max"><RetroWindow title="" onClose={() => {}} width={280}><AdBody ad={ad} onCta={() => {}} /></RetroWindow></div>
+      </div>
+      {layout && Array.from({ length: spawned }, (_, i) => i).filter((i) => !closed.has(i)).map((i) => (
+        <div
+          key={i}
+          className="fixed"
+          style={{
+            zIndex: 120 + i,
+            left: layout.left + i * layout.dx,
+            top: layout.top + i * layout.dy,
+            transform: layout.scale < 1 ? `scale(${layout.scale})` : undefined,
+            transformOrigin: "top left",
+          }}
+        >
+          <div className="retro-pop">
+            {i === n - 1 ? (
+              <RetroWindow title={`${ad.company} — Special Offer!!`} onClose={() => close(i)} width={280} flashing={ad.flash >= 5}>
+                <AdBody ad={ad} onCta={() => { onCta(); onDone(); }} onNo={() => close(i)} />
+              </RetroWindow>
+            ) : (
+              <VirusWindow ad={ad} onOk={() => close(i)} />
+            )}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
 /**
  * Shows one ad as pop-ups, behaving according to its annoyance level (see ANNOY_LEVELS):
- * sooner at 2, a message pop-up at 3, shaking at 4, and one comeback at 5.
- * Escape always closes everything.
+ * sooner at 2, a message pop-up at 3, shaking at 4, one comeback at 5, and the
+ * twenty-window virus at 6. Escape always closes everything.
  */
-export function AdPopups({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void; onDone: () => void; delayMs?: number }) {
+export function AdPopups(props: { ad: Ad; onCta: () => void; onDone: () => void; delayMs?: number }) {
+  return props.ad.annoy >= 6 ? <VirusPopups {...props} /> : <SinglePopup {...props} />;
+}
+
+function SinglePopup({ ad, onCta, onDone, delayMs }: { ad: Ad; onCta: () => void; onDone: () => void; delayMs?: number }) {
   const [mainOpen, setMainOpen] = useState(false);
   const [msgOpen, setMsgOpen] = useState(false);
   const [cameBack, setCameBack] = useState(false);

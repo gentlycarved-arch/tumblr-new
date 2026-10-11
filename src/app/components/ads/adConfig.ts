@@ -1,8 +1,8 @@
 // Paid pop-up ads, early-2000s style. A buyer picks a template and how flashy + annoying
-// the ad is (1–5 each); those levels decide the tier and price. They pay up front, Tahreem
+// the ad is (flashiness 1–5, annoyance 1–6); those levels decide the tier and price. They pay up front, Tahreem
 // reviews the order, then adds the ad to ADS by hand or refunds it in full if she doesn't approve.
 
-export type AdTier = "annoying" | "very-annoying";
+export type AdTier = "annoying" | "very-annoying" | "virus";
 export type AdTemplate = "classic" | "winner" | "system";
 
 export interface AdTierDef {
@@ -16,12 +16,17 @@ export interface AdTierDef {
 export const AD_TIERS: Record<AdTier, AdTierDef> = {
   annoying: { price: 200, name: "annoying-ish", maxLevel: 3, preset: { flash: 2, annoy: 2 }, days: 7 },
   "very-annoying": { price: 500, name: "extremely annoying", maxLevel: 5, preset: { flash: 5, annoy: 5 }, days: 14 },
+  virus: { price: 1000, name: "unbearably annoying", maxLevel: 6, preset: { flash: 5, annoy: 6 }, days: 14 },
 };
 
-/** Anything above level 3 on either scale needs the $500 tier. */
+/** Annoyance 6 is the virus tier; otherwise anything above level 3 on either scale needs the $500 tier. */
 export function tierFor(flash: number, annoy: number): AdTier {
+  if (annoy >= AD_TIERS.virus.maxLevel) return "virus";
   return Math.max(flash, annoy) <= AD_TIERS.annoying.maxLevel ? "annoying" : "very-annoying";
 }
+
+/** How many windows the virus tier opens. */
+export const VIRUS_WINDOWS = 20;
 
 /** What each level adds, on top of the levels below it. */
 export const FLASH_LEVELS = [
@@ -37,6 +42,7 @@ export const ANNOY_LEVELS = [
   "adds a \"you have 1 message\" pop-up",
   "shakes every few seconds",
   "comes back once after you close it",
+  "20 pop-ups at once, closed one by one",
 ];
 
 export const AD_TEMPLATES: Record<AdTemplate, { name: string }> = {
@@ -56,7 +62,7 @@ export interface Ad {
   logo?: string;
   template: AdTemplate;
   flash: number; // 1–5
-  annoy: number; // 1–5
+  annoy: number; // 1–6 (6 = virus)
   startsOn: string; // YYYY-MM-DD; the ad runs for its tier's `days` from here
 }
 
@@ -65,10 +71,11 @@ export const ADS: Ad[] = [];
 
 export const AD_CONTACT_EMAIL = "gentlycarved@gmail.com";
 
-/** Stripe Payment Links for each tier, opened when someone sends their order. */
-export const AD_PAYMENT_LINKS: Record<AdTier, string> = {
+/** Stripe Payment Links for each tier, opened when someone sends their order. No link yet = Tahreem emails one. */
+export const AD_PAYMENT_LINKS: Record<AdTier, string | undefined> = {
   annoying: "https://buy.stripe.com/eVqeVd2Ui2er21xatd2Ji00",
   "very-annoying": "https://buy.stripe.com/9B6cN57ay7yL0XtgRB2Ji01",
+  virus: "https://buy.stripe.com/00wcN5bqO5qD6hN1WH2Ji02",
 };
 
 /** The paid ad running today, if any (the newest one wins). */
