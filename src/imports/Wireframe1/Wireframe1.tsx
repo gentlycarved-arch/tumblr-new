@@ -328,7 +328,8 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
   onCorrect: () => void;
   onLiveMatch: (matches: boolean) => void;
   onWrong: (wrong: boolean) => void;
-}>(function LoginPassword({ darkMode, onCorrect, onLiveMatch, onWrong }, ref) {
+  onEmpty: (empty: boolean) => void; // tried to log in with nothing typed (true), or started typing (false)
+}>(function LoginPassword({ darkMode, onCorrect, onLiveMatch, onWrong, onEmpty }, ref) {
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -347,6 +348,7 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
   useEffect(() => { onWrong(wrong); }, [wrong, onWrong]);
 
   function submit() {
+    if (!value.trim()) { onEmpty(true); inputRef.current?.focus(); return; }
     if (value.trim().toLowerCase() === REAL_PASSWORD.toLowerCase()) {
       onCorrect();
     } else {
@@ -367,7 +369,7 @@ const LoginPassword = forwardRef<LoginPasswordHandle, {
         ref={inputRef}
         type="password"
         value={value}
-        onChange={(e) => { setValue(e.target.value); setWrong(false); }}
+        onChange={(e) => { setValue(e.target.value); setWrong(false); onEmpty(false); }}
         onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
         placeholder={wrong ? errorDisplayed : "type the password…"}
         className={`login-password w-full bg-transparent outline-none not-italic text-[22px] max-sm:text-[18px] tracking-[-0.44px]${wrong ? " wrong-placeholder" : ""}`}
@@ -438,6 +440,7 @@ export default function Wireframe() {
   const [passwordMatches, setPasswordMatches] = useState(false);
   const [passwordWrong, setPasswordWrong] = useState(false);
   const [loginBtnHover, setLoginBtnHover] = useState(false);
+  const [emptyHint, setEmptyHint] = useState(false);
   const loginPasswordRef = useRef<LoginPasswordHandle>(null);
   const { displayed: usernameDisplayed, done: usernameDone, skip: skipUsername } = useTypeOnce(FAKE_USERNAME, loginMode);
   const typingUsername = loginMode && !usernameDone;
@@ -578,6 +581,33 @@ export default function Wireframe() {
           onMouseEnter={() => setLoginBtnHover(true)}
           onMouseLeave={() => setLoginBtnHover(false)}
         >
+          {/* Tried to log in with an empty password: point them to the email */}
+          {emptyHint && loginMode && (
+            <div
+              role="status"
+              className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[300px] max-w-[86vw] rounded-[13px] px-4 py-3 text-center"
+              style={{
+                zIndex: 20,
+                background: darkMode ? "#2a2a2a" : "#FAFAFA",
+                color: darkMode ? "#c0bcbc" : "#5a5757",
+                boxShadow: darkMode
+                  ? "0 0 0 1px rgba(255,255,255,0.28), 0 2px 10px rgba(0,0,0,0.35)"
+                  : "0 0 0 1.5px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.18)",
+                animation: "fadeIn 200ms ease",
+              }}
+            >
+              <span className="font-['Favorit_Tumblr:Medium',sans-serif] text-[13px] leading-snug">
+                hey, if you want to log in you need to email me for a password at{" "}
+                <a
+                  href="mailto:gentlycarved@gmail.com?subject=can%20i%20see%20your%20portfolio%3F&body=hey%2C%20can%20i%20see%20your%20portfolio%3F"
+                  className="underline underline-offset-2"
+                  style={{ color: darkMode ? "#7ab2f0" : "#3a7fd4" }}
+                >
+                  gentlycarved@gmail.com
+                </a>
+              </span>
+            </div>
+          )}
           {/* Hover tooltip — desktop only */}
           {loginBtnHover && !loginMode && (
             <div
@@ -685,6 +715,7 @@ export default function Wireframe() {
             onCorrect={() => navigate("/portfolio", { state: { unlocked: true } })}
             onLiveMatch={setPasswordMatches}
             onWrong={setPasswordWrong}
+            onEmpty={setEmptyHint}
           />
         ) : !loginMode ? (
           <Typewriter darkMode={darkMode} />
