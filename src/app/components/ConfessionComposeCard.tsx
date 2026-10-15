@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import type { ConfessionStatus } from "../../hooks/useConfessions";
 import { MAX_CONFESSION_LEN } from "../../lib/uploads";
 
@@ -8,13 +8,22 @@ interface Props {
   error: string | null;
   onSubmit: (text: string) => void;
   onCancel: () => void;
+  title?: string;
+  intro?: string;
+  placeholder?: string;
+  children?: ReactNode; // extra fields shown above the text box (the hiring section's details)
 }
+
+const FREE_SPACE_INTRO = "anonymous. your unfiltered thoughts on the future, tech, your career, AI, life, anything. nothing personal, hateful, or inappropriate, please; it'll be flagged.";
 
 const BLUE_LIGHT = "radial-gradient(ellipse at 50% 35%, #7eb4e0 0%, #6a9fd8 35%, #5688be 70%, #4a7aaa 100%)";
 const BLUE_DARK = "radial-gradient(ellipse at 50% 35%, #3a5068 0%, #2c3f55 35%, #1f2e3e 70%, #151f2b 100%)";
 
-/** The "a free space" compose card: shared by the desktop popup and the mobile sheet. */
-export function ConfessionComposeCard({ darkMode, status, error, onSubmit, onCancel }: Props) {
+/** The compose card: "a free space" by default (mobile sheet, confessions page), retitled for the hiring section. */
+export function ConfessionComposeCard({
+  darkMode, status, error, onSubmit, onCancel,
+  title = "a free space", intro = FREE_SPACE_INTRO, placeholder = "say it here…", children,
+}: Props) {
   const [text, setText] = useState("");
   const [justSent, setJustSent] = useState(false);
 
@@ -54,19 +63,18 @@ export function ConfessionComposeCard({ darkMode, status, error, onSubmit, onCan
 
   return (
     <div className={`${font} flex flex-col gap-3`} style={{ color: muted }}>
-      <div className="text-[15px]" style={{ color: heading }}>a free space</div>
-      <div className="text-[12px] leading-snug -mt-1 opacity-80">
-        anonymous. your unfiltered thoughts on the future, tech, your career, AI, life,
-        anything. nothing personal, hateful, or inappropriate, please; it'll be flagged.
-      </div>
+      <div className="text-[15px]" style={{ color: heading }}>{title}</div>
+      <div className="text-[12px] leading-snug -mt-1 opacity-80">{intro}</div>
+
+      {children}
 
       <div className="flex flex-col gap-1">
         <textarea
-          autoFocus
+          autoFocus={!children}
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, MAX_CONFESSION_LEN))}
           onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit(); }}
-          placeholder="say it here…"
+          placeholder={placeholder}
           rows={4}
           disabled={busy}
           className="w-full rounded-[10px] px-3 py-2.5 text-[13px] outline-none resize-none"

@@ -428,7 +428,7 @@ export default function Wireframe() {
   // 'auto' until the user touches the toggle, then locked to 'dark' or 'light'
   const [mode, setMode] = useState<SlideMode>('auto');
   const { images: uploads, commentByUrl, configured: uploadsOn, status: uploadStatus, error: uploadError, upload, addByLink } = useUploads();
-  const { confessions, configured: confOn, status: confStatus, error: confError, submit: submitConfession } = useConfessions();
+  const { confessions, hiring: hiringConfessions, configured: confOn, status: confStatus, error: confError, submit: submitConfession } = useConfessions();
   const { currentSrc, nextSrc, fading, fadeDuration, currentMode } = useArenaSlideshow(bgImage, MAIN_SLUG, mode, uploads);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   // While a visitor is adding an image, blank the slideshow and show their pick as a preview.
@@ -723,13 +723,14 @@ export default function Wireframe() {
           />
         )}
 
-        {/* Anonymous confessions — desktop: submit box + feed underneath it */}
+        {/* Anonymous confessions — desktop: button + preview that open the full-screen confessions page */}
         {confOn && (
           <ConfessionFlow
             darkMode={darkMode}
             status={confStatus}
             error={confError}
             confessions={confessions}
+            hiring={hiringConfessions}
             onSubmit={submitConfession}
           />
         )}
@@ -740,7 +741,7 @@ export default function Wireframe() {
             status={confStatus}
             error={confError}
             confessions={confessions}
-            onSubmit={submitConfession}
+            onSubmit={(text) => submitConfession(text)}
           />
         )}
 

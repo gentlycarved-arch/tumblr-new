@@ -132,14 +132,25 @@ export async function listUploads(): Promise<Upload[]> {
 }
 
 // ---- Confessions (anonymous text, same bucket, "conf-" prefix) ----------------
+// Hiring-practice confessions are "conf-hire-…": still conf- files, so the existing
+// moderation (notify-upload) and the moderate page handle them with no changes.
 
-export interface Confession { text: string }
+export type ConfessionKind = "general" | "hiring";
+/** What a hiring confession can optionally say about the interview (all anonymous, all optional). */
+export interface HiringDetails { level?: string; stage?: string; company?: string }
+export interface Confession { text: string; kind: ConfessionKind; details?: HiringDetails }
+const HIRING_TAG = "hire-";
+const DETAILS_MARK = "j:"; // payload is JSON (text + details) rather than plain text
 
-function encodeConfessionName(text: string): string {
+function encodeConfessionName(text: string, kind: ConfessionKind, details?: HiringDetails): string {
   const t = text.trim().slice(0, MAX_CONFESSION_LEN);
-  // A unique opaque tag before "@" keeps identical confessions from colliding.
-  const tag = `${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
-  return `${CONF_PREFIX}${tag}${COMMENT_SEP}${b64urlEncode(t)}.txt`;
+  // A unique opaque tag before "@" keeps identical confessions from colliding. Hiring
+  // ones use a purely random tag: no timestamp in the name, nothing to line up with logs.
+  const rand = () => Math.random().toString(36).slice(2, 10);
+  const tag = kind === "hiring" ? `${HIRING_TAG}${rand()}${rand()}` : `${Date.now()}${Math.random().toString(36).slice(2, 6)}`;
+  const clean = details && Object.fromEntries(Object.entries(details).map(([k, v]) => [k, (v ?? "").trim().slice(0, 60)]).filter(([, v]) => v));
+  const payload = kind === "hiring" && clean && Object.keys(clean).length ? DETAILS_MARK + JSON.stringify({ t, ...clean }) : t;
+  return `${CONF_PREFIX}${tag}${COMMENT_SEP}${b64urlEncode(payload)}.txt`;
 }
 
 function decodeConfession(name: string): Confession | null {
@@ -147,11 +158,21 @@ function decodeConfession(name: string): Confession | null {
   const stem = name.slice(CONF_PREFIX.length, -4);
   const i = stem.indexOf(COMMENT_SEP);
   if (i === -1) return null;
-  const text = b64urlDecode(stem.slice(i + 1));
-  return text ? { text } : null;
+  const raw = b64urlDecode(stem.slice(i + 1));
+  if (!raw) return null;
+  const kind: ConfessionKind = stem.startsWith(HIRING_TAG) ? "hiring" : "general";
+  if (raw.startsWith(DETAILS_MARK)) {
+    try {
+      const { t, level, stage, company } = JSON.parse(raw.slice(DETAILS_MARK.length));
+      return t ? { text: String(t), kind, details: { level, stage, company } } : null;
+    } catch {
+      return null;
+    }
+  }
+  return { text: raw, kind };
 }
 
-/** Every confession, newest first. */
+/** Every confession (both kinds), newest first. */
 export async function listConfessions(): Promise<Confession[]> {
   if (!uploadsConfigured()) return [];
   const rows = await listRows();
@@ -161,12 +182,12 @@ export async function listConfessions(): Promise<Confession[]> {
 }
 
 /** Store one anonymous confession (moderated asynchronously by the notify-upload function). */
-export async function addConfession(text: string): Promise<void> {
+export async function addConfession(text: string, kind: ConfessionKind = "general", details?: HiringDetails): Promise<void> {
   if (!uploadsConfigured()) throw new Error("Confessions are not configured.");
   const t = text.trim();
   if (!t) throw new Error("Say something first.");
   if (t.length > MAX_CONFESSION_LEN) throw new Error(`Keep it under ${MAX_CONFESSION_LEN} characters.`);
-  await putObject(encodeConfessionName(t), "", "text/plain");
+  await putObject(encodeConfessionName(t, kind, details), "", "text/plain");
 }
 
 async function currentCount(): Promise<number> {
